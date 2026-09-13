@@ -11,7 +11,8 @@ const initialState: ResAuth = {
     email: null,
     token: null,
     role: null,
-    name: null
+    name: null,
+    isHydrated: false
 }
 
 export const auth = createSlice({
@@ -53,9 +54,13 @@ export const auth = createSlice({
             state.token = null
             state.role = null
             localStorage.removeItem(env.LOCAL_TOKEN)
+        },
+
+        onAuthHydrated: (state) => {
+            state.isHydrated = true
         }
     }
 })
 
-export const { onLogin, onLogout, onRefresh } = auth.actions
+export const { onLogin, onLogout, onRefresh, onAuthHydrated } = auth.actions
 export default auth.reducer

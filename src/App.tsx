@@ -1,7 +1,7 @@
-import React, { lazy, Suspense, useEffect, useState } from 'react'
+import React, { lazy, Suspense, useEffect } from 'react'
 import { useDispatch } from 'react-redux'
 import { createBrowserRouter, createRoutesFromElements, Navigate, Outlet, Route, RouterProvider } from 'react-router-dom'
-import { onRefresh } from './stores/features/auth'
+import { onAuthHydrated, onRefresh } from './stores/features/auth'
 import { useLazyMeQuery } from './stores/services/userApi'
 import { setDrawerOpen } from './stores/features/drawer'
 import BackdropComponent from './components/BackdropComponent'
@@ -114,7 +114,6 @@ const router = createBrowserRouter(
 
 const App: React.FC<Props> = () => {
     const dispatch = useDispatch()
-    const [isRefreshingAuth, setIsRefreshingAuth] = useState(true)
     const [fetchMe] = useLazyMeQuery()
 
     useEffect(() => {
@@ -142,9 +141,7 @@ const App: React.FC<Props> = () => {
             } catch (error) {
                 localStorage.removeItem(import.meta.env.VITE_APP_LOCAL_TOKEN ?? 'INFLUENCER')
             } finally {
-                if (isMounted) {
-                    setIsRefreshingAuth(false)
-                }
+                if (isMounted) dispatch(onAuthHydrated())
             }
         }
 
@@ -156,8 +153,8 @@ const App: React.FC<Props> = () => {
     }, [dispatch, fetchMe])
 
     return (
-        <Suspense fallback={<BackdropComponent open={isRefreshingAuth} />}>
-            {isRefreshingAuth ? <BackdropComponent open /> : <RouterProvider router={router} />}
+        <Suspense fallback={<BackdropComponent open />}>
+            <RouterProvider router={router} />
         </Suspense>
     )
 }

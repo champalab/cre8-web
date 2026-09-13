@@ -9,6 +9,7 @@ export interface ResAuth {
     name: string | null
     role: Role | null
     isLogin?: boolean
+    isHydrated?: boolean
 }
 
 export type SignIn = {
