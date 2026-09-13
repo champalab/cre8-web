@@ -23,13 +23,8 @@ spec:
       imagePullSecrets:
       - name: ghcr-secret
       containers:
-<<<<<<< HEAD
-      - name: cre8-web
+      - name: cre8-web 
         image: ghcr.io/champalab/cre8-web:ddabfeec5b82fac87cd012a379408286e0a3dadd
-=======
-      - name: influencer-web
-        image: ghcr.io/champalab/influencer-web:cff8c3e91f98cf934fed06291e31c6037fdb724f
->>>>>>> f00b0a178697405eefb7c1b9551f392c7ad7732f
         imagePullPolicy: Always
         resources:
           requests:
