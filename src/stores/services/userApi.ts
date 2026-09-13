@@ -1,6 +1,6 @@
 import { createApi } from '@reduxjs/toolkit/query/react'
 import { customBaseQuery } from '../baseQuery'
-import { ResAuth } from '@/pages/public/login/type';
+import { ResAuth } from '@/pages/public/login/type'
 
 type ApiUser = ResAuth & { name?: string | null }
 
@@ -9,7 +9,10 @@ export const userApi = createApi({
     tagTypes: ['userApi'],
     baseQuery: customBaseQuery,
     endpoints: (builder) => ({
-        updateProfile: builder.mutation<{ success: boolean; message: string; data: { user: ApiUser } }, { name: string; password?: string; currentPassword?: string }>({
+        updateProfile: builder.mutation<
+            { success: boolean; message: string; data: { user: ApiUser } },
+            { name: string; password?: string; currentPassword?: string }
+        >({
             query: (body) => ({ url: '/v1/auth/me', method: 'PATCH', body })
         }),
         passwordLogin: builder.mutation<{ success: boolean; message: string; data: { user: ApiUser } }, { identifier: string; password: string }>({
@@ -33,12 +36,14 @@ export const userApi = createApi({
             })
         }),
         logout: builder.mutation<{ success: boolean }, void>({
+            extraOptions: { skipAuthRedirect: true },
             query: () => ({
                 url: `/v1/auth/logout`,
                 method: 'POST'
             })
         }),
         me: builder.query<{ success: boolean; data: { user: ApiUser } }, void>({
+            extraOptions: { skipAuthRedirect: true },
             query: () => ({
                 url: `/v1/auth/me`,
                 method: 'GET'

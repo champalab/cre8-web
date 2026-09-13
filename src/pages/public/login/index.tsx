@@ -57,7 +57,7 @@ const Login = () => {
       setResendCooldown(data?.data?.resendAfterSeconds ?? 60)
       ToastSuccess(t('otpSentToast'), { autoClose: 2500 })
       return true
-    }
+    } 
 
     alertWarning({ text: data?.message || error?.data?.message || t('otpSendFailed') })
     return false
