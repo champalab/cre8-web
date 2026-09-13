@@ -25,7 +25,7 @@ spec:
       containers:
 <<<<<<< HEAD
       - name: cre8-web
-        image: ghcr.io/champalab/cre8-web:205e1c8d95d802b9b6854269162429704f4dc305
+        image: ghcr.io/champalab/cre8-web:ddabfeec5b82fac87cd012a379408286e0a3dadd
 =======
       - name: influencer-web
         image: ghcr.io/champalab/influencer-web:cff8c3e91f98cf934fed06291e31c6037fdb724f
