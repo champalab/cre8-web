@@ -1,0 +1,67 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cre8-web
+  namespace: prod
+  labels:
+    app: cre8-web
+spec:
+  selector:
+    matchLabels:
+      app: cre8-web
+  replicas: 1
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: cre8-web
+    spec:
+      imagePullSecrets:
+      - name: ghcr-secret
+      containers:
+<<<<<<< HEAD
+      - name: cre8-web
+        image: ghcr.io/champalab/cre8-web:205e1c8d95d802b9b6854269162429704f4dc305
+=======
+      - name: influencer-web
+        image: ghcr.io/champalab/influencer-web:cff8c3e91f98cf934fed06291e31c6037fdb724f
+>>>>>>> f00b0a178697405eefb7c1b9551f392c7ad7732f
+        imagePullPolicy: Always
+        resources:
+          requests:
+            cpu: 500m
+            memory: 100Mi
+          limits:
+            cpu: 2000m
+            memory: 2048Mi
+        livenessProbe:
+          tcpSocket:
+            port: 80
+          initialDelaySeconds: 5
+          timeoutSeconds: 5
+          successThreshold: 1
+          failureThreshold: 3
+          periodSeconds: 10
+        readinessProbe:
+          tcpSocket:
+            port: 80
+          initialDelaySeconds: 5
+          timeoutSeconds: 2
+          successThreshold: 1
+          failureThreshold: 3
+          periodSeconds: 10
+        ports:
+        - containerPort: 80
+          name: http-port
+        volumeMounts:
+        - name: localtime
+          mountPath: /etc/localtime
+      volumes:
+      - name: localtime
+        hostPath:
+          path: /usr/share/zoneinfo/Asia/Bangkok
+      restartPolicy: Always

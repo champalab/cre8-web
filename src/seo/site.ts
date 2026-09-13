@@ -1,0 +1,10 @@
+export const SITE_URL = String(import.meta.env.VITE_SITE_URL || 'https://cre8.la').replace(/\/$/, '')
+export const SITE_NAME = 'CRE8'
+export const SITE_LEGAL_NAME = 'Cre8 Marketing & Advertising'
+export const SITE_PHONE_DISPLAY = '020 2224 1188'
+export const SITE_PHONE_E164 = '+8562022241188'
+export const SITE_EMAIL = 'cre8lao@gmail.com'
+export const SITE_OG_IMAGE = `${SITE_URL}/images/logo.png`
+export const SITE_LOCALITY = 'Vientiane'
+export const SITE_COUNTRY = 'LA'
+export const SITE_SAME_AS = ['https://www.cre8.la'] as const

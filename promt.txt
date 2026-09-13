@@ -1,0 +1,69 @@
+
+ENTITY_NAME = zones
+
+response data 
+{
+    "status": "success",
+    "data": [
+        {
+            "id": 1,
+            "name": "AREA 51",
+            "userId": 1,
+            "users": {
+                "name": "ADMIN",
+                "tel": "91116465"
+            },
+            "zone_assignment": [
+                {
+                    "villages": {
+                        "name": "Hatsongkhon"
+                    }
+                },
+                {
+                    "villages": {
+                        "name": "Huayngam"
+                    }
+                }
+            ]
+        }
+    ],
+    "total": 1,
+    "page": 1,
+    "limit": 25
+}
+
+read folder  pages/app/customers after create promt for generate [ENTITY_NAME]
+Create a complete CRUD page for [ENTITY_NAME] following the exact structure and patterns from the customers page. The page should include:
+1. File Structure:
+Create these files in src/pages/app/[ENTITY_NAME]/:
+index.tsx - Main page component
+type.d.ts - TypeScript interfaces
+component/TableComponent.tsx - DataGrid table component
+component/[ENTITY_NAME]Modal.tsx - Create/Update modal component
+2. API Service (src/stores/services/[ENTITY_NAME]Api.ts):
+2.1 add [ENTITY_NAME] to (src/stores/index.ts):
+3. Types (type.d.ts):
+4. Main Page (index.tsx):
+5. Table Component (component/TableComponent.tsx)
+6. Modal Component (component/[ENTITY_NAME]Modal.tsx):
+7. Requirements:
+8. add page to route employee
+Replace [ENTITY_NAME] with your [ENTITY_NAME] (e.g., Product, Order, User)
+Replace [ENTITY_NAME] with lowercase entity name (e.g., product, order, user)
+Replace [ENTITY_DISPLAY_NAME] with display name (e.g., "ສິນຄ້າ", "ຄໍາສັ່ງ", "ຜູ້ໃຊ້")
+Add appropriate fields to the [ENTITY_NAME] interface
+Add corresponding columns to the DataGrid
+Add form fields to the modal component
+Update the API endpoints to match your backend
+Add the API service to your store configuration
+8. Features Included:
+✅ RTK Query API integration (GET, POST, PUT)
+✅ DataGrid with sorting and actions
+✅ Create/Update modal with form validation
+✅ Loading states with backdrop
+✅ Toast notifications for success/error
+✅ Automatic data refetch after operations
+✅ TypeScript interfaces
+✅ Responsive Material-UI components
+✅ Lao language support (can be customized)
+This prompt will generate a complete CRUD page that follows the exact same patterns and structure as your customers page, ensuring consistency across your application.

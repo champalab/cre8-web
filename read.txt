@@ -1,0 +1,33 @@
+
+Create a type definition for contract_type data in src/pages/app/users/type.d.ts based on the provided API response structure.
+Add RTK Query endpoints for POST /contract-types/create and PUT /contract-types/:id in api, using the contract-types type.
+Create a contract-type component in src/pages/app/contract-type/component/contract-type.tsx for creating and updating customers, using MUI Dialog and following the UserModal structure.
+Integrate contract-type in contract-type for create and update actions, and handle API calls for both.
+
+watch data structure example src/pages/app/customers
+
+update ContractTypeModal use open in component the same CustomerModal component
+update ContractTypePage use open in component the same  CustomersPage component
+update ContractType TableComponent use  the same  Customers  component TableComponent
+
+add to route employeeRoute
+
+update 
+
+response data
+{
+    "status": "success",
+    "data": [
+        {
+            "id": 1,
+            "name": "ຄົວເຮືອນ"
+        },
+        {
+            "id": 2,
+            "name": "ທຸລະກິດ"
+        }
+    ],
+    "total": 2,
+    "page": 1,
+    "limit": 25
+}

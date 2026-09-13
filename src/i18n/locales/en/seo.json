@@ -1,0 +1,255 @@
+{
+  "ctaContact": "Talk to CRE8",
+  "ctaServices": "See all services",
+  "relatedTitle": "Related services",
+  "offersTitle": "What you get",
+  "audienceTitle": "Who this is for",
+  "faqTitle": "Frequently asked questions",
+  "breadcrumbHome": "Home",
+  "breadcrumbServices": "Services",
+  "pages": {
+    "home": {
+      "title": "CRE8 | Influencer Marketing Agency in Laos",
+      "description": "CRE8 is a Vientiane influencer marketing and full-service agency. Plan, produce, and measure Facebook, TikTok, and 360 campaigns across Laos."
+    },
+    "services": {
+      "title": "Marketing Services in Laos | CRE8",
+      "description": "Influencer marketing, Facebook and TikTok management, digital ads, video production, 360 campaigns, PR, and consumer research from CRE8 in Laos.",
+      "h1": "Marketing services for brands in Laos",
+      "lead": "CRE8 is a full-service marketing agency in Vientiane. We help brands grow with influencer marketing, social content, digital ads, and campaigns that fit Lao audiences.",
+      "intro": "Choose a service to see how we plan, create, and measure work in Laos — in Lao and English."
+    },
+    "influencer-marketing": {
+      "title": "Influencer Marketing Agency in Laos | CRE8",
+      "description": "Hire a Laos influencer marketing agency. CRE8 matches brands with Facebook, TikTok, and Instagram creators, manages campaigns, and reports results.",
+      "h1": "Influencer marketing in Laos",
+      "lead": "CRE8 is an influencer marketing agency in Vientiane. We find the right creators, brief them, manage posting, and report reach, engagement, and sales impact.",
+      "body": [
+        "Brands in Laos win attention when a trusted creator speaks in the local language, on the platforms people already use. We run influencer campaigns on Facebook, TikTok, and Instagram — from one flagship creator to a network of micro-influencers.",
+        "Every campaign starts with audience fit, not follower count. We shortlist creators, check past content, agree deliverables, handle contracts and payments, and track links and views so you can see what worked."
+      ],
+      "offers": [
+        "Creator search and vetting across Laos",
+        "Briefs, content review, and posting calendars",
+        "TikTok, Facebook, and Instagram influencer campaigns",
+        "Micro-influencer and KOL / brand ambassador programs",
+        "Campaign tracking, view logs, and performance reports"
+      ],
+      "audience": [
+        "Consumer brands launching in Laos",
+        "F&B, beauty, retail, and hospitality teams",
+        "NGOs and public campaigns that need trusted local voices"
+      ],
+      "faqs": [
+        {
+          "q": "What is influencer marketing in Laos?",
+          "a": "It is paid or gifted collaboration with Lao creators who post on Facebook, TikTok, or Instagram so their audience hears about your brand from someone they already follow."
+        },
+        {
+          "q": "How do you choose influencers?",
+          "a": "We match location, language, niche, past brand fit, and real engagement — not only follower numbers. Vientiane, Luang Prabang, and provincial creators can all be part of a mix."
+        },
+        {
+          "q": "Can CRE8 manage the whole campaign?",
+          "a": "Yes. We handle sourcing, briefing, content approval, posting, boosting, payments, and reporting so your team has one partner."
+        }
+      ]
+    },
+    "digital-marketing-laos": {
+      "title": "Digital Marketing Agency in Laos | CRE8",
+      "description": "Digital marketing agency in Vientiane. CRE8 plans social ads, Google and YouTube buying, content, and 360 campaigns for brands across Laos.",
+      "h1": "Digital marketing agency in Laos",
+      "lead": "From Vientiane, CRE8 plans and runs digital marketing that reaches Lao audiences on Facebook, TikTok, Google, YouTube, and the open web.",
+      "body": [
+        "Laos is mobile-first. We build media plans around where people actually spend time: Facebook for reach, TikTok for discovery, Google and YouTube for intent, and websites or apps when you need remarketing.",
+        "As a full-service marketing agency we connect ads with content, influencers, and offline events so the same message shows up in every channel."
+      ],
+      "offers": [
+        "Digital marketing strategy for the Lao market",
+        "Social, Google, YouTube, and in-app media buying",
+        "Landing pages, creative, and conversion tracking",
+        "Monthly performance reviews and budget shifts"
+      ],
+      "audience": [
+        "Brands that need a local digital marketing partner",
+        "Regional teams entering Laos",
+        "Companies that want ads plus content, not ads alone"
+      ],
+      "faqs": [
+        {
+          "q": "Do you only run ads, or also content?",
+          "a": "Both. We plan content pillars, produce posts, and buy media so ads have something worth clicking."
+        },
+        {
+          "q": "Which cities do you cover?",
+          "a": "We are based in Vientiane and run nationwide digital campaigns across Laos."
+        }
+      ]
+    },
+    "facebook-tiktok-management": {
+      "title": "Facebook and TikTok Management in Laos | CRE8",
+      "description": "Facebook and TikTok content management in Laos. CRE8 plans pillars, produces posts, boosts ads, and replies to comments for local brands.",
+      "h1": "Facebook and TikTok content management",
+      "lead": "We plan, create, post, boost, and analyse Facebook and TikTok content so your brand stays active where Lao audiences already are.",
+      "body": [
+        "Most internet time in Laos happens on Facebook and TikTok. We help you plan content pillars, a posting timeline, and a boosting strategy — then we produce artwork, motion, video, and captions and reply to inboxes and comments.",
+        "After posting we review content performance, ads performance, competitor activity, and new trends so the next month is sharper than the last."
+      ],
+      "offers": [
+        "Content pillars, strategy, and posting calendar",
+        "Artwork, motion, video, and captions",
+        "Boosting strategy and community replies",
+        "Monthly analysis of content, ads, competitors, and trends"
+      ],
+      "audience": [
+        "Brands that need a always-on social team",
+        "Teams without in-house designers or community managers",
+        "Advertisers who want organic posts and paid boosts together"
+      ],
+      "faqs": [
+        {
+          "q": "Do you manage both Facebook and TikTok?",
+          "a": "Yes. We treat them as the two core channels in Laos and adapt format, tone, and posting times for each."
+        },
+        {
+          "q": "Can you reply to comments in Lao?",
+          "a": "Yes. Community management is part of the execute package, including Lao-language replies."
+        }
+      ]
+    },
+    "video-production": {
+      "title": "Video Production and Livestreaming in Laos | CRE8",
+      "description": "Video production and livestreaming in Laos. CRE8 films brand films, social videos, and live events for Facebook and TikTok campaigns.",
+      "h1": "Video production and livestreaming",
+      "lead": "CRE8 produces brand films, short social videos, motion, and livestreams for campaigns in Laos.",
+      "body": [
+        "Short video is the default format on TikTok and Facebook Reels. We script, shoot, and edit content that fits each platform — and we can go live for launches, roadshows, and creator sessions.",
+        "Video sits inside a wider plan: the same asset can seed influencer posts, paid ads, and PR."
+      ],
+      "offers": [
+        "Social-first video and motion graphics",
+        "Livestreaming for launches and events",
+        "On-site production across Laos",
+        "Edits cut for ads, influencers, and organic posts"
+      ],
+      "audience": [
+        "Brands launching a product or store",
+        "Teams that need monthly social video, not a one-off film",
+        "Event and roadshow organisers"
+      ],
+      "faqs": [
+        {
+          "q": "Do you only shoot in Vientiane?",
+          "a": "Vientiane is our base. We also produce on the road for events and nationwide campaigns."
+        }
+      ]
+    },
+    "campaign-management": {
+      "title": "360 Campaign Management in Laos | CRE8",
+      "description": "360 degree campaign management in Laos: influencers, digital ads, events, roadshows, premiums, and reporting from one CRE8 team.",
+      "h1": "360 campaign management",
+      "lead": "One team plans the full campaign — influencers, ads, events, roadshows, premiums, and reporting — so every channel says the same thing.",
+      "body": [
+        "A 360 campaign in Laos often mixes Facebook and TikTok, creator posts, a roadshow or retail activation, and printed premiums. CRE8 coordinates the brief, timeline, vendors, and results.",
+        "You get a single campaign owner instead of separate agencies for media, events, and influencers."
+      ],
+      "offers": [
+        "End-to-end campaign planning and project management",
+        "Influencer, digital, event, and premium workstreams",
+        "Roadshows and on-ground activations",
+        "Unified reporting after the campaign"
+      ],
+      "audience": [
+        "Brand managers running national launches",
+        "Companies that want one agency of record in Laos",
+        "Teams combining online and offline activity"
+      ],
+      "faqs": [
+        {
+          "q": "What does 360 degree campaign management include?",
+          "a": "Strategy, creative, influencers, media, events or roadshows, premiums, and a close-out report. Scope is agreed per campaign."
+        }
+      ]
+    },
+    "public-relations": {
+      "title": "Public Relations Agency in Laos | CRE8",
+      "description": "Public relations in Laos. CRE8 handles media stories, announcements, and reputation support for brands, NGOs, and institutions.",
+      "h1": "Public relations in Laos",
+      "lead": "We help brands and institutions tell a clear story to Lao media and the public — in Lao and English.",
+      "body": [
+        "PR in Laos still moves through relationships, local language, and the right channels. We draft announcements, support interviews, and align PR with social and influencer activity so the story is consistent.",
+        "This sits alongside our wider marketing work, not as a stand-alone press list."
+      ],
+      "offers": [
+        "Announcement and story development",
+        "Lao and English messaging",
+        "Alignment with social and influencer campaigns",
+        "Support for NGOs, government, and corporate clients"
+      ],
+      "audience": [
+        "Organisations that need careful public messaging",
+        "Brands launching with both ads and news",
+        "International teams that need a local PR partner"
+      ],
+      "faqs": [
+        {
+          "q": "Do you work with NGOs and government?",
+          "a": "Yes. CRE8 has worked with NGOs, international organisations, and governmental entities as well as commercial brands."
+        }
+      ]
+    },
+    "consumer-research": {
+      "title": "Consumer Research in Laos | CRE8",
+      "description": "Consumer and market research in Laos: face-to-face and online surveys, interviews, focus groups, pricing studies, and competitor analysis.",
+      "h1": "Consumer research in Laos",
+      "lead": "Before you spend on ads or influencers, we can test what Lao consumers think — with surveys, interviews, focus groups, and competitor analysis.",
+      "body": [
+        "CRE8 runs quantitative work (face-to-face / CAPI and online surveys), qualitative work (in-depth interviews and focus groups), experimental methods (blind tests and observation), and business analysis (competitors and pricing).",
+        "Findings feed the creative brief so campaigns are relevant, not guessed."
+      ],
+      "offers": [
+        "Face-to-face, CAPI, and online surveys",
+        "In-depth interviews and focus groups",
+        "Blind testing and observation",
+        "Competitor analysis and pricing surveys"
+      ],
+      "audience": [
+        "Brands entering Laos or launching a new SKU",
+        "Teams that need local evidence for a regional HQ",
+        "Marketers who want research tied to campaign design"
+      ],
+      "faqs": [
+        {
+          "q": "Can research be done outside Vientiane?",
+          "a": "Yes. Fieldwork can cover urban and provincial samples depending on the study design."
+        }
+      ]
+    },
+    "contact": {
+      "title": "Contact CRE8 | Influencer Marketing Agency Laos",
+      "description": "Contact CRE8 in Vientiane for influencer marketing, digital ads, and campaigns in Laos. WhatsApp 020 2224 1188 or cre8lao@gmail.com.",
+      "h1": "Contact CRE8",
+      "lead": "Tell us about your brand, timeline, and channels. We will reply with a practical next step for influencer marketing or a wider campaign in Laos.",
+      "body": [
+        "CRE8 is based in Vientiane and works with clients across Laos and with regional teams that need a local partner.",
+        "Call or WhatsApp 020 2224 1188, email cre8lao@gmail.com, or use the details below."
+      ],
+      "offers": [
+        "WhatsApp / Tel: 020 2224 1188",
+        "Email: cre8lao@gmail.com",
+        "Web: www.cre8.la"
+      ],
+      "audience": [
+        "Brand and marketing managers",
+        "Agencies needing a Laos execution partner",
+        "Founders planning a launch"
+      ],
+      "faqs": [
+        {
+          "q": "What should I send in the first message?",
+          "a": "Brand name, goal (awareness, traffic, or sales), channels you care about, timing, and a rough budget if you have one."
+        }
+      ]
+    }
+  }
+}
