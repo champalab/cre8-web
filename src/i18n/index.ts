@@ -58,7 +58,9 @@ void i18n
 
 const syncDocumentLang = (lng?: string) => {
     const lang = lng === 'lo' ? 'lo' : 'en'
-    document.documentElement.lang = lang
+    if (typeof document !== 'undefined') {
+        document.documentElement.lang = lang
+    }
     dayjs.locale(lang)
 }
 

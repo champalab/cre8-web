@@ -23,12 +23,13 @@ export const facebookScrapeApi = createApi({
             providesTags: ['facebookScrape'],
         }),
         connectFacebookScrape: builder.mutation<
-            { status: string; data: { connecting: boolean }; message?: string },
-            void
+            { status: string; data: { connecting?: boolean; connected?: boolean; platform_user_id?: string }; message?: string },
+            { cookie_string?: string } | void
         >({
-            query: () => ({
+            query: (body) => ({
                 url: '/v1/integrations/facebook/scrape-session/connect',
                 method: 'POST',
+                body: body ?? {},
             }),
             invalidatesTags: ['facebookScrape'],
         }),

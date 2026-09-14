@@ -16,6 +16,7 @@ import {
     useGetFacebookScrapeStatusQuery,
     useRefreshFacebookScrapeMutation,
 } from '../../../stores/services/facebookScrapeApi'
+import { FacebookViewerCard } from './components/FacebookViewerCard'
 import BackdropComponent from '@/components/BackdropComponent'
 import ToastComponent from '@/components/ToastComponent'
 import { PageHeader } from '@/components/page-header'
@@ -73,9 +74,9 @@ const PlatformsPage: React.FC = () => {
     const [tab, setTab] = useState(
         searchParams.get('facebook_business') || searchParams.get('tab') === 'business'
             ? 'business'
-            : searchParams.get('tab') === 'viewer'
-                ? 'viewer'
-                : 'platforms'
+            : searchParams.get('tab') === 'platforms'
+                ? 'platforms'
+                : 'viewer'
     )
 
     const {
@@ -108,14 +109,28 @@ const PlatformsPage: React.FC = () => {
         wasConnecting.current = Boolean(scrape?.connecting)
     }, [scrape?.connecting, scrape?.connected, scrape?.connect_error, t])
 
+    const handleTabChange = (newTab: string) => {
+        setTab(newTab)
+        const nextParams = new URLSearchParams(searchParams)
+        nextParams.set('tab', newTab)
+        setSearchParams(nextParams, { replace: true })
+    }
+
     useEffect(() => {
         const fbStatus = searchParams.get('facebook_business')
         const tabParam = searchParams.get('tab')
 
         if (fbStatus || tabParam === 'business') {
             setTab('business')
-        } else if (tabParam === 'viewer') {
+        } else if (tabParam === 'platforms') {
+            setTab('platforms')
+        } else {
             setTab('viewer')
+            if (!tabParam) {
+                const nextParams = new URLSearchParams(searchParams)
+                nextParams.set('tab', 'viewer')
+                setSearchParams(nextParams, { replace: true })
+            }
         }
 
         if (fbStatus === 'success') {
@@ -129,9 +144,10 @@ const PlatformsPage: React.FC = () => {
         }
 
         if (fbStatus || searchParams.has('reason')) {
-            searchParams.delete('facebook_business')
-            searchParams.delete('reason')
-            setSearchParams(searchParams, { replace: true })
+            const nextParams = new URLSearchParams(searchParams)
+            nextParams.delete('facebook_business')
+            nextParams.delete('reason')
+            setSearchParams(nextParams, { replace: true })
         }
     }, [searchParams, setSearchParams, refetchBusiness, t])
 
@@ -182,20 +198,13 @@ const PlatformsPage: React.FC = () => {
         }
     }
 
-    const handleConnectViewer = async () => {
-        try {
-            const res = await connectScrape().unwrap()
-            ToastComponent({
-                status: 'success',
-                message: res.message || t('platforms.viewerConnectHint'),
-            })
-            void refetchScrape()
-        } catch (error: any) {
-            ToastComponent({
-                status: 'error',
-                message: error?.data?.message || t('platforms.viewerConnectFailed'),
-            })
-        }
+    const handleConnectWithCookies = async (cookieString: string) => {
+        const res = await connectScrape({ cookie_string: cookieString }).unwrap()
+        ToastComponent({
+            status: 'success',
+            message: res.message || t('platforms.cookieConnectSuccess'),
+        })
+        void refetchScrape()
     }
 
     const handleRefreshViewer = async () => {
@@ -279,12 +288,12 @@ const PlatformsPage: React.FC = () => {
                 }
             />
 
-            <Tabs value={tab} onValueChange={setTab} className="w-full">
+            <Tabs value={tab} onValueChange={handleTabChange} className="w-full">
                 <div className="overflow-x-auto">
                     <TabsList className="h-auto w-max min-w-full justify-start">
-                        <TabsTrigger value="platforms">{t('platforms.tabPlatforms')}</TabsTrigger>
-                        <TabsTrigger value="business">{t('platforms.tabBusiness')}</TabsTrigger>
                         <TabsTrigger value="viewer">{t('platforms.tabViewer')}</TabsTrigger>
+                        <TabsTrigger value="platforms">{t('platforms.tabPlatforms')}</TabsTrigger>
+                        {/* <TabsTrigger value="business">{t('platforms.tabBusiness')}</TabsTrigger> */}
                     </TabsList>
                 </div>
 
@@ -426,91 +435,16 @@ const PlatformsPage: React.FC = () => {
                 </TabsContent>
 
                 <TabsContent value="viewer">
-                    <Card>
-                        <CardHeader>
-                            <CardTitle className="text-base">{t('platforms.viewerTitle')}</CardTitle>
-                            <CardDescription>
-                                {t('platforms.viewerDesc')}
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent className="space-y-4">
-                            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                                <div className="space-y-1 text-sm">
-                                    <div className="flex flex-wrap items-center gap-2">
-                                        <Badge
-                                            variant={
-                                                scrape?.connecting
-                                                    ? 'secondary'
-                                                    : scrape?.connected
-                                                        ? 'default'
-                                                        : 'secondary'
-                                            }
-                                        >
-                                            {scrape?.connecting
-                                                ? t('platforms.waitingForLogin')
-                                                : scrape?.connected
-                                                    ? t('platforms.statusConnected')
-                                                    : scrape?.status === 'expired'
-                                                        ? t('platforms.statusExpired')
-                                                        : t('platforms.statusNotConnected')}
-                                        </Badge>
-                                        {scrape?.display_name ? (
-                                            <span className="font-medium">{scrape.display_name}</span>
-                                        ) : null}
-                                    </div>
-                                    <p className="text-muted-foreground">
-                                        {t('platforms.chromeOpensHint')}
-                                        {scrape?.last_used_at
-                                            ? ` · ${t('platforms.lastUsed', { date: formatDateTime(scrape.last_used_at) })}`
-                                            : ''}
-                                        {scrape?.connected_at
-                                            ? ` · ${t('platforms.connectedAt', { date: formatDateTime(scrape.connected_at) })}`
-                                            : ''}
-                                    </p>
-                                    {scrape?.connect_error ? (
-                                        <p className="text-destructive">{scrape.connect_error}</p>
-                                    ) : null}
-                                    {scrape?.status === 'expired' ? (
-                                        <p className="text-destructive">
-                                            {t('platforms.sessionExpiredNotice')}
-                                        </p>
-                                    ) : null}
-                                </div>
-                                <div className="flex flex-wrap gap-2">
-                                    {scrape?.connected && !scrape.connecting ? (
-                                        <>
-                                            <Button
-                                                variant="outline"
-                                                size="sm"
-                                                onClick={() => void handleRefreshViewer()}
-                                                disabled={!canManageBusiness || refreshingScrape}
-                                            >
-                                                <RefreshCw className="size-3.5" />
-                                                {t('platforms.refreshSession')}
-                                            </Button>
-                                            <Button
-                                                variant="outline"
-                                                size="sm"
-                                                onClick={() => void handleDisconnectViewer()}
-                                                disabled={!canManageBusiness || disconnectingScrape}
-                                            >
-                                                <Unplug className="size-3.5" />
-                                                {t('platforms.disconnect')}
-                                            </Button>
-                                        </>
-                                    ) : (
-                                        <Button
-                                            size="sm"
-                                            onClick={() => void handleConnectViewer()}
-                                            disabled={!canManageBusiness || connectingScrape || scrape?.connecting}
-                                        >
-                                            {scrape?.connecting ? t('platforms.waitingInChrome') : t('platforms.connectViewer')}
-                                        </Button>
-                                    )}
-                                </div>
-                            </div>
-                        </CardContent>
-                    </Card>
+                    <FacebookViewerCard
+                        scrape={scrape}
+                        canManage={canManageBusiness}
+                        onConnect={handleConnectWithCookies}
+                        onRefresh={handleRefreshViewer}
+                        onDisconnect={handleDisconnectViewer}
+                        connecting={connectingScrape}
+                        refreshing={refreshingScrape}
+                        disconnecting={disconnectingScrape}
+                    />
                 </TabsContent>
             </Tabs>
 
