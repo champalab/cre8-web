@@ -71,11 +71,13 @@ export function AppSidebar({ collapsed, embedded = false, className }: Props) {
         )}
       >
         <div className={cn('flex flex-col items-center gap-2 px-3 py-5', collapsed ? 'px-2' : 'px-4')}>
-          <img
-            src="/images/logo.png"
-            alt="Logo"
-            className={cn('object-contain', collapsed ? 'size-9' : 'h-12 w-auto')}
-          />
+          <Link to='/'>
+            <img
+              src="/images/logo.png"
+              alt="Logo"
+              className={cn('object-contain', collapsed ? 'size-9' : 'h-12 w-auto')}
+            />
+          </Link>
           {!collapsed && (
             <>
               <p className="text-center text-sm font-semibold text-foreground">
@@ -97,7 +99,7 @@ export function AppSidebar({ collapsed, embedded = false, className }: Props) {
             item.group ? (
               !collapsed ? (
                 <div key={`${item.name}-${index}`} className="px-3 pb-1 pt-4">
-                    <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+                  <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
                     {t(item.nameKey)}
                   </p>
                 </div>
