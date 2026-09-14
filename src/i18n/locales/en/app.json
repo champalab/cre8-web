@@ -449,7 +449,15 @@
     "copyChromeExtensions": "Copy chrome://extensions",
     "chromeExtensionsCopied": "Copied chrome://extensions! Open a new tab and paste (Cmd+V / Ctrl+V)",
     "extensionRefreshBtn": "Refresh Extension",
-    "extensionRefreshSuccess": "Extension detected and ready!"
+    "extensionRefreshSuccess": "Extension detected and ready!",
+    "mobileNoticeTitle": "Please connect via Computer (PC / Mac)",
+    "mobileNoticeDesc": "Mobile browsers (Safari / Chrome Mobile) do not support extensions to automatically retrieve Facebook session cookies.",
+    "mobileNoticeAdvice": "Recommended: Open this link on your computer (PC / Mac) to connect in 1-Click (connect once, session lasts 30–90 days).",
+    "copyPageLink": "Copy Page Link",
+    "pageLinkCopied": "Page link copied! You can now send and open it on your computer",
+    "orManualPasteOnMobile": "Or paste cookies manually",
+    "methodExtensionTab": "Connect with Extension (1-Click 🚀 Recommended)",
+    "methodManualTab": "Paste Cookies Manually (Manual Paste 📋)"
   },
   "users": {
     "title": "Users",

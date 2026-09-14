@@ -7,8 +7,10 @@ import {
     Copy,
     Download,
     ExternalLink,
+    KeyRound,
     Loader2,
     RefreshCw,
+    Smartphone,
     Sparkles,
     Unplug,
     Zap,
@@ -20,6 +22,7 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import ToastComponent from '@/components/ToastComponent'
 import { formatDateTime } from '@/utils/datetime'
 import type { FacebookScrapeStatus } from '../../../../stores/services/facebookScrapeApi'
+import { diagnoseAndNormalizeCookies } from './FacebookConnectModal'
 
 interface FacebookViewerCardProps {
     scrape?: FacebookScrapeStatus
@@ -47,8 +50,28 @@ export const FacebookViewerCard: React.FC<FacebookViewerCardProps> = ({
     const [extensionSyncing, setExtensionSyncing] = useState(false)
     const [checkingExtension, setCheckingExtension] = useState(false)
     const [copiedLink, setCopiedLink] = useState(false)
+    const [copiedPageLink, setCopiedPageLink] = useState(false)
     const [activeError, setActiveError] = useState<string | null>(null)
+    const [isMobile, setIsMobile] = useState(false)
+    const [connectMethod, setConnectMethod] = useState<'extension' | 'manual'>('extension')
+    const [manualCookie, setManualCookie] = useState('')
+    const [manualSubmitting, setManualSubmitting] = useState(false)
+    const [showMobileManual, setShowMobileManual] = useState(false)
     const extensionInstalledRef = useRef(false)
+
+    // Detect mobile device
+    useEffect(() => {
+        const checkMobile = () => {
+            const userAgent =
+                navigator.userAgent || navigator.vendor || (window as any).opera || ''
+            const mobileRegex =
+                /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i
+            setIsMobile(mobileRegex.test(userAgent) || window.innerWidth < 768)
+        }
+        checkMobile()
+        window.addEventListener('resize', checkMobile)
+        return () => window.removeEventListener('resize', checkMobile)
+    }, [])
 
     // Detect Cre8 Chrome Extension via window.postMessage ping
     useEffect(() => {
@@ -131,6 +154,37 @@ export const FacebookViewerCard: React.FC<FacebookViewerCardProps> = ({
         window.postMessage({ type: 'CRE8_REQUEST_FB_COOKIES', requestId }, '*')
     }
 
+    const handleManualConnect = async () => {
+        const diag = diagnoseAndNormalizeCookies(manualCookie)
+        if (!diag.valid || !diag.sanitizedCookie) {
+            if (diag.errorKey) {
+                setActiveError(t(diag.errorKey))
+            } else {
+                setActiveError(t('platforms.cookieErrorStep4Empty'))
+            }
+            return
+        }
+
+        setManualSubmitting(true)
+        setActiveError(null)
+        try {
+            await onConnect(diag.sanitizedCookie)
+            setManualSubmitting(false)
+            setManualCookie('')
+            ToastComponent({
+                status: 'success',
+                message: t('platforms.viewerConnected'),
+            })
+        } catch (err: any) {
+            setManualSubmitting(false)
+            setActiveError(
+                `${t('platforms.cookieConnectError')}: ${
+                    err?.data?.message || err?.message || ''
+                }`
+            )
+        }
+    }
+
     const handleOpenFacebook = () => {
         window.open('https://www.facebook.com', '_blank', 'noopener,noreferrer')
     }
@@ -143,6 +197,20 @@ export const FacebookViewerCard: React.FC<FacebookViewerCardProps> = ({
             ToastComponent({
                 status: 'success',
                 message: t('platforms.chromeExtensionsCopied'),
+            })
+        } catch {
+            // fallback
+        }
+    }
+
+    const handleCopyPageLink = async () => {
+        try {
+            await navigator.clipboard.writeText(window.location.href)
+            setCopiedPageLink(true)
+            setTimeout(() => setCopiedPageLink(false), 2500)
+            ToastComponent({
+                status: 'success',
+                message: t('platforms.pageLinkCopied'),
             })
         } catch {
             // fallback
@@ -163,14 +231,13 @@ export const FacebookViewerCard: React.FC<FacebookViewerCardProps> = ({
                     message: t('platforms.extensionRefreshSuccess'),
                 })
             } else {
-                // In Chrome, newly installed unpacked extensions require a page reload
-                // so the content script gets injected into existing tabs.
                 window.location.reload()
             }
         }, 600)
     }
 
     const isConnected = scrape?.connected && !scrape.connecting
+    const manualDiag = manualCookie ? diagnoseAndNormalizeCookies(manualCookie) : null
 
     return (
         <Card className="w-full">
@@ -288,150 +355,334 @@ export const FacebookViewerCard: React.FC<FacebookViewerCardProps> = ({
                     </Alert>
                 )}
 
-                {/* In-Page 1-Click Extension Section */}
-                <div className="space-y-4 pt-1">
-                    {extensionInstalled ? (
-                        <div className="rounded-xl border border-emerald-500/40 bg-emerald-500/5 p-5 space-y-4">
-                            <div className="flex flex-wrap items-center justify-between gap-2">
-                                <Badge className="bg-emerald-600 text-white gap-1.5 text-xs">
-                                    <CheckCircle2 className="size-3.5" />
-                                    {t('platforms.extensionDetected')}
-                                </Badge>
-                                <Button
-                                    type="button"
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={handleOpenFacebook}
-                                    className="text-xs gap-1.5 h-7"
-                                >
-                                    <ExternalLink className="size-3.5" />
-                                    {t('platforms.cookieOpenFacebook')}
-                                </Button>
+                {/* Mobile Device Notice */}
+                {isMobile && !isConnected && (
+                    <div className="rounded-xl border border-amber-500/40 bg-amber-500/10 p-4 sm:p-5 space-y-3">
+                        <div className="flex items-start gap-3">
+                            <div className="p-2 rounded-lg bg-amber-500/20 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5">
+                                <Smartphone className="size-5" />
                             </div>
-
-                            <p className="text-xs sm:text-sm text-foreground/90 leading-relaxed">
-                                {t('platforms.extensionOneClickDesc')}
-                            </p>
-
-                            <div className="pt-1">
-                                <Button
-                                    type="button"
-                                    size="lg"
-                                    className="w-full sm:w-auto min-w-[280px] h-11 text-sm font-semibold shadow-md gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white"
-                                    onClick={handleOneClickSync}
-                                    disabled={
-                                        extensionSyncing ||
-                                        connecting ||
-                                        !canManage
-                                    }
-                                >
-                                    {extensionSyncing || connecting ? (
-                                        <>
-                                            <Loader2 className="size-4 animate-spin" />
-                                            {t('platforms.extensionSyncing')}
-                                        </>
-                                    ) : (
-                                        <>
-                                            <Sparkles className="size-4 text-amber-300" />
-                                            {isConnected
-                                                ? t('platforms.extensionOneClickBtn') +
-                                                  ' (Sync Again)'
-                                                : t('platforms.extensionOneClickBtn')}
-                                        </>
-                                    )}
-                                </Button>
+                            <div className="space-y-1">
+                                <div className="flex flex-wrap items-center gap-2">
+                                    <Badge
+                                        variant="outline"
+                                        className="text-amber-600 dark:text-amber-400 border-amber-500/50 text-[11px]"
+                                    >
+                                        Mobile Device
+                                    </Badge>
+                                    <h4 className="text-sm font-semibold text-foreground">
+                                        {t('platforms.mobileNoticeTitle')}
+                                    </h4>
+                                </div>
+                                <p className="text-xs text-muted-foreground leading-relaxed">
+                                    {t('platforms.mobileNoticeDesc')}
+                                </p>
+                                <p className="text-xs font-medium text-foreground/90 pt-0.5 leading-relaxed">
+                                    {t('platforms.mobileNoticeAdvice')}
+                                </p>
                             </div>
                         </div>
-                    ) : (
-                        <div className="rounded-xl border border-border/80 bg-muted/30 p-5 space-y-4">
-                            <div className="flex flex-wrap items-center justify-between gap-3">
-                                <Badge
-                                    variant="secondary"
-                                    className="gap-1.5 text-xs font-medium"
+
+                        <div className="flex flex-wrap items-center gap-2 pt-1 border-t border-amber-500/20">
+                            <Button
+                                type="button"
+                                size="sm"
+                                onClick={handleCopyPageLink}
+                                className="text-xs gap-1.5 font-medium"
+                            >
+                                {copiedPageLink ? (
+                                    <>
+                                        <Check className="size-3.5 text-emerald-400" />
+                                        Copied Link!
+                                    </>
+                                ) : (
+                                    <>
+                                        <Copy className="size-3.5" />
+                                        {t('platforms.copyPageLink')}
+                                    </>
+                                )}
+                            </Button>
+                            <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => {
+                                    setShowMobileManual(!showMobileManual)
+                                    if (!showMobileManual) setConnectMethod('manual')
+                                }}
+                                className="text-xs text-muted-foreground hover:text-foreground"
+                            >
+                                {t('platforms.orManualPasteOnMobile')}
+                            </Button>
+                        </div>
+                    </div>
+                )}
+
+                {/* Connection Section (Visible on Desktop or when mobile user expands manual mode) */}
+                {(!isMobile || showMobileManual) && (
+                    <div className="space-y-4 pt-1">
+                        {/* Method Selection Tabs (when not connected) */}
+                        {!isConnected && (
+                            <div className="flex border-b border-border/80">
+                                {!isMobile && (
+                                    <button
+                                        type="button"
+                                        onClick={() => setConnectMethod('extension')}
+                                        className={`flex items-center gap-2 px-4 py-2.5 text-xs font-medium border-b-2 transition-all ${
+                                            connectMethod === 'extension'
+                                                ? 'border-primary text-primary font-semibold'
+                                                : 'border-transparent text-muted-foreground hover:text-foreground'
+                                        }`}
+                                    >
+                                        <Sparkles className="size-3.5 text-amber-500" />
+                                        {t('platforms.methodExtensionTab')}
+                                    </button>
+                                )}
+                                <button
+                                    type="button"
+                                    onClick={() => setConnectMethod('manual')}
+                                    className={`flex items-center gap-2 px-4 py-2.5 text-xs font-medium border-b-2 transition-all ${
+                                        connectMethod === 'manual'
+                                            ? 'border-primary text-primary font-semibold'
+                                            : 'border-transparent text-muted-foreground hover:text-foreground'
+                                    }`}
                                 >
-                                    <Zap className="size-3.5 text-amber-500" />
-                                    {t('platforms.extensionNotDetected')}
-                                </Badge>
-                                <div className="flex items-center gap-2">
+                                    <KeyRound className="size-3.5" />
+                                    {t('platforms.methodManualTab')}
+                                </button>
+                            </div>
+                        )}
+
+                        {/* TAB 1: EXTENSION 1-CLICK */}
+                        {connectMethod === 'extension' && (
+                            <div className="space-y-4">
+                                {extensionInstalled ? (
+                                    <div className="rounded-xl border border-emerald-500/40 bg-emerald-500/5 p-5 space-y-4">
+                                        <div className="flex flex-wrap items-center justify-between gap-2">
+                                            <Badge className="bg-emerald-600 text-white gap-1.5 text-xs">
+                                                <CheckCircle2 className="size-3.5" />
+                                                {t('platforms.extensionDetected')}
+                                            </Badge>
+                                            <Button
+                                                type="button"
+                                                variant="outline"
+                                                size="sm"
+                                                onClick={handleOpenFacebook}
+                                                className="text-xs gap-1.5 h-7"
+                                            >
+                                                <ExternalLink className="size-3.5" />
+                                                {t('platforms.cookieOpenFacebook')}
+                                            </Button>
+                                        </div>
+
+                                        <p className="text-xs sm:text-sm text-foreground/90 leading-relaxed">
+                                            {t('platforms.extensionOneClickDesc')}
+                                        </p>
+
+                                        <div className="pt-1">
+                                            <Button
+                                                type="button"
+                                                size="lg"
+                                                className="w-full sm:w-auto min-w-[280px] h-11 text-sm font-semibold shadow-md gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white"
+                                                onClick={handleOneClickSync}
+                                                disabled={
+                                                    extensionSyncing ||
+                                                    connecting ||
+                                                    !canManage
+                                                }
+                                            >
+                                                {extensionSyncing || connecting ? (
+                                                    <>
+                                                        <Loader2 className="size-4 animate-spin" />
+                                                        {t('platforms.extensionSyncing')}
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <Sparkles className="size-4 text-amber-300" />
+                                                        {isConnected
+                                                            ? t('platforms.extensionOneClickBtn') +
+                                                              ' (Sync Again)'
+                                                            : t('platforms.extensionOneClickBtn')}
+                                                    </>
+                                                )}
+                                            </Button>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className="rounded-xl border border-border/80 bg-muted/30 p-5 space-y-4">
+                                        <div className="flex flex-wrap items-center justify-between gap-3">
+                                            <Badge
+                                                variant="secondary"
+                                                className="gap-1.5 text-xs font-medium"
+                                            >
+                                                <Zap className="size-3.5 text-amber-500" />
+                                                {t('platforms.extensionNotDetected')}
+                                            </Badge>
+                                            <div className="flex items-center gap-2">
+                                                <Button
+                                                    type="button"
+                                                    variant="outline"
+                                                    size="sm"
+                                                    onClick={handleRefreshExtension}
+                                                    disabled={checkingExtension}
+                                                    className="h-8 px-2.5 text-xs gap-1.5 shadow-sm"
+                                                    title={t('platforms.extensionRefreshBtn')}
+                                                >
+                                                    <RefreshCw
+                                                        className={`size-3.5 ${
+                                                            checkingExtension ? 'animate-spin' : ''
+                                                        }`}
+                                                    />
+                                                    {t('platforms.extensionRefreshBtn')}
+                                                </Button>
+                                                <a
+                                                    href="/cre8-extension.zip"
+                                                    download="cre8-extension.zip"
+                                                    className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-md text-xs font-semibold bg-primary text-primary-foreground hover:bg-primary/90 transition-colors shadow-sm"
+                                                >
+                                                    <Download className="size-3.5" />
+                                                    {t('platforms.extensionDownloadBtn')}
+                                                </a>
+                                            </div>
+                                        </div>
+
+                                        <div className="text-xs space-y-2.5 text-muted-foreground pt-1">
+                                            <p className="font-semibold text-foreground text-sm">
+                                                {t('platforms.extensionInstallTitle')}
+                                            </p>
+                                            <div className="space-y-2 pl-1">
+                                                <p>{t('platforms.extensionInstallStep1')}</p>
+                                                <div className="flex flex-wrap items-center gap-2">
+                                                    <span>
+                                                        {t('platforms.extensionInstallStep2')}
+                                                    </span>
+                                                    <Button
+                                                        type="button"
+                                                        variant="outline"
+                                                        size="sm"
+                                                        onClick={handleCopyChromeExtensions}
+                                                        className="h-6 px-2 text-xs font-mono gap-1 text-primary hover:text-primary shrink-0 transition-all"
+                                                        title={t('platforms.copyChromeExtensions')}
+                                                    >
+                                                        {copiedLink ? (
+                                                            <>
+                                                                <Check className="size-3 text-emerald-500" />
+                                                                <span className="text-emerald-600 font-semibold">
+                                                                    Copied!
+                                                                </span>
+                                                            </>
+                                                        ) : (
+                                                            <>
+                                                                <Copy className="size-3" />
+                                                                <span>
+                                                                    Copy chrome://extensions
+                                                                </span>
+                                                            </>
+                                                        )}
+                                                    </Button>
+                                                </div>
+                                                <div className="flex flex-wrap items-center gap-2">
+                                                    <span>
+                                                        {t('platforms.extensionInstallStep3')}
+                                                    </span>
+                                                    <Button
+                                                        type="button"
+                                                        variant="secondary"
+                                                        size="sm"
+                                                        onClick={handleRefreshExtension}
+                                                        disabled={checkingExtension}
+                                                        className="h-6 px-2 text-xs gap-1 font-medium shrink-0"
+                                                    >
+                                                        <RefreshCw
+                                                            className={`size-3 ${
+                                                                checkingExtension
+                                                                    ? 'animate-spin'
+                                                                    : ''
+                                                            }`}
+                                                        />
+                                                        {t('platforms.extensionRefreshBtn')}
+                                                    </Button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        )}
+
+                        {/* TAB 2: MANUAL PASTE */}
+                        {connectMethod === 'manual' && (
+                            <div className="rounded-xl border border-border/80 bg-muted/20 p-5 space-y-4">
+                                <div className="flex flex-wrap items-center justify-between gap-2">
+                                    <span className="text-xs text-muted-foreground">
+                                        {t('platforms.cookieStep4Desc')}
+                                    </span>
                                     <Button
                                         type="button"
                                         variant="outline"
                                         size="sm"
-                                        onClick={handleRefreshExtension}
-                                        disabled={checkingExtension}
-                                        className="h-8 px-2.5 text-xs gap-1.5 shadow-sm"
-                                        title={t('platforms.extensionRefreshBtn')}
+                                        onClick={handleOpenFacebook}
+                                        className="text-xs gap-1.5 h-7"
                                     >
-                                        <RefreshCw
-                                            className={`size-3.5 ${
-                                                checkingExtension ? 'animate-spin' : ''
-                                            }`}
-                                        />
-                                        {t('platforms.extensionRefreshBtn')}
+                                        <ExternalLink className="size-3.5" />
+                                        {t('platforms.cookieOpenFacebook')}
                                     </Button>
-                                    <a
-                                        href="/cre8-extension.zip"
-                                        download="cre8-extension.zip"
-                                        className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-md text-xs font-semibold bg-primary text-primary-foreground hover:bg-primary/90 transition-colors shadow-sm"
-                                    >
-                                        <Download className="size-3.5" />
-                                        {t('platforms.extensionDownloadBtn')}
-                                    </a>
                                 </div>
-                            </div>
 
-                            <div className="text-xs space-y-2.5 text-muted-foreground pt-1">
-                                <p className="font-semibold text-foreground text-sm">
-                                    {t('platforms.extensionInstallTitle')}
-                                </p>
-                                <div className="space-y-2 pl-1">
-                                    <p>{t('platforms.extensionInstallStep1')}</p>
-                                    <div className="flex flex-wrap items-center gap-2">
-                                        <span>{t('platforms.extensionInstallStep2')}</span>
-                                        <Button
-                                            type="button"
-                                            variant="outline"
-                                            size="sm"
-                                            onClick={handleCopyChromeExtensions}
-                                            className="h-6 px-2 text-xs font-mono gap-1 text-primary hover:text-primary shrink-0 transition-all"
-                                            title={t('platforms.copyChromeExtensions')}
-                                        >
-                                            {copiedLink ? (
-                                                <>
-                                                    <Check className="size-3 text-emerald-500" />
-                                                    <span className="text-emerald-600 font-semibold">Copied!</span>
-                                                </>
-                                            ) : (
-                                                <>
-                                                    <Copy className="size-3" />
-                                                    <span>Copy chrome://extensions</span>
-                                                </>
-                                            )}
-                                        </Button>
-                                    </div>
-                                    <div className="flex flex-wrap items-center gap-2">
-                                        <span>{t('platforms.extensionInstallStep3')}</span>
-                                        <Button
-                                            type="button"
-                                            variant="secondary"
-                                            size="sm"
-                                            onClick={handleRefreshExtension}
-                                            disabled={checkingExtension}
-                                            className="h-6 px-2 text-xs gap-1 font-medium shrink-0"
-                                        >
-                                            <RefreshCw
-                                                className={`size-3 ${
-                                                    checkingExtension ? 'animate-spin' : ''
-                                                }`}
-                                            />
-                                            {t('platforms.extensionRefreshBtn')}
-                                        </Button>
-                                    </div>
+                                <div className="space-y-1.5">
+                                    <textarea
+                                        value={manualCookie}
+                                        onChange={(e) => {
+                                            setManualCookie(e.target.value)
+                                            if (activeError) setActiveError(null)
+                                        }}
+                                        placeholder={t('platforms.cookieInputPlaceholder')}
+                                        rows={4}
+                                        className="w-full rounded-md border border-input bg-background px-3 py-2 text-xs font-mono shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+                                        disabled={manualSubmitting || connecting}
+                                    />
+
+                                    {/* Live diagnosis badge */}
+                                    {manualDiag && manualDiag.valid && (
+                                        <div className="flex items-center gap-1.5 text-xs text-emerald-600 dark:text-emerald-400 font-medium">
+                                            <CheckCircle2 className="size-3.5" />
+                                            <span>
+                                                Cookies ຖືກຕ້ອງ · Facebook ID:{' '}
+                                                {manualDiag.userId}
+                                            </span>
+                                        </div>
+                                    )}
+                                </div>
+
+                                <div>
+                                    <Button
+                                        type="button"
+                                        onClick={handleManualConnect}
+                                        disabled={
+                                            !manualCookie.trim() ||
+                                            manualSubmitting ||
+                                            connecting ||
+                                            !canManage
+                                        }
+                                        className="w-full sm:w-auto min-w-[200px] h-10 text-xs font-semibold gap-2"
+                                    >
+                                        {manualSubmitting || connecting ? (
+                                            <>
+                                                <Loader2 className="size-3.5 animate-spin" />
+                                                {t('platforms.viewerConnectHint')}
+                                            </>
+                                        ) : (
+                                            <>
+                                                <KeyRound className="size-3.5" />
+                                                {t('platforms.cookieConnectBtn')}
+                                            </>
+                                        )}
+                                    </Button>
                                 </div>
                             </div>
-                        </div>
-                    )}
-                </div>
+                        )}
+                    </div>
+                )}
             </CardContent>
         </Card>
     )

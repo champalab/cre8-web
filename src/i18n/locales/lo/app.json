@@ -521,7 +521,7 @@
     "cookieFormatDetected": "ກວດພົບ Cookies ຖືກຕ້ອງ (User ID: {{userId}})",
     "extensionDetected": "ກວດພົບ Cre8 Extension ແລ້ວ ⚡",
     "extensionNotDetected": "ຍັງບໍ່ໄດ້ຕິດຕັ້ງ Cre8 Extension",
-    "extensionOneClickBtn": "ດຶງ Cookies ແລະ ເຊື່ອມຕໍ່ທັນທີ (1-Click)",
+    "extensionOneClickBtn": "ເຊື່ອມຕໍ່ Facebook",
     "extensionOneClickDesc": "ກົດປຸ່ມດຽວ ລະບົບຈະດຶງ Cookies ຈາກ Facebook ທີ່ Login ຢູ່ແລ້ວມາເຊື່ອມຕໍ່ໃຫ້ອັດຕະໂນມັດ ໂດຍບໍ່ຕ້ອງເປີດ DevTools ຫຼື Copy ຫຍັງເລີຍ.",
     "extensionDownloadBtn": "ດາວໂຫຼດ Extension (.zip)",
     "extensionInstallTitle": "ວິທີຕິດຕັ້ງ Extension (ງ່າຍໆພຽງ 3 ຂັ້ນຕອນ):",
@@ -537,7 +537,15 @@
     "copyChromeExtensions": "Copy chrome://extensions",
     "chromeExtensionsCopied": "ຄັດລອກ chrome://extensions ແລ້ວ! ສາມາດເປີດ Tab ໃໝ່ ແລ້ວວາງ (Paste) ໄດ້ເລີຍ",
     "extensionRefreshBtn": "ໂຫຼດໃໝ່ / Refresh",
-    "extensionRefreshSuccess": "ກວດພົບ Extension ແລ້ວ ພ້ອມໃຊ້ງານ!"
+    "extensionRefreshSuccess": "ກວດພົບ Extension ແລ້ວ ພ້ອມໃຊ້ງານ!",
+    "mobileNoticeTitle": "ກະລຸນາເຊື່ອມຕໍ່ເທິງ Computer (PC / Mac)",
+    "mobileNoticeDesc": "Browser ເທິງໂທລະສັບມືຖື (Safari / Chrome Mobile) ບໍ່ຮອງຮັບ Extension ສຳລັບດຶງ Cookies ຂອງ Facebook ອັດຕະໂນມັດ.",
+    "mobileNoticeAdvice": "ແນະນຳ: ເປີດລິ້ງໜ້ານີ້ເທິງ Computer ເພື່ອເຊື່ອມຕໍ່ Facebook ໃນ 1 ຄລິກ (ເຊື່ອມຄັ້ງດຽວ session ຈະໃຊ້ງານໄດ້ 30–90 ວັນ).",
+    "copyPageLink": "ຄັດລອກລິ້ງໜ້ານີ້",
+    "pageLinkCopied": "ຄັດລອກລິ້ງໜ້ານີ້ແລ້ວ! ສາມາດສົ່ງໄປເປີດໃນ Computer ໄດ້ເລີຍ",
+    "orManualPasteOnMobile": "ຫຼື ວາງ Cookies ດ້ວຍຕົນເອງ",
+    "methodExtensionTab": "ເຊື່ອມຕໍ່ດ້ວຍ Extension (1-Click 🚀 ແນະນຳ)",
+    "methodManualTab": "ວາງ Cookies ດ້ວຍຕົນເອງ (Manual Paste 📋)"
   },
   "users": {
     "title": "ຜູ້ໃຊ້",
