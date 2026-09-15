@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import {  ExternalLink, History, Link2, Loader2, Pencil, RefreshCw, Globe2Icon } from 'lucide-react'
+import { ExternalLink, History, Link2, Loader2, Pencil, RefreshCw, Globe2Icon } from 'lucide-react'
 import {
     Actor,
     InfluencerSocialAccount,
@@ -316,7 +316,7 @@ export function SocialAccountsDialog({ actor, open, onOpenChange, onUpdated }: P
 
     const renderAccountActions = (account: InfluencerSocialAccount) => (
         <TooltipProvider>
-            <div className="inline-flex items-center gap-0.5">
+            <div className="inline-flex items-center gap-2">
                 <Tooltip>
                     <TooltipTrigger asChild>
                         <Button
@@ -384,7 +384,7 @@ export function SocialAccountsDialog({ actor, open, onOpenChange, onUpdated }: P
                                 {refreshingAccountUuid === account.uuid ? (
                                     <Loader2 className="size-4 animate-spin" />
                                 ) : (
-                                    <RefreshCw className="size-4" />
+                                    <Globe2Icon className="size-4" />
                                 )}
                             </Button>
                         </TooltipTrigger>
@@ -428,62 +428,18 @@ export function SocialAccountsDialog({ actor, open, onOpenChange, onUpdated }: P
                                             {actor.phone_number || t('influencers.noPhone')}
                                         </p>
                                         {batchProgress && batchId ? (
-                                             <p className="mt-1 text-xs font-medium text-primary">
-                                                 {t('influencers.fetchingProfiles', {
-                                                     finished: batchProgress.finished,
-                                                     total: batchProgress.total,
-                                                     failed: batchProgress.failed > 0 ? ` · ${t('campaigns.failedCount', { count: batchProgress.failed })}` : ''
-                                                 })}
-                                             </p>
-                                         ) : null}
+                                            <p className="mt-1 text-xs font-medium text-primary">
+                                                {t('influencers.fetchingProfiles', {
+                                                    finished: batchProgress.finished,
+                                                    total: batchProgress.total,
+                                                    failed: batchProgress.failed > 0 ? ` · ${t('campaigns.failedCount', { count: batchProgress.failed })}` : ''
+                                                })}
+                                            </p>
+                                        ) : null}
                                     </div>
                                 </div>
                                 <div className="flex w-full flex-col gap-2 sm:w-auto sm:items-end">
                                     <div className="flex w-full flex-wrap gap-2 sm:w-auto sm:justify-end">
-                                        {/* {facebookConnected ? (
-                                            <Button
-                                                variant="outline"
-                                                size="sm"
-                                                className="flex-1 sm:flex-none"
-                                                onClick={() => void handleDisconnectOAuth('facebook')}
-                                                disabled={disconnectingOAuth}
-                                            >
-                                                <Unplug className="size-3.5" />
-                                                {t('influencers.disconnectFB')}
-                                            </Button>
-                                        ) : (
-                                            <Button
-                                                variant="outline"
-                                                size="sm"
-                                                className="flex-1 sm:flex-none"
-                                                onClick={handleConnectFacebook}
-                                            >
-                                                <span className="text-xs font-bold">FB</span>
-                                                OAuth
-                                            </Button>
-                                        )}
-                                        {tiktokConnected ? (
-                                            <Button
-                                                variant="outline"
-                                                size="sm"
-                                                className="flex-1 sm:flex-none"
-                                                onClick={() => void handleDisconnectOAuth('tiktok')}
-                                                disabled={disconnectingOAuth}
-                                            >
-                                                <Unplug className="size-3.5" />
-                                                {t('influencers.disconnectTT')}
-                                            </Button>
-                                        ) : (
-                                            <Button
-                                                variant="outline"
-                                                size="sm"
-                                                className="flex-1 sm:flex-none"
-                                                onClick={handleConnectTikTok}
-                                            >
-                                                <span className="text-xs font-bold">TT</span>
-                                                OAuth
-                                            </Button>
-                                        )} */}
                                         <Button
                                             size="sm"
                                             className="w-full sm:w-auto"
@@ -577,9 +533,9 @@ export function SocialAccountsDialog({ actor, open, onOpenChange, onUpdated }: P
                                                         <p className="mt-3 truncate text-xs text-muted-foreground" title={account.profile_url}>
                                                             {account.profile_url}
                                                         </p>
-                                                         <p className="mt-1 text-[11px] text-muted-foreground">
-                                                             {t('influencers.lastSync', { date: formatDateTime(account.last_scraped_at) })}
-                                                         </p>
+                                                        <p className="mt-1 text-[11px] text-muted-foreground">
+                                                            {t('influencers.lastSync', { date: formatDateTime(account.last_scraped_at) })}
+                                                        </p>
                                                         {account.last_error_code ? (
                                                             <div className="mt-2 rounded-lg border border-amber-500/30 bg-amber-500/10 px-2.5 py-2">
                                                                 <p className="text-[11px] font-semibold uppercase text-amber-700 dark:text-amber-400">

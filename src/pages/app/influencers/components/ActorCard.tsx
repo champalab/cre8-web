@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { BarChart3, Camera, CheckCircle2, ChevronLeft, ChevronRight, Eye, Globe2Icon, Link2, Loader2, Mail, MoreHorizontal, Pencil, Phone, Trash2, User2 } from 'lucide-react'
+import { BarChart3, Camera, CheckCircle2, ChevronLeft, ChevronRight, ExternalLink, Eye, Globe2Icon, Link2, Loader2, Mail, MoreHorizontal, Pencil, Phone, Trash2, User2 } from 'lucide-react'
 import {
     Actor,
     PROFILE_METRIC_PLATFORMS,
@@ -431,6 +431,7 @@ export const ActorCard = ({ actor, onEdit, onSocialAccounts, onDetail, onDelete,
                                     )
                                 }
 
+
                                 return (
                                     <div
                                         key={platform}
@@ -449,10 +450,10 @@ export const ActorCard = ({ actor, onEdit, onSocialAccounts, onDetail, onDelete,
                                                         href={account.profile_url}
                                                         target="_blank"
                                                         rel="noopener noreferrer"
-                                                        className="text-muted-foreground hover:text-foreground transition-colors"
+                                                        className="text-muted-foreground px-3 hover:text-foreground transition-colors"
                                                         title={`Open ${meta.label} profile`}
                                                     >
-                                                        <Link2 className="size-3.5" />
+                                                        <ExternalLink className="size-3.5" />
                                                     </a>
                                                 )}
                                                 <button

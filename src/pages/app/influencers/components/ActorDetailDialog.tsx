@@ -1,7 +1,9 @@
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
     BarChart3,
     ExternalLink,
+    ImageOff,
     Link2,
     Mail,
     Pencil,
@@ -10,6 +12,7 @@ import {
     UserPlus,
     Users,
 } from 'lucide-react'
+
 import { Actor, useGetActorByIdQuery } from '@/stores/services/actorApi'
 import BackdropComponent from '@/components/BackdropComponent'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
@@ -65,6 +68,34 @@ function DetailField({ label, value }: { label: string; value: React.ReactNode }
         </div>
     )
 }
+
+function GalleryImageItem({ url, index }: { url: string; index: number }) {
+    const [hasError, setHasError] = useState(false)
+
+    return (
+        <a
+            href={url}
+            target="_blank"
+            rel="noreferrer"
+            className="group relative flex h-24 w-24 items-center justify-center overflow-hidden rounded-lg border bg-muted/30 transition-all hover:border-primary/40 hover:opacity-90 sm:h-32 sm:w-32"
+        >
+            {hasError ? (
+                <div className="flex flex-col items-center justify-center gap-1 p-2 text-center text-muted-foreground">
+                    <ImageOff className="size-6 text-muted-foreground/50 sm:size-8" />
+                    <span className="text-[10px] sm:text-xs">Failed to load</span>
+                </div>
+            ) : (
+                <img
+                    src={url}
+                    alt={`Profile ${index + 1}`}
+                    className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                    onError={() => setHasError(true)}
+                />
+            )}
+        </a>
+    )
+}
+
 
 export function ActorDetailDialog({ actor, open, onOpenChange, onEdit, onSocialAccounts }: Props) {
     const { t } = useTranslation('app')
@@ -242,24 +273,13 @@ export function ActorDetailDialog({ actor, open, onOpenChange, onEdit, onSocialA
                                     <CardContent>
                                         <div className="flex flex-wrap gap-4">
                                             {detail.profile_urls.map((url, i) => (
-                                                <a 
-                                                    key={i} 
-                                                    href={url} 
-                                                    target="_blank" 
-                                                    rel="noreferrer"
-                                                    className="overflow-hidden rounded-lg border hover:opacity-80 transition-opacity"
-                                                >
-                                                    <img 
-                                                        src={url} 
-                                                        alt={`Profile ${i + 1}`} 
-                                                        className="h-24 w-24 object-cover sm:h-32 sm:w-32" 
-                                                    />
-                                                </a>
+                                                <GalleryImageItem key={`${url}-${i}`} url={url} index={i} />
                                             ))}
                                         </div>
                                     </CardContent>
                                 </Card>
                             )}
+
 
                             {detail.users && (
                                 <Card className="mx-4 sm:mx-6">

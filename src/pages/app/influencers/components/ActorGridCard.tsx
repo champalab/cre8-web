@@ -97,9 +97,8 @@ export const ActorGridCard = ({ actor, onEdit, onSocialAccounts, onDetail, onDel
                             return (
                                 <div
                                     key={platform}
-                                    className={`flex size-5 items-center justify-center rounded-md text-[8px] font-bold ${
-                                        account ? meta.iconClass : 'bg-muted text-muted-foreground/30'
-                                    }`}
+                                    className={`flex size-5 items-center justify-center rounded-md text-[8px] font-bold ${account ? meta.iconClass : 'bg-muted text-muted-foreground/30'
+                                        }`}
                                     title={meta.label}
                                 >
                                     {meta.short}
