@@ -230,9 +230,10 @@ const matchesActorKeyword = (actor: ActorFilterable | null | undefined, query: s
     return tokens.every((token) => haystack.includes(token)) || (compactQuery.length >= 2 && compactHaystack.includes(compactQuery))
 }
 
-const formatAge = (dob?: string | null) => {
+const formatAge = (dob?: string | null, tFunc?: (k: string, options?: any) => string) => {
     const age = getAge(dob)
-    return age == null ? null : `${age} ປີ`
+    if (age == null) return null
+    return tFunc ? tFunc("influencerTab.yearsOld", { age }) : `${age}`
 }
 
 const formatFollowers = (value: number | null | undefined) => {
@@ -1141,15 +1142,15 @@ const InfluencerTab: React.FC<Props> = ({ campaign, onChanged }) => {
                     <Card className="border-dashed border-2">
                         <CardContent className="flex flex-col items-center justify-center py-16 text-center">
                             <UsersRound className="mb-3 size-12 text-muted-foreground/30" />
-                            <h3 className="text-base font-semibold">ບໍ່ພົບອິນຟລູເອັນເຊີ</h3>
+                            <h3 className="text-base font-semibold">{t('influencerTab.noInfluencersFound')}</h3>
                             <p className="mt-1 text-sm text-muted-foreground max-w-sm">
                                 {statusFilter !== 'ALL' || hasActiveActorFilters || searchQuery.trim()
                                     ? t('influencerTab.emptyState')
-                                    : 'ເພີ່ມອິນຟລູເອັນເຊີເຂົ້າໃນໃບສະເໜີແຄມເປນ ເພື່ອໃຫ້ລູກຄ້າກວດສອບ ແລະ ອະນຸມັດ.'}
+                                    : t('influencerTab.addFirstInfluencerHint')}
                             </p>
                             {canManage && statusFilter === 'ALL' && !hasActiveActorFilters && !searchQuery.trim() && (
                                 <Button onClick={handleOpenAddModal} className="mt-4 gap-1.5">
-                                    <Plus className="size-4" /> ເພີ່ມອິນຟລູເອັນເຊີຄົນທຳອິດ
+                                    <Plus className="size-4" /> {t('influencerTab.addFirstInfluencerBtn')}
                                 </Button>
                             )}
                         </CardContent>
@@ -1226,10 +1227,10 @@ const InfluencerTab: React.FC<Props> = ({ campaign, onChanged }) => {
                                             <div className="min-w-0 flex-1">
                                                 <CardTitle className="text-base font-bold truncate">{actor?.name}</CardTitle>
                                                 <div className="flex flex-wrap items-center gap-1.5 mt-1">
-                                                    {formatAge(actor?.date_of_birth) && (
+                                                    {formatAge(actor?.date_of_birth, t) && (
                                                         <Badge variant="secondary" className="text-[10px] px-1.5 py-0 bg-muted/60 text-muted-foreground font-medium rounded-md gap-1 h-5 hover:bg-muted/60">
                                                             <User2 className="size-3" />
-                                                            {formatAge(actor?.date_of_birth)}
+                                                            {formatAge(actor?.date_of_birth, t)}
                                                         </Badge>
                                                     )}
                                                     {actor?.social_handle ? (
@@ -1242,8 +1243,8 @@ const InfluencerTab: React.FC<Props> = ({ campaign, onChanged }) => {
                                                             <Share2 className="size-3" />
                                                             Source: {actor.source}
                                                         </Badge>
-                                                    ) : !formatAge(actor?.date_of_birth) && (
-                                                        <span className="text-xs text-muted-foreground">ອິນຟລູເອັນເຊີ</span>
+                                                    ) : !formatAge(actor?.date_of_birth, t) && (
+                                                        <span className="text-xs text-muted-foreground">{t('influencerTab.influencerLabel')}</span>
                                                     )}
                                                 </div>
                                             </div>
@@ -1256,7 +1257,7 @@ const InfluencerTab: React.FC<Props> = ({ campaign, onChanged }) => {
                                                 <TrendingUp className="size-4 text-primary shrink-0" />
                                                 <div>
                                                     <p className="text-lg font-bold tabular-nums">{item.total_followers?.toLocaleString()}</p>
-                                                    <p className="text-[10px] text-muted-foreground uppercase font-semibold">ຜູ້ຕິດຕາມ</p>
+                                                    <p className="text-[10px] text-muted-foreground uppercase font-semibold">{t('influencerTab.followersLabel')}</p>
                                                 </div>
                                             </div>
 
@@ -1267,7 +1268,7 @@ const InfluencerTab: React.FC<Props> = ({ campaign, onChanged }) => {
                                         <div className="grid grid-cols-2 gap-2 text-xs">
                                             {canManage && (
                                                 <div className="rounded-xl border p-2.5 bg-background/50">
-                                                    <span className="text-[10px] font-semibold text-muted-foreground block uppercase">{t('influencerTab.offerPrice')} (ຕົ້ນທຶນ)</span>
+                                                    <span className="text-[10px] font-semibold text-muted-foreground block uppercase">{t('influencerTab.offerPriceCost')}</span>
                                                     <span className="font-bold text-foreground text-sm truncate block mt-0.5">
                                                         {formatCurrency(item.offer_price)}
                                                     </span>
@@ -1569,15 +1570,15 @@ const InfluencerTab: React.FC<Props> = ({ campaign, onChanged }) => {
                             <DialogTitle className="flex items-center gap-2 text-lg">
                                 <Plus className="size-5 text-primary" /> {t('influencerTab.addInfluencerToProposal')}
                             </DialogTitle>
-                            <CardDescription>ເລືອກອິນຟລູເອັນເຊີ. ລະບົບຈະຄິດໄລ່ລາຄາລວມຈາກລາຄາຮູບພາບ + ວິດີໂອອັດຕະໂນມັດ.</CardDescription>
+                            <CardDescription>{t('influencerTab.autoCalcHint')}</CardDescription>
                         </DialogHeader>
 
                         <div className="space-y-4 py-2">
                             {/* Actor Selection */}
                             <div className="space-y-2">
                                 <div className="flex items-center justify-between gap-2">
-                                    <Label className="text-xs font-semibold">1. ເລືອກອິນຟລູເອັນເຊີ</Label>
-                                    <span className="text-[10px] text-muted-foreground">{availableActors.length} ລາຍການ</span>
+                                    <Label className="text-xs font-semibold">{t('influencerTab.step1SelectInfluencer')}</Label>
+                                    <span className="text-[10px] text-muted-foreground">{t('influencerTab.itemsCount', { count: availableActors.length })}</span>
                                 </div>
                                 <div className="flex items-center gap-2">
                                     <div className="relative flex-1">
@@ -1597,7 +1598,7 @@ const InfluencerTab: React.FC<Props> = ({ campaign, onChanged }) => {
                                         onClick={() => setShowPickerFilters((open) => !open)}
                                     >
                                         <Filter className="size-3.5" />
-                                        ຕົວເລືອກກັ່ນຕອງ
+                                        {t('influencerTab.actorFilters')}
                                         {hasActiveActorFilterState(pickerFilters) && <span className="ml-1 size-1.5 rounded-full bg-primary" />}
                                     </Button>
                                 </div>
@@ -1738,7 +1739,7 @@ const InfluencerTab: React.FC<Props> = ({ campaign, onChanged }) => {
                                                 className="h-8 bg-background text-xs"
                                                 type="number"
                                                 min={0}
-                                                placeholder="ຕົວຢ່າງ 1000000"
+                                                placeholder={t('influencerTab.egPricePlaceholder')}
                                                 value={pickerFilters.maxPrice}
                                                 onChange={(event) => setPickerFilters((prev) => ({ ...prev, maxPrice: event.target.value }))}
                                             />
@@ -1749,7 +1750,7 @@ const InfluencerTab: React.FC<Props> = ({ campaign, onChanged }) => {
                                                 className="h-8 bg-background text-xs"
                                                 type="number"
                                                 min={0}
-                                                placeholder="ຕົວຢ່າງ 18"
+                                                placeholder={t('influencerTab.egAgePlaceholder18')}
                                                 value={pickerFilters.minAge}
                                                 onChange={(event) => setPickerFilters((prev) => ({ ...prev, minAge: event.target.value }))}
                                             />
@@ -1760,7 +1761,7 @@ const InfluencerTab: React.FC<Props> = ({ campaign, onChanged }) => {
                                                 className="h-8 bg-background text-xs"
                                                 type="number"
                                                 min={0}
-                                                placeholder="ຕົວຢ່າງ 35"
+                                                placeholder={t('influencerTab.egAgePlaceholder35')}
                                                 value={pickerFilters.maxAge}
                                                 onChange={(event) => setPickerFilters((prev) => ({ ...prev, maxAge: event.target.value }))}
                                             />
@@ -1784,12 +1785,12 @@ const InfluencerTab: React.FC<Props> = ({ campaign, onChanged }) => {
 
                                 <div className="max-h-48 overflow-y-auto border rounded-xl divide-y bg-muted/20">
                                     {isActorsLoading ? (
-                                        <div className="p-4 text-center text-xs text-muted-foreground">ກຳລັງໂຫຼດອິນຟລູເອັນເຊີ...</div>
+                                        <div className="p-4 text-center text-xs text-muted-foreground">{t('influencerTab.loadingInfluencers')}</div>
                                     ) : availableActors.length === 0 ? (
                                         <div className="p-4 text-center text-xs text-muted-foreground">
                                             {actorSearch.trim() || hasActiveActorFilterState(pickerFilters)
                                                 ? t('influencerTab.emptyState')
-                                                : 'ບໍ່ພົບອິນຟລູເອັນເຊີທີ່ສາມາດເລືອກໄດ້'}
+                                                : t('influencerTab.noSelectableInfluencers')}
                                         </div>
                                     ) : (
                                         availableActors.map((actor) => {
@@ -1814,10 +1815,10 @@ const InfluencerTab: React.FC<Props> = ({ campaign, onChanged }) => {
                                                         <div className="min-w-0">
                                                             <p className="text-xs font-semibold truncate">{actor.name}</p>
                                                             <div className="flex flex-wrap items-center gap-1 mt-1">
-                                                                {formatAge(actor.date_of_birth) && (
+                                                                {formatAge(actor.date_of_birth, t) && (
                                                                     <span className="inline-flex items-center gap-1 text-[9px] bg-muted/60 text-muted-foreground px-1.5 py-0.5 rounded font-medium">
                                                                         <User2 className="size-2.5" />
-                                                                        {formatAge(actor.date_of_birth)}
+                                                                        {formatAge(actor.date_of_birth, t)}
                                                                     </span>
                                                                 )}
                                                                 {actor.social_handle ? (
@@ -1830,8 +1831,8 @@ const InfluencerTab: React.FC<Props> = ({ campaign, onChanged }) => {
                                                                         <Share2 className="size-2.5" />
                                                                         {actor.source}
                                                                     </span>
-                                                                ) : !formatAge(actor.date_of_birth) && (
-                                                                    <span className="text-[10px] text-muted-foreground">ອິນຟລູເອັນເຊີ</span>
+                                                                ) : !formatAge(actor.date_of_birth, t) && (
+                                                                    <span className="text-[10px] text-muted-foreground">{t('influencerTab.influencerLabel')}</span>
                                                                 )}
                                                             </div>
                                                         </div>
@@ -1841,7 +1842,7 @@ const InfluencerTab: React.FC<Props> = ({ campaign, onChanged }) => {
                                                         <span className="text-xs font-bold text-primary block">
                                                             {formatCurrency(sumPV > 0 ? sumPV : actor.standard_price)}
                                                         </span>
-                                                        <span className="text-[10px] text-muted-foreground">{sumPV > 0 ? 'ລາຄາລວມ ຮູບ+ວິດີໂອ' : 'ລາຄາມາດຕະຖານ'}</span>
+                                                        <span className="text-[10px] text-muted-foreground">{sumPV > 0 ? t('influencerTab.sumPhotoVideo') : t('influencerTab.standardPrice')}</span>
                                                     </div>
                                                 </button>
                                             )
@@ -1862,12 +1863,12 @@ const InfluencerTab: React.FC<Props> = ({ campaign, onChanged }) => {
                                             <div>
                                                 <h4 className="text-xs font-bold">
                                                     {selectedActor.name}
-                                                    {formatAge(selectedActor.date_of_birth) ? ` · ${formatAge(selectedActor.date_of_birth)}` : ''} — {t('influencerTab.influencerRateSheet')}
+                                                    {formatAge(selectedActor.date_of_birth, t) ? ` · ${formatAge(selectedActor.date_of_birth, t)}` : ''} — {t('influencerTab.influencerRateSheet')}
                                                 </h4>
                                             </div>
                                         </div>
                                         <Badge variant="outline" className="bg-background text-[10px] font-semibold">
-                                            ຄິດໄລ່ອັດຕະໂນມັດໃນຫຼັກພັນ
+                                            {t('influencerTab.autoCalcThousands')}
                                         </Badge>
                                     </div>
 
@@ -1908,7 +1909,7 @@ const InfluencerTab: React.FC<Props> = ({ campaign, onChanged }) => {
 
                                     {/* Quick action buttons to set prices */}
                                     <div className="flex flex-wrap items-center gap-1.5 pt-1 text-[11px]">
-                                        <span className="text-muted-foreground font-medium">ເລືອກດ່ວນ:</span>
+                                        <span className="text-muted-foreground font-medium">{t('influencerTab.quickSelect')}</span>
                                         <Button
                                             type="button"
                                             variant="outline"
@@ -1923,7 +1924,7 @@ const InfluencerTab: React.FC<Props> = ({ campaign, onChanged }) => {
                                                 }
                                             }}
                                         >
-                                            ລາຄາລວມ ຮູບ+ວິດີໂອ
+                                            {t('influencerTab.sumPhotoVideo')}
                                         </Button>
 
                                         {Number(selectedActor.price_photo) > 0 && (
@@ -1937,7 +1938,7 @@ const InfluencerTab: React.FC<Props> = ({ campaign, onChanged }) => {
                                                     setAddForm({ ...addForm, offer_price: val, display_price: val })
                                                 }}
                                             >
-                                                ສະເພາະຮູບພາບ
+                                                {t('influencerTab.photoOnly')}
                                             </Button>
                                         )}
 
@@ -1952,7 +1953,7 @@ const InfluencerTab: React.FC<Props> = ({ campaign, onChanged }) => {
                                                     setAddForm({ ...addForm, offer_price: val, display_price: val })
                                                 }}
                                             >
-                                                ສະເພາະວິດີໂອ
+                                                {t('influencerTab.videoOnly')}
                                             </Button>
                                         )}
 
@@ -1973,7 +1974,7 @@ const InfluencerTab: React.FC<Props> = ({ campaign, onChanged }) => {
                                                     })
                                                 }}
                                             >
-                                                + ເພີ່ມຄ່າຣີໂພສ
+                                                {t('influencerTab.addRepostFee')}
                                             </Button>
                                         )}
                                     </div>
@@ -1992,12 +1993,12 @@ const InfluencerTab: React.FC<Props> = ({ campaign, onChanged }) => {
                                     <Input
                                         type="text"
                                         inputMode="numeric"
-                                        placeholder="ຕົວຢ່າງ 1,500,000"
+                                        placeholder={t('influencerTab.egCostPricePlaceholder')}
                                         value={formatNumberThousands(addForm.offer_price)}
                                         onChange={(e) => setAddForm({ ...addForm, offer_price: parsePriceInput(e.target.value) })}
                                         className="h-9 text-xs tabular-nums"
                                     />
-                                    <p className="text-[10px] text-muted-foreground">ຕົ້ນທຶນພາຍໃນທີ່ຈ່າຍໃຫ້ອິນຟລູເອັນເຊີ (ຫຼັກພັນ)</p>
+                                    <p className="text-[10px] text-muted-foreground">{t('influencerTab.costPriceHint')}</p>
                                 </div>
 
                                 <div className="space-y-1.5">
@@ -2010,31 +2011,31 @@ const InfluencerTab: React.FC<Props> = ({ campaign, onChanged }) => {
                                     <Input
                                         type="text"
                                         inputMode="numeric"
-                                        placeholder="ຕົວຢ່າງ 2,000,000"
+                                        placeholder={t('influencerTab.egClientPricePlaceholder')}
                                         value={formatNumberThousands(addForm.display_price)}
                                         onChange={(e) => setAddForm({ ...addForm, display_price: parsePriceInput(e.target.value) })}
                                         className="h-9 text-xs tabular-nums"
                                     />
-                                    <p className="text-[10px] text-muted-foreground">ລາຄາທີ່ສະແດງໃຫ້ລູກຄ້າເຫັນໃນໃບສະເໜີ (ຫຼັກພັນ)</p>
+                                    <p className="text-[10px] text-muted-foreground">{t('influencerTab.clientPriceHint')}</p>
                                 </div>
                             </div>
 
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                 <div className="space-y-1.5">
-                                    <Label className="text-xs font-semibold">{t('influencerTab.postDate')} (ບໍ່ບັງຄັບ)</Label>
+                                    <Label className="text-xs font-semibold">{t('influencerTab.postDateOptional')}</Label>
                                     <Input
                                         type="date"
                                         value={addForm.post_date}
                                         onChange={(e) => setAddForm({ ...addForm, post_date: e.target.value })}
                                         className="h-9 text-xs"
                                     />
-                                    <p className="text-[10px] text-muted-foreground">ຄ່າເລີ່ມຕົ້ນແມ່ນວ່າງເປົ່າ ເພື່ອໃຫ້ລູກຄ້າສາມາດກຳນົດເອງໄດ້</p>
+                                    <p className="text-[10px] text-muted-foreground">{t('influencerTab.postDateEmptyHint')}</p>
                                 </div>
 
                                 <div className="space-y-1.5">
                                     <Label className="text-xs font-semibold">{t('influencerTab.kpiDeliverables')}</Label>
                                     <Input
-                                        placeholder="ຕົວຢ່າງ 1 Reel + 2 Stories, 50k Views"
+                                        placeholder={t('influencerTab.egKpiPlaceholder')}
                                         value={addForm.kpi}
                                         onChange={(e) => setAddForm({ ...addForm, kpi: e.target.value })}
                                         className="h-9 text-xs"
@@ -2048,7 +2049,7 @@ const InfluencerTab: React.FC<Props> = ({ campaign, onChanged }) => {
                                 {t('influencerTab.cancel')}
                             </Button>
                             <Button onClick={handleSaveAdd} disabled={isAdding || !selectedActor} className="gap-1.5">
-                                <Plus className="size-4" /> ເພີ່ມອິນຟລູເອັນເຊີ
+                                <Plus className="size-4" /> {t('influencerTab.addInfluencerBtn')}
                             </Button>
                         </DialogFooter>
                     </DialogContent>

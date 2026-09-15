@@ -646,10 +646,9 @@ export const FacebookViewerCard: React.FC<FacebookViewerCardProps> = ({
                                     {manualDiag && manualDiag.valid && (
                                         <div className="flex items-center gap-1.5 text-xs text-emerald-600 dark:text-emerald-400 font-medium">
                                             <CheckCircle2 className="size-3.5" />
-                                            <span>
-                                                Cookies ຖືກຕ້ອງ · Facebook ID:{' '}
-                                                {manualDiag.userId}
-                                            </span>
+                                             <span>
+                                                {t('platforms.cookieFormatDetected', { userId: manualDiag.userId })}
+                                             </span>
                                         </div>
                                     )}
                                 </div>

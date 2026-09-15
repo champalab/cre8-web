@@ -159,7 +159,8 @@
     "addFailed": "ເພີ່ມອິນຟລູເອັນເຊີບໍ່ສຳເລັດ",
     "detailsUpdated": "ອັບເດດລາຍລະອຽດອິນຟລູເອັນເຊີສຳເລັດ",
     "unableUpdateDetails": "ບໍ່ສາມາດອັບເດດລາຍລະອຽດໄດ້",
-    "updateFailedShort": "ອັບເດດບໍ່ສຳເລັດ"
+    "updateFailedShort": "ອັບເດດບໍ່ສຳເລັດ",
+    "linkCopied": "ຄັດລອກລິ້ງແລ້ວ!"
   },
   "influencers": {
     "title": "ອິນຟລູເອັນເຊີ",
@@ -355,7 +356,20 @@
     "dropImagesHere": "ວາງຮູບຢູ່ນີ້",
     "noPhotosYet": "ຍັງບໍ່ມີຮູບທີ່ອັບໂຫຼດ",
     "dragDropUpload": "ລາກວາງ ຫຼື ກົດເພື່ອອັບໂຫຼດຮູບ",
-    "displayMode": "ຮູບແບບສະແດງ"
+    "displayMode": "ຮູບແບບສະແດງ",
+    "errProfileUrlRequired": "ກະລຸນາປ້ອນ URL ໂປຣໄຟລ໌",
+    "errInvalidUrl": "ຮູບແບບ URL ບໍ່ຖືກຕ້ອງ",
+    "errPlatformMismatch": "URL ນີ້ແມ່ນສຳລັບ {{detected}}, ແຕ່ທ່ານເລືອກ {{expected}}.",
+    "errFbMustBeFacebook": "Facebook Profile URL ຕ້ອງເປັນໂດເມນ facebook.com",
+    "errFbProfilePhpMissingId": "Facebook profile.php ບໍ່ມີ ID. ຕົວຢ່າງ: https://www.facebook.com/profile.php?id=100012345678",
+    "errFbHomeNotProfile": "ກະລຸນາປ້ອນລິ້ງໂປຣໄຟລ໌ອິນຟລູເອັນເຊີ, ບໍ່ແມ່ນໜ້າທຳອິດ Facebook",
+    "errFbNotProfileLink": "ລິ້ງນີ້ແມ່ນໂພສ, ວິດີໂອ, ຣີລ ຫຼື ກຸ່ມ, ບໍ່ແມ່ນ URL ໂປຣໄຟລ໌ Facebook",
+    "errTiktokDomain": "TikTok Profile URL ຕ້ອງເປັນໂດເມນ tiktok.com",
+    "errTiktokFormat": "TikTok profile URL ຕ້ອງເປັນ https://www.tiktok.com/@username",
+    "errTiktokVideoNotProfile": "ລິ້ງນີ້ແມ່ນວິດີໂອ TikTok, ບໍ່ແມ່ນ URL ໂປຣໄຟລ໌",
+    "errIgDomain": "Instagram Profile URL ຕ້ອງເປັນໂດເມນ instagram.com",
+    "errIgFormat": "Instagram profile URL ຕ້ອງເປັນ https://www.instagram.com/username",
+    "errIgNotProfileLink": "ລິ້ງນີ້ແມ່ນໂພສ, ຣີລ ຫຼື ສະຕໍຣີ, ບໍ່ແມ່ນ URL ໂປຣໄຟລ໌ Instagram"
   },
   "payments": {
     "title": "ການຊຳລະຄ່າອິນຟລູເອັນເຊີ",
@@ -545,7 +559,10 @@
     "pageLinkCopied": "ຄັດລອກລິ້ງໜ້ານີ້ແລ້ວ! ສາມາດສົ່ງໄປເປີດໃນ Computer ໄດ້ເລີຍ",
     "orManualPasteOnMobile": "ຫຼື ວາງ Cookies ດ້ວຍຕົນເອງ",
     "methodExtensionTab": "ເຊື່ອມຕໍ່ດ້ວຍ Extension (1-Click 🚀 ແນະນຳ)",
-    "methodManualTab": "ວາງ Cookies ດ້ວຍຕົນເອງ (Manual Paste 📋)"
+    "methodManualTab": "ວາງ Cookies ດ້ວຍຕົນເອງ (Manual Paste 📋)",
+    "cookieStep4Desc": "ວາງຄຸກກີ້ທີ່ຄັດລອກໃສ່ໃນຊ່ອງລຸ່ມນີ້ ແລ້ວຄລິກ \"ເຊື່ອມຕໍ່ Facebook\".",
+    "cookieInputPlaceholder": "ວາງຄຸກກີ້ຢູ່ທີ່ນີ້ ເຊັ່ນ c_user=1000...; xs=... ຫຼື JSON ຈາກ Cookie-Editor",
+    "cookieConnectBtn": "ເຊື່ອມຕໍ່ Facebook"
   },
   "users": {
     "title": "ຜູ້ໃຊ້",
@@ -562,7 +579,8 @@
     "emailHint": "ຜູ້ໃຊ້ເຂົ້າສູ່ລະບົບດ້ວຍ OTP ທີ່ສົງຫາອີເມວນີ້",
     "access": "ສິດເຂົ້າເຖິງ",
     "active": "ໃຊ້ງານ",
-    "inactive": "ບໍ່ໃຊ້ງານ"
+    "inactive": "ບໍ່ໃຊ້ງານ",
+    "email": "ອີເມລ໌"
   },
   "auditLogs": {
     "title": "ບັນທຶກກວດສອບ",
@@ -633,7 +651,9 @@
     "topCreator": "ອິນຟລູເອັນເຊີທີ່ໂດດເດັ່ນ",
     "topCreatorDesc": "<1>{{name}}</1> ແມ່ນຜູ້ທີ່ສ້າງຍອດວິວໄດ້ສູງສຸດ. ຄວນພິຈາລະນາຮ່ວມງານຕໍ່ໃນແຄມເປນໜ້າ.",
     "attribution": "ຄວາມຖືກຕ້ອງ (Attribution): {{percentage}}%",
-    "verifiedData": "ຂໍ້ມູນທີ່ໄດ້ຮັບການຢືນຢັນແລ້ວ"
+    "verifiedData": "ຂໍ້ມູນທີ່ໄດ້ຮັບການຢືນຢັນແລ້ວ",
+    "exporting": "ກຳລັງໂຫຼດ PDF...",
+    "exportPDF": "ດາວໂຫຼດ PDF"
   },
   "postLinksDialog": {
     "title": "ລິ້ງໂພສອິນຟລູເອັນເຊີ",
@@ -803,7 +823,37 @@
       "kpi": "KPI",
       "status": "ສະຖານະ",
       "actions": "ຈັດການ"
-    }
+    },
+    "yearsOld": "{{age}} ປີ",
+    "noInfluencersFound": "ບໍ່ພົບອິນຟລູເອັນເຊີ",
+    "addFirstInfluencerHint": "ເພີ່ມອິນຟລູເອັນເຊີເຂົ້າໃນໃບສະເໜີແຄມເປນ ເພື່ອໃຫ້ລູກຄ້າກວດສອບ ແລະ ອະນຸມັດ.",
+    "addFirstInfluencerBtn": "ເພີ່ມອິນຟລູເອັນເຊີຄົນທຳອິດ",
+    "influencerLabel": "ອິນຟລູເອັນເຊີ",
+    "followersLabel": "ຜູ້ຕິດຕາມ",
+    "offerPriceCost": "ລາຄາຕົ້ນທຶນ",
+    "autoCalcHint": "ເລືອກອິນຟລູເອັນເຊີ. ລະບົບຈະຄິດໄລ່ລາຄາລວມຈາກລາຄາຮູບພາບ + ວິດີໂອອັດຕະໂນມັດ.",
+    "step1SelectInfluencer": "1. ເລືອກອິນຟລູເອັນເຊີ",
+    "itemsCount": "{{count}} ລາຍການ",
+    "egPricePlaceholder": "ຕົວຢ່າງ 1000000",
+    "egAgePlaceholder18": "ຕົວຢ່າງ 18",
+    "egAgePlaceholder35": "ຕົວຢ່າງ 35",
+    "loadingInfluencers": "ກຳລັງໂຫຼດອິນຟລູເອັນເຊີ...",
+    "noSelectableInfluencers": "ບໍ່ພົບອິນຟລູເອັນເຊີທີ່ສາມາດເລືອກໄດ້",
+    "sumPhotoVideo": "ລາຄາລວມ ຮູບ+ວິດີໂອ",
+    "standardPrice": "ລາຄາມາດຕະຖານ",
+    "autoCalcThousands": "ຄິດໄລ່ອັດຕະໂນມັດໃນຫຼັກພັນ",
+    "quickSelect": "ເລືອກດ່ວນ:",
+    "photoOnly": "ສະເພາະຮູບພາບ",
+    "videoOnly": "ສະເພາະວິດີໂອ",
+    "addRepostFee": "+ ເພີ່ມຄ່າຣີໂພສ",
+    "egCostPricePlaceholder": "ຕົວຢ່າງ 1,500,000",
+    "costPriceHint": "ຕົ້ນທຶນພາຍໃນທີ່ຈ່າຍໃຫ້ອິນຟລູເອັນເຊີ (ຫຼັກພັນ)",
+    "egClientPricePlaceholder": "ຕົວຢ່າງ 2,000,000",
+    "clientPriceHint": "ລາຄາທີ່ສະແດງໃຫ້ລູກຄ້າເຫັນໃນໃບສະເໜີ (ຫຼັກພັນ)",
+    "postDateOptional": "ວັນທີໂພສ (ບໍ່ບັງຄັບ)",
+    "postDateEmptyHint": "ຄ່າເລີ່ມຕົ້ນແມ່ນວ່າງເປົ່າ ເພື່ອໃຫ້ລູກຄ້າສາມາດກຳນົດເອງໄດ້",
+    "egKpiPlaceholder": "ຕົວຢ່າງ 1 Reel + 2 Stories, 50k Views",
+    "addInfluencerBtn": "ເພີ່ມອິນຟລູເອັນເຊີ"
   },
   "ownerOverview": {
     "title": "ພາບລວມຜົນງານແຄມເປນ",
