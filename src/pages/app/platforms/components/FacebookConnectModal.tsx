@@ -212,9 +212,8 @@ export const FacebookConnectModal: React.FC<FacebookConnectModalProps> = ({
                     } catch (err: any) {
                         setExtensionSyncing(false)
                         setActiveError({
-                            message: `${t('platforms.cookieConnectError')}: ${
-                                err?.data?.message || err?.message || ''
-                            }`,
+                            message: `${t('platforms.cookieConnectError')}: ${err?.data?.message || err?.message || ''
+                                }`,
                         })
                     }
                 } else {
@@ -226,9 +225,8 @@ export const FacebookConnectModal: React.FC<FacebookConnectModalProps> = ({
                         })
                     } else {
                         setActiveError({
-                            message: `${t('platforms.cookieConnectError')}: ${
-                                res?.message || ''
-                            }`,
+                            message: `${t('platforms.cookieConnectError')}: ${res?.message || ''
+                                }`,
                         })
                     }
                 }

@@ -135,8 +135,7 @@ export const FacebookViewerCard: React.FC<FacebookViewerCardProps> = ({
                     } catch (err: any) {
                         setExtensionSyncing(false)
                         setActiveError(
-                            `${t('platforms.cookieConnectError')}: ${
-                                err?.data?.message || err?.message || ''
+                            `${t('platforms.cookieConnectError')}: ${err?.data?.message || err?.message || ''
                             }`
                         )
                     }
@@ -181,8 +180,7 @@ export const FacebookViewerCard: React.FC<FacebookViewerCardProps> = ({
         } catch (err: any) {
             setManualSubmitting(false)
             setActiveError(
-                `${t('platforms.cookieConnectError')}: ${
-                    err?.data?.message || err?.message || ''
+                `${t('platforms.cookieConnectError')}: ${err?.data?.message || err?.message || ''
                 }`
             )
         }
@@ -262,18 +260,18 @@ export const FacebookViewerCard: React.FC<FacebookViewerCardProps> = ({
                                 scrape?.connecting
                                     ? 'secondary'
                                     : scrape?.connected
-                                      ? 'default'
-                                      : 'secondary'
+                                        ? 'default'
+                                        : 'secondary'
                             }
                             className="text-xs font-medium"
                         >
                             {scrape?.connecting
                                 ? t('platforms.waitingForLogin')
                                 : scrape?.connected
-                                  ? t('platforms.statusConnected')
-                                  : scrape?.status === 'expired'
-                                    ? t('platforms.statusExpired')
-                                    : t('platforms.statusNotConnected')}
+                                    ? t('platforms.statusConnected')
+                                    : scrape?.status === 'expired'
+                                        ? t('platforms.statusExpired')
+                                        : t('platforms.statusNotConnected')}
                         </Badge>
                         {scrape?.display_name ? (
                             <span className="text-xs font-semibold text-foreground/90">
@@ -292,13 +290,13 @@ export const FacebookViewerCard: React.FC<FacebookViewerCardProps> = ({
                             {t('platforms.chromeOpensHint')}
                             {scrape?.last_used_at
                                 ? ` · ${t('platforms.lastUsed', {
-                                      date: formatDateTime(scrape.last_used_at),
-                                  })}`
+                                    date: formatDateTime(scrape.last_used_at),
+                                })}`
                                 : ''}
                             {scrape?.connected_at
                                 ? ` · ${t('platforms.connectedAt', {
-                                      date: formatDateTime(scrape.connected_at),
-                                  })}`
+                                    date: formatDateTime(scrape.connected_at),
+                                })}`
                                 : ''}
                         </p>
                         {scrape?.connect_error ? (
@@ -431,11 +429,10 @@ export const FacebookViewerCard: React.FC<FacebookViewerCardProps> = ({
                                     <button
                                         type="button"
                                         onClick={() => setConnectMethod('extension')}
-                                        className={`flex items-center gap-2 px-4 py-2.5 text-xs font-medium border-b-2 transition-all ${
-                                            connectMethod === 'extension'
-                                                ? 'border-primary text-primary font-semibold'
-                                                : 'border-transparent text-muted-foreground hover:text-foreground'
-                                        }`}
+                                        className={`flex items-center gap-2 px-4 py-2.5 text-xs font-medium border-b-2 transition-all ${connectMethod === 'extension'
+                                            ? 'border-primary text-primary font-semibold'
+                                            : 'border-transparent text-muted-foreground hover:text-foreground'
+                                            }`}
                                     >
                                         <Sparkles className="size-3.5 text-amber-500" />
                                         {t('platforms.methodExtensionTab')}
@@ -444,11 +441,10 @@ export const FacebookViewerCard: React.FC<FacebookViewerCardProps> = ({
                                 <button
                                     type="button"
                                     onClick={() => setConnectMethod('manual')}
-                                    className={`flex items-center gap-2 px-4 py-2.5 text-xs font-medium border-b-2 transition-all ${
-                                        connectMethod === 'manual'
-                                            ? 'border-primary text-primary font-semibold'
-                                            : 'border-transparent text-muted-foreground hover:text-foreground'
-                                    }`}
+                                    className={`flex items-center gap-2 px-4 py-2.5 text-xs font-medium border-b-2 transition-all ${connectMethod === 'manual'
+                                        ? 'border-primary text-primary font-semibold'
+                                        : 'border-transparent text-muted-foreground hover:text-foreground'
+                                        }`}
                                 >
                                     <KeyRound className="size-3.5" />
                                     {t('platforms.methodManualTab')}
@@ -504,7 +500,7 @@ export const FacebookViewerCard: React.FC<FacebookViewerCardProps> = ({
                                                         <Sparkles className="size-4 text-amber-300" />
                                                         {isConnected
                                                             ? t('platforms.extensionOneClickBtn') +
-                                                              ' (Sync Again)'
+                                                            ' (Sync Again)'
                                                             : t('platforms.extensionOneClickBtn')}
                                                     </>
                                                 )}
@@ -532,9 +528,8 @@ export const FacebookViewerCard: React.FC<FacebookViewerCardProps> = ({
                                                     title={t('platforms.extensionRefreshBtn')}
                                                 >
                                                     <RefreshCw
-                                                        className={`size-3.5 ${
-                                                            checkingExtension ? 'animate-spin' : ''
-                                                        }`}
+                                                        className={`size-3.5 ${checkingExtension ? 'animate-spin' : ''
+                                                            }`}
                                                     />
                                                     {t('platforms.extensionRefreshBtn')}
                                                 </Button>
@@ -542,9 +537,10 @@ export const FacebookViewerCard: React.FC<FacebookViewerCardProps> = ({
                                                     href={CHROME_WEBSTORE_URL}
                                                     target="_blank"
                                                     rel="noopener noreferrer"
+                                                    style={{ color: "white" }}
                                                     className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-md text-xs font-semibold bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white transition-colors shadow-sm"
                                                 >
-                                                    <Sparkles className="size-3.5 text-amber-300" />
+                                                    <Sparkles className="size-3.5 text-amber-300 text-white" />
                                                     {t('platforms.extensionStoreBtn')}
                                                     <ExternalLink className="size-3.5" />
                                                 </a>
@@ -591,11 +587,10 @@ export const FacebookViewerCard: React.FC<FacebookViewerCardProps> = ({
                                                         className="h-6 px-2 text-xs gap-1 font-medium shrink-0"
                                                     >
                                                         <RefreshCw
-                                                            className={`size-3 ${
-                                                                checkingExtension
-                                                                    ? 'animate-spin'
-                                                                    : ''
-                                                            }`}
+                                                            className={`size-3 ${checkingExtension
+                                                                ? 'animate-spin'
+                                                                : ''
+                                                                }`}
                                                         />
                                                         {t('platforms.extensionRefreshBtn')}
                                                     </Button>
@@ -677,9 +672,9 @@ export const FacebookViewerCard: React.FC<FacebookViewerCardProps> = ({
                                     {manualDiag && manualDiag.valid && (
                                         <div className="flex items-center gap-1.5 text-xs text-emerald-600 dark:text-emerald-400 font-medium">
                                             <CheckCircle2 className="size-3.5" />
-                                             <span>
+                                            <span>
                                                 {t('platforms.cookieFormatDetected', { userId: manualDiag.userId })}
-                                             </span>
+                                            </span>
                                         </div>
                                     )}
                                 </div>
