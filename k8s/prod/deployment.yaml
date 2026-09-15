@@ -24,7 +24,7 @@ spec:
       - name: ghcr-secret
       containers:
       - name: cre8-web 
-        image: ghcr.io/champalab/cre8-web:70641d0af67fa6f12e16b8e810fca82388aa2a19
+        image: ghcr.io/champalab/cre8-web:7f9e424757d036734571c9eee55733d320682be4
         imagePullPolicy: Always
         resources:
           requests:
