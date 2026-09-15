@@ -1,7 +1,9 @@
 import React from 'react'
 import { useTranslation } from 'react-i18next'
+import SafeImage from '@/components/ui/SafeImage'
 import { CampaignInfluencer } from '../campaign.api'
 import { Users, TrendingUp, Smartphone } from 'lucide-react'
+
 
 const Facebook = (props: React.SVGProps<SVGSVGElement>) => (
     <svg
@@ -59,8 +61,16 @@ export const InfluencerCard: React.FC<{
                         <div className={`w-28 h-28 sm:w-32 sm:h-32 rounded-3xl p-1 bg-gradient-to-tr ${isTop1 ? 'from-indigo-600 via-indigo-500 to-teal-500' : 'from-slate-200 to-slate-300 dark:from-slate-700 dark:to-slate-800'} shadow-xl group-hover:scale-105 transition-transform duration-300`}>
                             <div className="w-full h-full rounded-[22px] overflow-hidden bg-slate-100 dark:bg-slate-900 relative">
                                 {influencer.profile_url ? (
-                                    <img src={resolveImageUrl(influencer.profile_url)} alt={influencer.actor_name} className="w-full h-full object-cover" />
+                                    <SafeImage
+                                        src={resolveImageUrl(influencer.profile_url)}
+                                        alt={influencer.actor_name}
+                                        variant="avatar"
+                                        fallbackName={influencer.actor_name}
+                                        className="w-full h-full object-cover"
+                                    />
                                 ) : (
+
+
                                     <div className="w-full h-full flex items-center justify-center text-slate-400">
                                         <Users className="w-12 h-12" />
                                     </div>

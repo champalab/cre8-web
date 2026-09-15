@@ -2,7 +2,9 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { BarChart3, Eye, Pencil, Trash2, CheckCircle2, User2 } from 'lucide-react'
 import { Actor } from '@/stores/services/actorApi'
+import SafeImage from '@/components/ui/SafeImage'
 import { Badge } from '@/components/ui/badge'
+
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { actorStatusClass, formatCount, getActorStatus, PLATFORM_META } from './utils'
@@ -34,13 +36,18 @@ export const ActorGridCard = ({ actor, onEdit, onSocialAccounts, onDetail, onDel
                 onClick={() => onDetail(actor)}
             >
                 {photo ? (
-                    <img
+                    <SafeImage
                         src={photo}
                         alt={actor.name}
+                        variant="avatar"
+                        fallbackName={actor.name}
+                        fallbackSrc="/images/person.jpg"
                         className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
                         onError={() => setImgFailed(true)}
                     />
                 ) : (
+
+
                     <div className="flex h-full w-full flex-col items-center justify-center bg-gradient-to-br from-slate-900 via-zinc-900 to-neutral-950 text-slate-300 p-4 text-center select-none">
                         <div className="relative mb-2 flex items-center justify-center">
                             <div className="size-14 sm:size-16 rounded-full bg-slate-800/80 border border-slate-700/60 shadow-inner flex items-center justify-center">

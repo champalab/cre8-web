@@ -19,7 +19,8 @@ import ToastComponent from '@/components/ToastComponent'
 import { getMutationPayload, isMutationSuccess } from '@/utils/mutation-response'
 import { alertWarning } from '@/utils/alerts'
 import { formatDateTime } from '@/utils/datetime'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Avatar } from '@/components/ui/avatar'
+import SafeImage from '@/components/ui/SafeImage'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -415,9 +416,15 @@ export function SocialAccountsDialog({ actor, open, onOpenChange, onUpdated }: P
                         <div className="space-y-6">
                             <div className="flex flex-col gap-3 rounded-lg border bg-muted/30 p-4 sm:flex-row sm:items-center sm:justify-between">
                                 <div className="flex items-center gap-3">
-                                    <Avatar className="size-12">
-                                        <AvatarImage src={actor.profile_url || undefined} />
-                                        <AvatarFallback>{actor.name.charAt(0).toUpperCase()}</AvatarFallback>
+                                    <Avatar className="size-12 overflow-hidden">
+                                        <SafeImage
+                                            src={actor.profile_url}
+                                            alt={actor.name}
+                                            variant="avatar"
+                                            fallbackName={actor.name}
+                                            fallbackSrc="/images/person.jpg"
+                                            className="h-full w-full object-cover"
+                                        />
                                     </Avatar>
                                     <div className="min-w-0">
                                         <p className="font-semibold">{actor.name}</p>

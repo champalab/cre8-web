@@ -636,7 +636,7 @@
     "rankCreator": "ອັນດັບ #{{rank}}",
     "topContributor": "ຜູ້ປະກອບສ່ວນຫຼັກ (Top Contributor)",
     "contentProducer": "ຜູ້ສ້າງເນື້ອຫາ",
-    "totalCreatorViews": "ຍອດວິວລວມຂອງຄົນນີ້",
+    "totalCreatorViews": "ຍອດວິວລວມ",
     "livePostDeliverables": "ຜົນງານທີ່ເຜີຍແຜ່",
     "postsCount": "{{count}} ໂພສ",
     "completed": "Completed",
@@ -735,7 +735,11 @@
     "platform": "ແພລດຟອມ",
     "influencer": "ອິນຟລູເອັນເຊີ",
     "other": "ອື່ນໆ",
-    "fallbackInfluencer": "ອິນຟລູເອັນເຊີ"
+    "fallbackInfluencer": "ອິນຟລູເອັນເຊີ",
+    "kpiProgress": "ຄວາມຄືບໜ້າ KPI",
+    "kpiTarget": "ເປົ້າໝາຍ KPI",
+    "kpiAchieved": "ບັນລຸ KPI ແລ້ວ",
+    "noKpiSet": "ບໍ່ໄດ້ລະບຸ KPI"
   },
   "influencerTab": {
     "proposalTitle": "ສະເໜີລາຍຊື່ອິນຟລູເອັນເຊີ",

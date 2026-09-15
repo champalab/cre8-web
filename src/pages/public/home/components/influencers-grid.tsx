@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import { motion, useReducedMotion, type Variants } from 'framer-motion'
+import SafeImage from '@/components/ui/SafeImage'
 import { fetchInfluencers, type Influencer } from './influencers.api'
+
 
 const Instagram = (props: React.SVGProps<SVGSVGElement>) => (
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><rect width="20" height="20" x="2" y="2" rx="5" ry="5" /><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" /><line x1="17.5" x2="17.51" y1="6.5" y2="6.5" /></svg>
@@ -76,11 +78,15 @@ export function InfluencersGrid() {
             {influencers.map((influencer) => (
                 <motion.div key={influencer.id} variants={fadeUp} className="group relative flex flex-col overflow-hidden rounded-2xl border border-white/10 bg-black/40 transition-all duration-500 hover:-translate-y-1 hover:border-orange-500/50 hover:shadow-[0_8px_32px_rgba(255,107,0,0.2)]">
                     <div className="aspect-[4/6] w-full overflow-hidden">
-                        <img
+                        <SafeImage
                             src={influencer.imageUrl}
                             alt={influencer.name}
+                            variant="avatar"
+                            fallbackName={influencer.name}
                             className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
                         />
+
+
                         <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" />
                     </div>
                     <div className="absolute bottom-0 left-0 w-full p-5">

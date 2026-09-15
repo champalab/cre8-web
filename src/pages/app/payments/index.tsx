@@ -29,7 +29,8 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Badge } from '@/components/ui/badge'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Avatar } from '@/components/ui/avatar'
+import SafeImage from '@/components/ui/SafeImage'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
@@ -487,9 +488,15 @@ const PaymentsPage = () => {
                                     <div className="flex items-start justify-between gap-3">
                                         <button type="button" className="flex min-w-0 items-center gap-2 text-left" disabled={!row.actor.profile_url}
                                             onClick={() => { if (row.actor.profile_url) setPreviewFile({ id: 0, uuid: `profile-${row.actor.uuid}`, original_name: row.actor.name, mime_type: 'image/*', public_url: row.actor.profile_url, file_size: 0 }) }}>
-                                            <Avatar className="size-10 shrink-0">
-                                                <AvatarImage src={resolveFileUrl(row.actor.profile_url || '') || undefined} />
-                                                <AvatarFallback>{row.actor.name.charAt(0)}</AvatarFallback>
+                                            <Avatar className="size-10 shrink-0 overflow-hidden">
+                                                <SafeImage
+                                                    src={resolveFileUrl(row.actor.profile_url || '')}
+                                                    alt={row.actor.name}
+                                                    variant="avatar"
+                                                    fallbackName={row.actor.name}
+                                                    fallbackSrc="/images/person.jpg"
+                                                    className="h-full w-full object-cover"
+                                                />
                                             </Avatar>
                                             <span className="break-words font-semibold">{row.actor.name}</span>
                                         </button>
@@ -569,9 +576,15 @@ const PaymentsPage = () => {
                                                             })
                                                         }}
                                                     >
-                                                        <Avatar className="size-8">
-                                                            <AvatarImage src={resolveFileUrl(row.actor.profile_url || '') || undefined} />
-                                                            <AvatarFallback>{row.actor.name.charAt(0)}</AvatarFallback>
+                                                        <Avatar className="size-8 overflow-hidden">
+                                                            <SafeImage
+                                                                src={resolveFileUrl(row.actor.profile_url || '')}
+                                                                alt={row.actor.name}
+                                                                variant="avatar"
+                                                                fallbackName={row.actor.name}
+                                                                fallbackSrc="/images/person.jpg"
+                                                                className="h-full w-full object-cover"
+                                                            />
                                                         </Avatar>
                                                         <span className="font-medium">{row.actor.name}</span>
                                                     </button>

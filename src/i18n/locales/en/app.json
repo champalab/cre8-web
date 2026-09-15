@@ -735,7 +735,11 @@
     "platform": "Platform",
     "influencer": "Influencer",
     "other": "Other",
-    "fallbackInfluencer": "Influencer"
+    "fallbackInfluencer": "Influencer",
+    "kpiProgress": "KPI Progress",
+    "kpiTarget": "KPI Target",
+    "kpiAchieved": "KPI Achieved",
+    "noKpiSet": "No KPI Set"
   },
   "influencerTab": {
     "proposalTitle": "Influencer Proposal",

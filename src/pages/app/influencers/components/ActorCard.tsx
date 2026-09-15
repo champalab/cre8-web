@@ -8,7 +8,9 @@ import {
     useRefreshAllInfluencerSocialAccountsMutation
 } from '@/stores/services/actorApi'
 import ToastComponent from '@/components/ToastComponent'
+import SafeImage from '@/components/ui/SafeImage'
 import { useGetProvincesQuery } from '@/stores/services/provinceApi'
+
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
@@ -213,15 +215,20 @@ export const ActorCard = ({ actor, onEdit, onSocialAccounts, onDetail, onDelete,
                                     className="relative shrink-0 cursor-pointer"
                                     style={{ width: `${100 / validPhotos.length}%` }}
                                 >
-                                    <img
+                                    <SafeImage
                                         src={url}
                                         alt={`${actor.name} ${idx + 1}`}
+                                        variant="avatar"
+                                        fallbackName={actor.name}
+                                        fallbackSrc="/images/person.jpg"
                                         className="h-full w-full object-cover"
                                         draggable={false}
                                         onError={() => handleImageError(url)}
                                     />
+
                                 </div>
                             ))}
+
                         </div>
                     ) : (
                         <div

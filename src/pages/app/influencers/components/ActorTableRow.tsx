@@ -4,7 +4,8 @@ import { Actor } from '@/stores/services/actorApi'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { TableCell, TableRow } from '@/components/ui/table'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Avatar } from '@/components/ui/avatar'
+import SafeImage from '@/components/ui/SafeImage'
 import { actorStatusClass, formatCount, getActorStatus, PLATFORM_META } from './utils'
 
 interface ActorTableRowProps {
@@ -32,11 +33,15 @@ export const ActorTableRow = ({ actor, onEdit, onSocialAccounts, onDetail, onDel
                     className="flex items-center gap-3 cursor-pointer"
                     onClick={() => onDetail(actor)}
                 >
-                    <Avatar className="size-9 shrink-0">
-                        <AvatarImage src={actor.profile_url || undefined} />
-                        <AvatarFallback className="bg-primary/10 text-primary text-xs font-bold">
-                            {actor.name.charAt(0).toUpperCase()}
-                        </AvatarFallback>
+                    <Avatar className="size-9 shrink-0 overflow-hidden">
+                        <SafeImage
+                            src={actor.profile_url}
+                            alt={actor.name}
+                            variant="avatar"
+                            fallbackName={actor.name}
+                            fallbackSrc="/images/person.jpg"
+                            className="h-full w-full object-cover"
+                        />
                     </Avatar>
                     <div className="min-w-0">
                         <p className="font-semibold text-sm truncate max-w-[160px] hover:text-primary transition-colors">

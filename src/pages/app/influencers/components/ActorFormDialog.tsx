@@ -4,7 +4,9 @@ import { alertError, alertWarning } from '../../../../utils/alerts'
 import { Actor } from '@/stores/services/actorApi'
 import { useUploadFilesMutation } from '@/stores/services/filesApi'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import SafeImage from '@/components/ui/SafeImage'
 import { Loader2, Camera, User, Phone, MapPin, Banknote, Trash2, Briefcase, FileImage, Contact, DollarSign, Mail, Check } from 'lucide-react'
+
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
@@ -623,7 +625,14 @@ export const ActorFormDialog = ({ open, onOpenChange, actor, form, onFormChange,
                                                 key={i}
                                                 className="group relative aspect-[3/4] rounded-xl overflow-hidden bg-muted/20 border border-border/40 shadow-sm hover:shadow-md transition-all"
                                             >
-                                                <img src={url} alt={t('influencers.galleryAlt', { index: i + 1 })} className="w-full h-full object-cover" />
+                                                <SafeImage
+                                                    src={url}
+                                                    alt={t('influencers.galleryAlt', { index: i + 1 })}
+                                                    variant="gallery"
+                                                    className="w-full h-full object-cover"
+                                                />
+
+
                                                 <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                                                     <Button
                                                         size="icon"

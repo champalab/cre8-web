@@ -15,6 +15,8 @@ import {
 
 import { Actor, useGetActorByIdQuery } from '@/stores/services/actorApi'
 import BackdropComponent from '@/components/BackdropComponent'
+import SafeImage from '@/components/ui/SafeImage'
+
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -70,8 +72,6 @@ function DetailField({ label, value }: { label: string; value: React.ReactNode }
 }
 
 function GalleryImageItem({ url, index }: { url: string; index: number }) {
-    const [hasError, setHasError] = useState(false)
-
     return (
         <a
             href={url}
@@ -79,22 +79,18 @@ function GalleryImageItem({ url, index }: { url: string; index: number }) {
             rel="noreferrer"
             className="group relative flex h-24 w-24 items-center justify-center overflow-hidden rounded-lg border bg-muted/30 transition-all hover:border-primary/40 hover:opacity-90 sm:h-32 sm:w-32"
         >
-            {hasError ? (
-                <div className="flex flex-col items-center justify-center gap-1 p-2 text-center text-muted-foreground">
-                    <ImageOff className="size-6 text-muted-foreground/50 sm:size-8" />
-                    <span className="text-[10px] sm:text-xs">Failed to load</span>
-                </div>
-            ) : (
-                <img
-                    src={url}
-                    alt={`Profile ${index + 1}`}
-                    className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-                    onError={() => setHasError(true)}
-                />
-            )}
+            <SafeImage
+                src={url}
+                alt={`Profile ${index + 1}`}
+                variant="gallery"
+                fallbackText="Failed to load"
+                className="transition-transform duration-300 group-hover:scale-105"
+            />
         </a>
     )
 }
+
+
 
 
 export function ActorDetailDialog({ actor, open, onOpenChange, onEdit, onSocialAccounts }: Props) {

@@ -19,12 +19,14 @@ import {
     Share2,
     Table2,
     TrendingUp,
-    Globe2Icon
+    Globe2Icon,
+    Target
 } from 'lucide-react'
 import { useSelector } from 'react-redux'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
+import SafeImage from '@/components/ui/SafeImage'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { canAccess, INTERNAL_ROLES, isADMINRole } from '@/config/roles'
@@ -62,6 +64,7 @@ type InfluencerGroup = {
     photos: string[]
     handle: string | null
     source: string | null
+    kpi: number | null
     links: CampaignPostLink[]
     totals: MetricTotals
     platforms: PlatformGroup[]
@@ -170,6 +173,87 @@ const StatBox: React.FC<{
     </div>
 )
 
+const KpiProgressBar: React.FC<{
+    views: number
+    kpi: number | null
+    compact?: boolean
+}> = ({ views, kpi, compact = false }) => {
+    const { t } = useTranslation('app')
+
+    if (!kpi || kpi <= 0) {
+        if (compact) {
+            return <span className="text-[11px] italic text-muted-foreground">{t('statusTab.noKpiSet')}</span>
+        }
+        return (
+            <div className="rounded-xl border border-dashed border-border/60 bg-muted/20 px-3 py-2 text-xs text-muted-foreground flex items-center justify-between">
+                <span className="font-medium text-[11px] uppercase tracking-wider">{t('statusTab.kpiTarget')}</span>
+                <span className="text-[11px] italic opacity-75">{t('statusTab.noKpiSet')}</span>
+            </div>
+        )
+    }
+
+    const pct = Math.round((views / kpi) * 100)
+    const cappedPct = Math.min(pct, 100)
+    const isCompleted = pct >= 100
+
+    if (compact) {
+        return (
+            <div className="flex items-center gap-2 min-w-[130px]" title={`${formatCount(views)} / ${formatCount(kpi)}`}>
+                <div className="flex-1 bg-muted rounded-full h-2 overflow-hidden">
+                    <div
+                        className={`h-full rounded-full transition-all duration-500 ${
+                            isCompleted ? 'bg-emerald-500' : pct >= 50 ? 'bg-indigo-600' : 'bg-amber-500'
+                        }`}
+                        style={{ width: `${cappedPct}%` }}
+                    />
+                </div>
+                <span className={`text-xs font-bold tabular-nums shrink-0 ${isCompleted ? 'text-emerald-600 dark:text-emerald-400' : 'text-foreground'}`}>
+                    {pct}%
+                </span>
+            </div>
+        )
+    }
+
+    return (
+        <div className="rounded-xl border border-border/60 bg-gradient-to-r from-muted/30 via-muted/15 to-muted/30 p-3 space-y-2">
+            <div className="flex items-center justify-between text-xs">
+                <div className="flex items-center gap-1.5">
+                    <Target className="size-3.5 text-primary" />
+                    <span className="font-semibold text-foreground text-[11px] uppercase tracking-wide">
+                        {t('statusTab.kpiProgress')}
+                    </span>
+                    {isCompleted && (
+                        <Badge className="bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border-emerald-500/30 text-[9px] font-bold px-1.5 py-0 h-4">
+                            ✓ {t('statusTab.kpiAchieved')}
+                        </Badge>
+                    )}
+                </div>
+                <div className="flex items-baseline gap-1">
+                    <span className={`font-extrabold text-sm tabular-nums ${isCompleted ? 'text-emerald-600 dark:text-emerald-400' : 'text-foreground'}`}>
+                        {pct}%
+                    </span>
+                    <span className="text-[10px] text-muted-foreground">
+                        ({formatCount(views)} / {formatCount(kpi)})
+                    </span>
+                </div>
+            </div>
+
+            <div className="w-full bg-slate-200/80 dark:bg-slate-700/60 rounded-full h-2.5 p-0.5 overflow-hidden shadow-inner">
+                <div
+                    className={`h-full rounded-full transition-all duration-700 ${
+                        isCompleted
+                            ? 'bg-gradient-to-r from-emerald-500 to-teal-400 shadow-sm shadow-emerald-500/30'
+                            : pct >= 50
+                            ? 'bg-gradient-to-r from-indigo-600 to-blue-500 shadow-sm shadow-indigo-500/30'
+                            : 'bg-gradient-to-r from-amber-500 to-orange shadow-sm shadow-amber-500/30'
+                    }`}
+                    style={{ width: `${cappedPct}%` }}
+                />
+            </div>
+        </div>
+    )
+}
+
 const InfluencerPhotos: React.FC<{
     name: string
     subtitle?: string
@@ -213,7 +297,12 @@ const InfluencerPhotos: React.FC<{
                                 className="h-full w-full shrink-0 cursor-zoom-in"
                                 onClick={() => onPreview(url)}
                             >
-                                <img src={url} alt={`${name} ${index + 1}`} className="h-full w-full object-cover" />
+                                <SafeImage
+                                    src={url}
+                                    alt={`${name} ${index + 1}`}
+                                    variant="gallery"
+                                    className="h-full w-full object-cover"
+                                />
                             </button>
                         ))}
                     </div>
@@ -351,6 +440,15 @@ const StatusTab: React.FC<Props> = ({ campaign, onChanged }) => {
                 existing.links.push(link)
                 continue
             }
+            const rawKpi = assignment?.kpi
+            let kpiNum: number | null = null
+            if (rawKpi != null && rawKpi !== '') {
+                const parsed = Number(String(rawKpi).replace(/,/g, ''))
+                if (!isNaN(parsed) && parsed > 0) {
+                    kpiNum = parsed
+                }
+            }
+
             map.set(id, {
                 id,
                 name: actor?.name || link.influencer?.name || t('statusTab.fallbackInfluencer'),
@@ -358,6 +456,7 @@ const StatusTab: React.FC<Props> = ({ campaign, onChanged }) => {
                 photos: collectPhotos(actor?.profile_url || link.influencer?.profile_url, actor?.profile_urls),
                 handle: actor?.social_handle || null,
                 source: actor?.source || null,
+                kpi: kpiNum,
                 links: [link],
                 totals: emptyTotals(),
                 platforms: []
@@ -832,7 +931,8 @@ const StatusTab: React.FC<Props> = ({ campaign, onChanged }) => {
                                         photos={group.photos}
                                         onPreview={(url) => setPreviewPhoto({ url, name: group.name })}
                                     />
-                                    <CardContent className="space-y-3 p-3">
+                                    <CardContent className="space-y-3 p-3.5">
+                                        <KpiProgressBar views={group.totals.views} kpi={group.kpi} />
                                         <div className="grid grid-cols-2 gap-2">
                                             <StatBox icon={<Eye className="size-3.5" />} label={t('metrics.views')} value={group.totals.views} tone="border-sky-200 bg-sky-50 text-sky-900" />
                                             <StatBox icon={<Heart className="size-3.5" />} label={t('metrics.likes')} value={group.totals.likes} tone="border-rose-200 bg-rose-50 text-rose-900" />
@@ -892,16 +992,19 @@ const StatusTab: React.FC<Props> = ({ campaign, onChanged }) => {
                                         className="size-16 shrink-0 overflow-hidden rounded-lg bg-muted"
                                         onClick={() => group.photos[0] && setPreviewPhoto({ url: group.photos[0], name: group.name })}
                                     >
-                                        {group.photos[0] ? (
-                                            <img src={group.photos[0]} alt={group.name} className="h-full w-full object-cover" />
-                                        ) : (
-                                            <div className="flex h-full items-center justify-center text-lg font-bold text-primary/40">
-                                                {group.name.slice(0, 1).toUpperCase()}
-                                            </div>
-                                        )}
+                                        <SafeImage
+                                            src={group.photos[0]}
+                                            alt={group.name}
+                                            variant="avatar"
+                                            fallbackName={group.name}
+                                            className="h-full w-full object-cover"
+                                        />
                                     </button>
-                                    <div className="min-w-0 flex-1">
-                                        <p className="truncate font-semibold">{group.name}</p>
+                                    <div className="min-w-0 flex-1 space-y-1">
+                                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+                                            <p className="truncate font-semibold">{group.name}</p>
+                                            <KpiProgressBar views={group.totals.views} kpi={group.kpi} compact />
+                                        </div>
                                         <p className="truncate text-[11px] text-muted-foreground">
                                             {[group.handle, t('statusTab.postsCount', { count: group.totals.posts }), group.platforms.map((p) => getPlatformMeta(p.name).label).join(', ')]
                                                 .filter(Boolean)
@@ -956,6 +1059,7 @@ const StatusTab: React.FC<Props> = ({ campaign, onChanged }) => {
                                         <th className="px-3 py-2 font-medium">{t('statusTab.platform')}</th>
                                         <th className="px-3 py-2 font-medium">{t('statusTab.posts')}</th>
                                         <th className="px-3 py-2 font-medium">{t('metrics.views')}</th>
+                                        <th className="px-3 py-2 font-medium">{t('statusTab.kpiProgress')}</th>
                                         <th className="px-3 py-2 font-medium">{t('metrics.likes')}</th>
                                         <th className="px-3 py-2 font-medium">{t('metrics.comments')}</th>
                                         <th className="px-3 py-2 font-medium">{t('metrics.shares')}</th>
@@ -967,13 +1071,15 @@ const StatusTab: React.FC<Props> = ({ campaign, onChanged }) => {
                                         <tr key={String(group.id)} className="border-t hover:bg-muted/30">
                                             <td className="px-3 py-2">
                                                 <div className="flex items-center gap-2">
-                                                    {group.photos[0] ? (
-                                                        <img src={group.photos[0]} alt="" className="size-9 rounded-md object-cover" />
-                                                    ) : (
-                                                        <div className="flex size-9 items-center justify-center rounded-md bg-primary/10 text-xs font-bold text-primary">
-                                                            {group.name.slice(0, 1).toUpperCase()}
-                                                        </div>
-                                                    )}
+                                                    <div className="size-9 shrink-0 overflow-hidden rounded-md">
+                                                        <SafeImage
+                                                            src={group.photos[0]}
+                                                            alt={group.name}
+                                                            variant="avatar"
+                                                            fallbackName={group.name}
+                                                            className="h-full w-full object-cover"
+                                                        />
+                                                    </div>
                                                     <div className="min-w-0">
                                                         <p className="truncate font-medium">{group.name}</p>
                                                         {group.handle ? <p className="truncate text-[11px] text-muted-foreground">{group.handle}</p> : null}
@@ -983,6 +1089,9 @@ const StatusTab: React.FC<Props> = ({ campaign, onChanged }) => {
                                             <td className="px-3 py-2 text-xs">{group.platforms.map((p) => getPlatformMeta(p.name).label).join(', ')}</td>
                                             <td className="px-3 py-2 tabular-nums">{formatCount(group.totals.posts)}</td>
                                             <td className="px-3 py-2 tabular-nums font-medium">{formatCount(group.totals.views)}</td>
+                                            <td className="px-3 py-2">
+                                                <KpiProgressBar views={group.totals.views} kpi={group.kpi} compact />
+                                            </td>
                                             <td className="px-3 py-2 tabular-nums">{formatCount(group.totals.likes)}</td>
                                             <td className="px-3 py-2 tabular-nums">{formatCount(group.totals.comments)}</td>
                                             <td className="px-3 py-2 tabular-nums">{formatCount(group.totals.shares)}</td>
@@ -1031,18 +1140,16 @@ const StatusTab: React.FC<Props> = ({ campaign, onChanged }) => {
                         <>
                             <DialogHeader className="shrink-0 pr-8">
                                 <div className="flex items-center gap-3">
-                                    {detailGroup.photos[0] ? (
-                                        <img
+                                    <div className="size-14 shrink-0 overflow-hidden rounded-xl">
+                                        <SafeImage
                                             src={detailGroup.photos[0]}
                                             alt={detailGroup.name}
-                                            className="size-14 shrink-0 cursor-zoom-in rounded-xl object-cover"
+                                            variant="avatar"
+                                            fallbackName={detailGroup.name}
+                                            className="h-full w-full cursor-zoom-in object-cover"
                                             onClick={() => setPreviewPhoto({ url: detailGroup.photos[0], name: detailGroup.name })}
                                         />
-                                    ) : (
-                                        <div className="flex size-14 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-lg font-bold text-primary">
-                                            {detailGroup.name.slice(0, 1).toUpperCase()}
-                                        </div>
-                                    )}
+                                    </div>
                                     <div className="min-w-0">
                                         <DialogTitle className="truncate">{detailGroup.name}</DialogTitle>
                                         <DialogDescription>
@@ -1061,11 +1168,14 @@ const StatusTab: React.FC<Props> = ({ campaign, onChanged }) => {
                                                 className="size-12 shrink-0 overflow-hidden rounded-lg border"
                                                 onClick={() => setPreviewPhoto({ url, name: detailGroup.name })}
                                             >
-                                                <img src={url} alt="" className="h-full w-full object-cover" />
+                                                <SafeImage src={url} alt="" variant="gallery" className="h-full w-full object-cover" />
                                             </button>
                                         ))}
                                     </div>
                                 )}
+                                <div className="mt-3">
+                                    <KpiProgressBar views={detailGroup.totals.views} kpi={detailGroup.kpi} />
+                                </div>
                                 <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
                                     <StatBox icon={<Eye className="size-3.5" />} label={t('metrics.views')} value={detailGroup.totals.views} tone="border-sky-200 bg-sky-50 text-sky-900" />
                                     <StatBox icon={<Heart className="size-3.5" />} label={t('metrics.likes')} value={detailGroup.totals.likes} tone="border-rose-200 bg-rose-50 text-rose-900" />

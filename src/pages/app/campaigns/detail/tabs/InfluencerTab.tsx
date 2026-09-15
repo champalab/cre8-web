@@ -32,6 +32,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import SafeImage from '@/components/ui/SafeImage'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -1197,17 +1198,14 @@ const InfluencerTab: React.FC<Props> = ({ campaign, onChanged }) => {
                                                 }
                                             }}
                                         >
-                                            {actor?.profile_url ? (
-                                                <img
-                                                    src={actor.profile_url}
-                                                    alt={actor.name}
-                                                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                                                />
-                                            ) : (
-                                                <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-orange/10 to-black/10 text-4xl font-bold text-orange/40">
-                                                    {actor?.name?.slice(0, 1).toUpperCase() || 'I'}
-                                                </div>
-                                            )}
+                                            <SafeImage
+                                                src={actor?.profile_url}
+                                                alt={actor?.name}
+                                                variant="avatar"
+                                                fallbackName={actor?.name}
+                                                fallbackSrc="/images/person.jpg"
+                                                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                                            />
                                         </button>
 
                                         <div className="absolute bottom-2 left-2 flex items-center gap-1.5">
@@ -1321,7 +1319,7 @@ const InfluencerTab: React.FC<Props> = ({ campaign, onChanged }) => {
                                                 )}
                                                 {item.kpi && (
                                                     <div className="text-muted-foreground text-[11px] line-clamp-2">
-                                                        <strong>KPI:</strong> {item.kpi}
+                                                        <strong>KPI:</strong> {Number(item.kpi)?.toLocaleString()}
                                                     </div>
                                                 )}
                                             </div>
@@ -1440,11 +1438,15 @@ const InfluencerTab: React.FC<Props> = ({ campaign, onChanged }) => {
                                                 </TableCell>
                                                 <TableCell>
                                                     <div className="flex items-center gap-3">
-                                                        <Avatar className="size-9 border">
-                                                            <AvatarImage src={actor?.profile_url || undefined} />
-                                                            <AvatarFallback className="text-xs font-bold">
-                                                                {actor?.name?.slice(0, 1).toUpperCase()}
-                                                            </AvatarFallback>
+                                                        <Avatar className="size-9 border overflow-hidden">
+                                                            <SafeImage
+                                                                src={actor?.profile_url}
+                                                                alt={actor?.name}
+                                                                variant="avatar"
+                                                                fallbackName={actor?.name}
+                                                                fallbackSrc="/images/person.jpg"
+                                                                className="w-full h-full object-cover"
+                                                            />
                                                         </Avatar>
                                                         <div className="min-w-0">
                                                             <p className="font-semibold text-sm truncate">{actor?.name}</p>
@@ -1808,9 +1810,15 @@ const InfluencerTab: React.FC<Props> = ({ campaign, onChanged }) => {
                                                         }`}
                                                 >
                                                     <div className="flex items-center gap-2.5 min-w-0">
-                                                        <Avatar className="size-8">
-                                                            <AvatarImage src={actor.profile_url || undefined} />
-                                                            <AvatarFallback className="text-xs">{actor.name.slice(0, 1)}</AvatarFallback>
+                                                        <Avatar className="size-8 overflow-hidden">
+                                                            <SafeImage
+                                                                src={actor.profile_url}
+                                                                alt={actor.name}
+                                                                variant="avatar"
+                                                                fallbackName={actor.name}
+                                                                fallbackSrc="/images/person.jpg"
+                                                                className="w-full h-full object-cover"
+                                                            />
                                                         </Avatar>
                                                         <div className="min-w-0">
                                                             <p className="text-xs font-semibold truncate">{actor.name}</p>
@@ -1856,9 +1864,15 @@ const InfluencerTab: React.FC<Props> = ({ campaign, onChanged }) => {
                                 <div className="rounded-xl border bg-primary/5 p-3.5 space-y-2.5">
                                     <div className="flex items-center justify-between">
                                         <div className="flex items-center gap-2">
-                                            <Avatar className="size-7">
-                                                <AvatarImage src={selectedActor.profile_url || undefined} />
-                                                <AvatarFallback className="text-xs">{selectedActor.name.slice(0, 1)}</AvatarFallback>
+                                            <Avatar className="size-7 overflow-hidden">
+                                                <SafeImage
+                                                    src={selectedActor.profile_url}
+                                                    alt={selectedActor.name}
+                                                    variant="avatar"
+                                                    fallbackName={selectedActor.name}
+                                                    fallbackSrc="/images/person.jpg"
+                                                    className="w-full h-full object-cover"
+                                                />
                                             </Avatar>
                                             <div>
                                                 <h4 className="text-xs font-bold">
