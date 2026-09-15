@@ -1,6 +1,6 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { BarChart3, Camera, CheckCircle2, ChevronLeft, ChevronRight, Eye, Globe2Icon, Link2, Loader2, Mail, MoreHorizontal, Pencil, Phone, Trash2 } from 'lucide-react'
+import { BarChart3, Camera, CheckCircle2, ChevronLeft, ChevronRight, Eye, Globe2Icon, Link2, Loader2, Mail, MoreHorizontal, Pencil, Phone, Trash2, User2 } from 'lucide-react'
 import {
     Actor,
     PROFILE_METRIC_PLATFORMS,
@@ -63,21 +63,33 @@ export const ActorCard = ({ actor, onEdit, onSocialAccounts, onDetail, onDelete,
     const { data: provincesResponse } = useGetProvincesQuery()
     const provinceName = actor.province_id ? provincesResponse?.data?.find((p) => p.id === actor.province_id)?.nameLao || actor.province_id : null
 
-    const allPhotos = actor.profile_urls && actor.profile_urls.length > 0 ? actor.profile_urls : actor.profile_url ? [actor.profile_url] : []
+    const allPhotosRaw = useMemo(() => {
+        return actor.profile_urls && actor.profile_urls.length > 0 ? actor.profile_urls : actor.profile_url ? [actor.profile_url] : []
+    }, [actor.profile_url, actor.profile_urls])
+
+    const [failedImages, setFailedImages] = useState<Record<string, boolean>>({})
+
+    const handleImageError = useCallback((url: string) => {
+        setFailedImages((prev) => ({ ...prev, [url]: true }))
+    }, [])
+
+    const validPhotos = useMemo(() => {
+        return allPhotosRaw.filter((url) => url && !failedImages[url])
+    }, [allPhotosRaw, failedImages])
 
     const [activeImageIndex, setActiveImageIndex] = useState(0)
-    const mainPhoto = allPhotos[activeImageIndex] || null
-    const hasMultiple = allPhotos.length > 1
+    const mainPhoto = validPhotos[activeImageIndex] || null
+    const hasMultiple = validPhotos.length > 1
 
     const goPrev = useCallback((e: React.MouseEvent) => {
         e.stopPropagation()
-        setActiveImageIndex((i) => (i - 1 + allPhotos.length) % allPhotos.length)
-    }, [allPhotos.length])
+        setActiveImageIndex((i) => (i - 1 + validPhotos.length) % validPhotos.length)
+    }, [validPhotos.length])
 
     const goNext = useCallback((e: React.MouseEvent) => {
         e.stopPropagation()
-        setActiveImageIndex((i) => (i + 1) % allPhotos.length)
-    }, [allPhotos.length])
+        setActiveImageIndex((i) => (i + 1) % validPhotos.length)
+    }, [validPhotos.length])
 
     const goTo = useCallback((idx: number, e: React.MouseEvent) => {
         e.stopPropagation()
@@ -145,10 +157,10 @@ export const ActorCard = ({ actor, onEdit, onSocialAccounts, onDetail, onDelete,
                         message:
                             status.failed > 0
                                 ? t('influencers.followPartial', {
-                                      completed: status.completed,
-                                      total: status.total,
-                                      failed: status.failed
-                                  })
+                                    completed: status.completed,
+                                    total: status.total,
+                                    failed: status.failed
+                                })
                                 : t('influencers.followSuccess', { completed: status.completed })
                     })
                 }
@@ -170,9 +182,8 @@ export const ActorCard = ({ actor, onEdit, onSocialAccounts, onDetail, onDelete,
     return (
         <Card className="group flex flex-col lg:flex-row overflow-hidden rounded-[2rem] border border-border/50 bg-card shadow-sm transition-all duration-500 hover:shadow-2xl hover:shadow-primary/5">
             {/* Left Image / Carousel Section (45–50% width on desktop) */}
-            <div className="relative flex shrink-0 flex-col lg:w-[48%] xl:w-[45%] bg-muted/10 p-2 sm:p-3">
+            <div className="relative flex shrink-0 flex-col lg:w-[38%] xl:w-[35%] bg-muted/10 p-2 sm:p-3">
                 <div className="relative overflow-hidden rounded-3xl bg-background" style={{ aspectRatio: '3/4' }}>
-
                     {/* Background blur glow — transitions with the active photo */}
                     <div
                         className="absolute inset-0 scale-110 blur-3xl opacity-25 saturate-150 pointer-events-none"
@@ -184,40 +195,53 @@ export const ActorCard = ({ actor, onEdit, onSocialAccounts, onDetail, onDelete,
                         }}
                     />
 
-                    {/* --- Image strip: all photos rendered side-by-side, strip slides via translateX --- */}
-                    {allPhotos.length > 0 ? (
+                    {/* --- Image strip: all valid photos rendered side-by-side, strip slides via translateX --- */}
+                    {validPhotos.length > 0 ? (
                         <div
                             className="absolute inset-0 flex"
                             style={{
-                                width: `${allPhotos.length * 100}%`,
-                                transform: `translateX(-${(activeImageIndex / allPhotos.length) * 100}%)`,
+                                width: `${validPhotos.length * 100}%`,
+                                transform: `translateX(-${(activeImageIndex / validPhotos.length) * 100}%)`,
                                 transition: 'transform 420ms cubic-bezier(0.4, 0, 0.2, 1)',
                                 willChange: 'transform',
                             }}
                             onClick={() => onDetail(actor)}
                         >
-                            {allPhotos.map((url, idx) => (
+                            {validPhotos.map((url, idx) => (
                                 <div
                                     key={idx}
                                     className="relative shrink-0 cursor-pointer"
-                                    style={{ width: `${100 / allPhotos.length}%` }}
+                                    style={{ width: `${100 / validPhotos.length}%` }}
                                 >
                                     <img
                                         src={url}
                                         alt={`${actor.name} ${idx + 1}`}
                                         className="h-full w-full object-cover"
                                         draggable={false}
+                                        onError={() => handleImageError(url)}
                                     />
                                 </div>
                             ))}
                         </div>
                     ) : (
                         <div
-                            className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-muted/50 to-muted text-muted-foreground/50 cursor-pointer"
+                            className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-slate-900 via-zinc-900 to-neutral-950 text-slate-300 cursor-pointer select-none p-6 text-center"
                             onClick={() => onDetail(actor)}
                         >
-                            <Camera className="size-16 mb-4 opacity-20" />
-                            <span className="text-6xl font-black opacity-20 tracking-tighter">{actor.name.charAt(0).toUpperCase()}</span>
+                            <div className="relative mb-3 flex items-center justify-center">
+                                <div className="size-20 sm:size-24 rounded-full bg-slate-800/80 border border-slate-700/60 shadow-inner flex items-center justify-center">
+                                    <User2 className="size-10 sm:size-12 text-slate-400/80" />
+                                </div>
+                                <div className="absolute -bottom-1 -right-1 size-7 rounded-full bg-slate-700 border border-slate-600 flex items-center justify-center shadow-md">
+                                    <Camera className="size-3.5 text-slate-300" />
+                                </div>
+                            </div>
+                            <span className="text-3xl font-black tracking-wider text-slate-100 uppercase opacity-90">
+                                {actor.name.charAt(0).toUpperCase()}
+                            </span>
+                            <span className="mt-1 text-[11px] font-medium text-slate-400">
+                                {t('influencers.noPhotosYet')}
+                            </span>
                         </div>
                     )}
 
@@ -228,7 +252,7 @@ export const ActorCard = ({ actor, onEdit, onSocialAccounts, onDetail, onDelete,
                     {hasMultiple && (
                         <div className="absolute top-3 left-3 z-20 flex items-center gap-1 rounded-full bg-black/40 backdrop-blur-md px-2.5 py-1 text-white text-[10px] font-semibold select-none">
                             <Camera className="size-3" />
-                            {activeImageIndex + 1} / {allPhotos.length}
+                            {activeImageIndex + 1} / {validPhotos.length}
                         </div>
                     )}
 
@@ -257,14 +281,14 @@ export const ActorCard = ({ actor, onEdit, onSocialAccounts, onDetail, onDelete,
                     {/* Dot indicators */}
                     {hasMultiple && (
                         <div className="absolute bottom-[4.5rem] inset-x-0 z-20 flex justify-center gap-1.5">
-                            {allPhotos.map((_, idx) => (
+                            {validPhotos.map((_, idx) => (
                                 <button
                                     key={idx}
                                     type="button"
                                     onClick={(e) => goTo(idx, e)}
                                     className={`rounded-full transition-all duration-300 ease-out ${idx === activeImageIndex
-                                            ? 'w-5 h-1.5 bg-white shadow'
-                                            : 'size-1.5 bg-white/40 hover:bg-white/70'
+                                        ? 'w-5 h-1.5 bg-white shadow'
+                                        : 'size-1.5 bg-white/40 hover:bg-white/70'
                                         }`}
                                 />
                             ))}

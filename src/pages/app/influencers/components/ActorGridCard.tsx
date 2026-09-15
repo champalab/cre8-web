@@ -1,5 +1,6 @@
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { BarChart3, Eye, Pencil, Trash2, CheckCircle2 } from 'lucide-react'
+import { BarChart3, Eye, Pencil, Trash2, CheckCircle2, User2 } from 'lucide-react'
 import { Actor } from '@/stores/services/actorApi'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -16,8 +17,10 @@ interface ActorGridCardProps {
 
 export const ActorGridCard = ({ actor, onEdit, onSocialAccounts, onDetail, onDelete }: ActorGridCardProps) => {
     const { t } = useTranslation('app')
+    const [imgFailed, setImgFailed] = useState(false)
 
-    const photo = actor.profile_urls?.[0] || actor.profile_url || null
+    const rawPhoto = actor.profile_urls?.[0] || actor.profile_url || null
+    const photo = !imgFailed ? rawPhoto : null
 
     const totalFollowers = (actor.influencer_social_accounts ?? []).reduce((sum, acc) => {
         return sum + Number(acc.follower_count ?? 0)
@@ -35,10 +38,16 @@ export const ActorGridCard = ({ actor, onEdit, onSocialAccounts, onDetail, onDel
                         src={photo}
                         alt={actor.name}
                         className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+                        onError={() => setImgFailed(true)}
                     />
                 ) : (
-                    <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-muted/60 to-muted text-muted-foreground/30">
-                        <span className="text-5xl font-black">{actor.name.charAt(0).toUpperCase()}</span>
+                    <div className="flex h-full w-full flex-col items-center justify-center bg-gradient-to-br from-slate-900 via-zinc-900 to-neutral-950 text-slate-300 p-4 text-center select-none">
+                        <div className="relative mb-2 flex items-center justify-center">
+                            <div className="size-14 sm:size-16 rounded-full bg-slate-800/80 border border-slate-700/60 shadow-inner flex items-center justify-center">
+                                <User2 className="size-7 sm:size-8 text-slate-400/80" />
+                            </div>
+                        </div>
+                        <span className="text-2xl font-black text-slate-100 uppercase tracking-wider">{actor.name.charAt(0).toUpperCase()}</span>
                     </div>
                 )}
 
