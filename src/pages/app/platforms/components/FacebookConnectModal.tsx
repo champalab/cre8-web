@@ -337,51 +337,68 @@ export const FacebookConnectModal: React.FC<FacebookConnectModalProps> = ({
                     ) : (
                         <div className="space-y-4">
                             <div className="rounded-xl border border-border/80 bg-muted/40 p-4 space-y-3">
-                                <div className="flex items-center justify-between">
+                                <div className="flex flex-wrap items-center justify-between gap-2">
                                     <Badge variant="secondary" className="gap-1.5 text-xs font-medium">
                                         <Zap className="size-3.5 text-amber-500" />
                                         {t('platforms.extensionNotDetected')}
                                     </Badge>
                                     <a
-                                        href="/cre8-extension.zip"
-                                        download="cre8-extension.zip"
-                                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold bg-primary text-primary-foreground hover:bg-primary/90 transition-colors shadow-sm"
+                                        href="https://chromewebstore.google.com/detail/cre8-facebook-sync/maecjojlbcdnchjmackkbingdmnlblob?authuser=0&hl=th"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-md text-xs font-semibold bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white transition-colors shadow-sm"
                                     >
-                                        <Download className="size-3.5" />
-                                        {t('platforms.extensionDownloadBtn')}
+                                        <Sparkles className="size-3.5 text-amber-300" />
+                                        {t('platforms.extensionStoreBtn')}
+                                        <ExternalLink className="size-3.5" />
                                     </a>
                                 </div>
 
-                                <div className="text-xs space-y-2 text-muted-foreground pt-1">
+                                <div className="text-xs space-y-2.5 text-muted-foreground pt-1">
                                     <p className="font-semibold text-foreground text-sm">
                                         {t('platforms.extensionInstallTitle')}
                                     </p>
-                                    <div className="space-y-1.5 pl-1">
-                                        <p>{t('platforms.extensionInstallStep1')}</p>
+                                    <div className="space-y-2 pl-1">
+                                        <div className="flex flex-wrap items-center gap-2">
+                                            <span>{t('platforms.extensionInstallStep1')}</span>
+                                            <a
+                                                href="https://chromewebstore.google.com/detail/cre8-facebook-sync/maecjojlbcdnchjmackkbingdmnlblob?authuser=0&hl=th"
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="inline-flex items-center gap-1 text-xs font-semibold text-primary underline underline-offset-2 hover:opacity-80"
+                                            >
+                                                Chrome Web Store <ExternalLink className="size-3" />
+                                            </a>
+                                        </div>
                                         <div className="flex flex-wrap items-center gap-2">
                                             <span>{t('platforms.extensionInstallStep2')}</span>
                                             <Button
                                                 type="button"
-                                                variant="outline"
+                                                variant="ghost"
                                                 size="sm"
-                                                onClick={handleCopyChromeExtensions}
-                                                className="h-6 px-2 text-xs font-mono gap-1 text-primary hover:text-primary shrink-0 transition-all"
-                                                title={t('platforms.copyChromeExtensions')}
+                                                onClick={handleOpenFacebook}
+                                                className="h-6 px-1.5 text-xs gap-1 text-primary hover:text-primary shrink-0"
                                             >
-                                                {copiedLink ? (
-                                                    <>
-                                                        <Check className="size-3 text-emerald-500" />
-                                                        <span className="text-emerald-600 font-semibold">Copied!</span>
-                                                    </>
-                                                ) : (
-                                                    <>
-                                                        <Copy className="size-3" />
-                                                        <span>Copy chrome://extensions</span>
-                                                    </>
-                                                )}
+                                                <ExternalLink className="size-3" />
+                                                {t('platforms.cookieOpenFacebook')}
                                             </Button>
                                         </div>
                                         <p>{t('platforms.extensionInstallStep3')}</p>
+                                    </div>
+
+                                    {/* Fallback ZIP Option */}
+                                    <div className="pt-2 border-t border-border/50 flex flex-wrap items-center justify-between gap-2">
+                                        <span className="text-muted-foreground text-[11px]">
+                                            {t('platforms.extensionZipOptionTitle')}
+                                        </span>
+                                        <a
+                                            href="/cre8-extension.zip"
+                                            download="cre8-extension.zip"
+                                            className="inline-flex items-center gap-1 text-[11px] font-medium text-muted-foreground hover:text-foreground underline underline-offset-2"
+                                        >
+                                            <Download className="size-3" />
+                                            {t('platforms.extensionDownloadZipBtn')}
+                                        </a>
                                     </div>
                                 </div>
                             </div>
