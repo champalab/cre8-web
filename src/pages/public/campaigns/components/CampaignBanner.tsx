@@ -35,7 +35,10 @@ export const CampaignBanner: React.FC<{
                     </div>
 
                     <div className="flex items-baseline gap-3 mt-1">
-                        <h1 className="text-3xl sm:text-4xl text-slate-900 dark:text-white tracking-tight font-extrabold">{campaign.description || t('publicCampaign.title')}</h1>
+                        <h1 className="text-3xl sm:text-4xl text-slate-900 dark:text-white tracking-tight font-extrabold">{campaign.title || t('publicCampaign.title')}</h1>
+                    </div>
+                    <div className="flex items-baseline gap-3 mt-1">
+                        <h2 className="text-xl sm:text-1xl text-slate-900 dark:text-white tracking-tight font-extrabold">{campaign.description || ''}</h2>
                     </div>
 
                     <p className="text-sm text-slate-500 flex flex-wrap items-center gap-2 mt-2 font-lao">
@@ -69,10 +72,11 @@ export const CampaignBanner: React.FC<{
                     )}
                     <button
                         onClick={() => {
+                            console.log({ campaign })
                             const url = window.location.href;
                             const title = campaign.description || t('publicCampaign.title');
                             const formattedViews = new Intl.NumberFormat('en-US').format(campaign.total_views || 0);
-                            const text = `📊 ລາຍງານຍອດວິວແຄມເປນ: ${title}\n👁️ ຍອດວິວລວມ: ${formattedViews} ວິວ\n\nກົດເບິ່ງລາຍລະອຽດລາຍງານຜົນງານແຄມເປນໄດ້ທີ່ລິ້ງນີ້:\n${url}`;
+                            const text = `ລາຍງານຍອດວິວແຄມເປນ: ${title ?? '-'}\n👩‍💻 ຍອດວິວລວມ: ${formattedViews} ວິວ\n\nກົດເບິ່ງລາຍລະອຽດລາຍງານຜົນງານແຄມເປນໄດ້ທີ່ລິ້ງນີ້:\n${url}`;
                             window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
                         }}
                         data-html2canvas-ignore="true"
@@ -81,7 +85,7 @@ export const CampaignBanner: React.FC<{
                         <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                             <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
                         </svg>
-                        Share to Whatsapp
+                        Share to Whatsapp {campaign.description}
                     </button>
                 </div>
             </div>

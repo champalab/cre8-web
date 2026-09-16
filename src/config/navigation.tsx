@@ -203,6 +203,12 @@ export const publicRoutes: PublicRouteItem[] = [
         path: '/public/campaigns/:slug',
         routePath: 'public/campaigns/:slug',
         component: lazyPage(() => import('../pages/public/campaigns/index'))
+    },
+    {
+        name: 'campaign-performance',
+        path: '/campaigns/:slug',
+        routePath: '/campaigns/:slug',
+        component: lazyPage(() => import('../pages/public/campaigns/index'))
     }
 ]
 

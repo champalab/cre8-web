@@ -56,7 +56,7 @@ const CampaignDetailPage: React.FC = () => {
         await refetch()
     }
 
-    const publicUrl = campaign ? `${window.location.origin}/public/campaigns/${campaign.uuid}` : ''
+    const publicUrl = campaign ? `${window.location.origin}/campaigns/${campaign.uuid}` : ''
 
     const handleCopy = () => {
         if (!publicUrl) return

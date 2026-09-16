@@ -355,7 +355,7 @@ const CampaignsPage: React.FC = () => {
                                 <p className="text-sm">{t('campaigns.empty')}</p>
                             </div>
                         ) : (
-                            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                            <div className="grid gap-4 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
                                 {rows.map((row) => {
                                     const active = isActive(row)
                                     return (
@@ -595,7 +595,7 @@ const CampaignsPage: React.FC = () => {
                                                                     </Link>
                                                                 </Button>
                                                             </TooltipTrigger>
-                                                             <TooltipContent>{t('campaigns.viewDetails')}</TooltipContent>
+                                                            <TooltipContent>{t('campaigns.viewDetails')}</TooltipContent>
                                                         </Tooltip>
                                                     </div>
                                                 </TooltipProvider>
@@ -642,7 +642,7 @@ const CampaignsPage: React.FC = () => {
                             <Label htmlFor="campaign_title">{t('campaigns.titleRequired')}</Label>
                             <Input id="campaign_title" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} />
                         </div>
-                         <div className="space-y-2">
+                        <div className="space-y-2">
                             <Label htmlFor="campaign_target_views">{t('campaigns.targetViews')}</Label>
                             <NumericFormat
                                 id="campaign_target_views"

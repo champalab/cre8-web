@@ -19,7 +19,8 @@ export interface ViewsByPlatform {
 
 export interface CampaignPerformanceData {
     uuid: string
-    description: string
+    title: string
+    description: string | null
     total_views: number
     views_by_platform: ViewsByPlatform[]
     campaign_influencers: CampaignInfluencer[]
@@ -37,7 +38,7 @@ export const fetchCampaignPerformance = async (slug: string): Promise<CampaignPe
             console.error('Failed to fetch campaign performance', await response.text())
             return null
         }
-        
+
         const json: CampaignPerformanceResponse = await response.json()
         return json.data || null
     } catch (e) {
