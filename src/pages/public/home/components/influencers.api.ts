@@ -16,14 +16,14 @@ export interface Influencer {
 import env from '../../../../env'
 
 // Call the public backend API to fetch real influencers
-export const fetchInfluencers = async (limit: number = 4): Promise<Influencer[]> => {
+export const fetchInfluencers = async (limit: number = 4000): Promise<Influencer[]> => {
     try {
         const response = await fetch(`${env.VITE_APP_API_PATH}/v1/public/influencers?limit=${limit}`)
         if (!response.ok) {
             console.error('Failed to fetch influencers', await response.text())
             return []
         }
-        
+
         const json = await response.json()
         return json.data || []
     } catch (e) {
