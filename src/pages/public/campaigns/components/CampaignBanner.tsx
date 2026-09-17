@@ -72,9 +72,8 @@ export const CampaignBanner: React.FC<{
                     )}
                     <button
                         onClick={() => {
-                            console.log({ campaign })
                             const url = window.location.href;
-                            const title = campaign.description || t('publicCampaign.title');
+                            const title = campaign.title || t('publicCampaign.title');
                             const formattedViews = new Intl.NumberFormat('en-US').format(campaign.total_views || 0);
                             const text = `ລາຍງານຍອດວິວແຄມເປນ: ${title ?? '-'}\n👩‍💻 ຍອດວິວລວມ: ${formattedViews} ວິວ\n\nກົດເບິ່ງລາຍລະອຽດລາຍງານຜົນງານແຄມເປນໄດ້ທີ່ລິ້ງນີ້:\n${url}`;
                             window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
