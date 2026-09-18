@@ -13,6 +13,7 @@ import Loader from './components/Loader'
 import { getAppRoutes, publicRoutes } from './config/navigation'
 import { SeoHead } from './components/seo-head'
 import { normalizeRole } from './config/roles'
+import env from './env'
 
 interface Props {}
 
@@ -122,10 +123,8 @@ const App: React.FC<Props> = () => {
         let isMounted = true
         const drawerState = Boolean(localStorage.getItem('drawer'))
         dispatch(setDrawerOpen({ open: drawerState }))
-        const authToken = localStorage.getItem(import.meta.env.VITE_APP_LOCAL_TOKEN ?? 'INFLUENCER')
 
         const refreshAuth = async () => {
-            if (!authToken) return
             try {
                 const result = await fetchMe()
                 if ('data' in result && result.data?.success && result.data.data?.user) {
