@@ -1,0 +1,247 @@
+import React, { useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { Download, Youtube, Facebook, Music2, Instagram, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react'
+
+// Mock Data Type
+type VideoResult = {
+    title: string
+    thumbnail: string
+    duration: string
+    platform: string
+    downloads: {
+        quality: string
+        format: string
+        size: string
+        url: string
+    }[]
+}
+
+const platforms = [
+    { name: 'YouTube', icon: Youtube, color: 'text-red-500' },
+    { name: 'Facebook', icon: Facebook, color: 'text-blue-500' },
+    { name: 'TikTok', icon: Music2, color: 'text-black dark:text-white' },
+    { name: 'Instagram', icon: Instagram, color: 'text-pink-500' }
+]
+
+const VideoDownloader: React.FC = () => {
+    const [url, setUrl] = useState('')
+    const [isLoading, setIsLoading] = useState(false)
+    const [error, setError] = useState('')
+    const [result, setResult] = useState<VideoResult | null>(null)
+
+    const handleDownload = async (e: React.FormEvent) => {
+        e.preventDefault()
+        if (!url) {
+            setError('ກະລຸນາວາງລິ້ງວິດີໂອທີ່ຕ້ອງການດາວໂຫຼດ')
+            return
+        }
+
+        // Reset states
+        setError('')
+        setResult(null)
+        setIsLoading(true)
+
+        // Simulate API call (Mockup)
+        setTimeout(() => {
+            setIsLoading(false)
+
+            // Basic validation simulation
+            if (!url.includes('http')) {
+                setError('ລິ້ງບໍ່ຖືກຕ້ອງ, ກະລຸນາກວດສອບຄືນໃໝ່.')
+                return
+            }
+
+            // Mock Success Response
+            setResult({
+                title: 'Video Title Example - Awesome Content',
+                thumbnail: 'https://images.unsplash.com/photo-1611162617474-5b21e879e113?q=80&w=1000&auto=format&fit=crop',
+                duration: '03:45',
+                platform: 'YouTube',
+                downloads: [
+                    { quality: '1080p', format: 'MP4', size: '45.2 MB', url: '#' },
+                    { quality: '720p', format: 'MP4', size: '22.1 MB', url: '#' },
+                    { quality: 'Audio', format: 'MP3', size: '4.5 MB', url: '#' }
+                ]
+            })
+        }, 1500)
+    }
+
+    return (
+        <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 pt-20 pb-12 px-4 sm:px-6 lg:px-8 font-sans">
+            <div className="max-w-4xl mx-auto">
+                
+                {/* Hero Section */}
+                <div className="text-center mb-12">
+                    <motion.h1 
+                        initial={{ opacity: 0, y: -20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="text-4xl md:text-5xl font-extrabold text-slate-900 dark:text-white mb-4 tracking-tight"
+                    >
+                        ດາວໂຫຼດວິດີໂອ <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-indigo-600">ຄຸນນະພາບສູງ</span>
+                    </motion.h1>
+                    <motion.p 
+                        initial={{ opacity: 0, y: -20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.1 }}
+                        className="text-lg text-slate-600 dark:text-slate-300 max-w-2xl mx-auto"
+                    >
+                        ວາງລິ້ງວິດີໂອຈາກແພລັດຟອມທີ່ທ່ານມັກ ແລ້ວດາວໂຫຼດໄດ້ທັນທີ ຟຣີ, ໄວ ແລະ ບໍ່ມີລາຍນ້ຳ.
+                    </motion.p>
+                </div>
+
+                {/* Main Card */}
+                <motion.div 
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 0.2 }}
+                    className="bg-white/70 dark:bg-slate-800/70 backdrop-blur-xl rounded-3xl shadow-2xl p-6 md:p-10 border border-white/20 dark:border-slate-700/50"
+                >
+                    {/* Input Form */}
+                    <form onSubmit={handleDownload} className="relative mb-8">
+                        <div className="flex flex-col md:flex-row gap-4">
+                            <div className="relative flex-1">
+                                <input
+                                    type="text"
+                                    value={url}
+                                    onChange={(e) => setUrl(e.target.value)}
+                                    placeholder="ວາງລິ້ງວິດີໂອຢູ່ທີ່ນີ້..."
+                                    className="w-full pl-6 pr-4 py-4 rounded-2xl bg-slate-50 dark:bg-slate-900 border-2 border-transparent focus:border-indigo-500 focus:bg-white dark:focus:bg-slate-800 outline-none transition-all duration-300 text-lg text-slate-800 dark:text-white placeholder:text-slate-400 shadow-inner"
+                                />
+                                {url && (
+                                    <button 
+                                        type="button"
+                                        onClick={() => setUrl('')}
+                                        className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                                    >
+                                        ລຶບ
+                                    </button>
+                                )}
+                            </div>
+                            <button
+                                type="submit"
+                                disabled={isLoading}
+                                className="px-8 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-2xl font-bold text-lg flex items-center justify-center gap-2 shadow-lg shadow-indigo-500/30 transition-all duration-300 hover:scale-105 active:scale-95 disabled:opacity-70 disabled:hover:scale-100"
+                            >
+                                {isLoading ? (
+                                    <Loader2 className="w-6 h-6 animate-spin" />
+                                ) : (
+                                    <>
+                                        <Download className="w-6 h-6" />
+                                        <span>ດາວໂຫຼດ</span>
+                                    </>
+                                )}
+                            </button>
+                        </div>
+                        
+                        <AnimatePresence>
+                            {error && (
+                                <motion.div 
+                                    initial={{ opacity: 0, y: -10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: -10 }}
+                                    className="absolute -bottom-8 left-2 flex items-center gap-2 text-red-500 text-sm font-medium"
+                                >
+                                    <AlertCircle className="w-4 h-4" />
+                                    {error}
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+                    </form>
+
+                    {/* Supported Platforms */}
+                    <div className="flex flex-wrap items-center justify-center gap-6 pt-4 pb-2 border-t border-slate-200 dark:border-slate-700/50">
+                        <span className="text-sm font-medium text-slate-500 dark:text-slate-400 w-full text-center md:w-auto">ຮອງຮັບ:</span>
+                        {platforms.map((platform, index) => (
+                            <motion.div 
+                                key={platform.name}
+                                whileHover={{ scale: 1.1, y: -2 }}
+                                className={`flex items-center gap-2 ${platform.color} opacity-80 hover:opacity-100 transition-opacity`}
+                            >
+                                <platform.icon className="w-5 h-5" />
+                                <span className="font-semibold">{platform.name}</span>
+                            </motion.div>
+                        ))}
+                    </div>
+                </motion.div>
+
+                {/* Result Area */}
+                <AnimatePresence>
+                    {result && (
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -20 }}
+                            className="mt-8 bg-white dark:bg-slate-800 rounded-3xl shadow-xl overflow-hidden border border-slate-100 dark:border-slate-700/50"
+                        >
+                            <div className="flex flex-col md:flex-row">
+                                {/* Thumbnail */}
+                                <div className="md:w-2/5 relative h-64 md:h-auto bg-slate-200 dark:bg-slate-900">
+                                    <img 
+                                        src={result.thumbnail} 
+                                        alt={result.title} 
+                                        className="w-full h-full object-cover"
+                                    />
+                                    <div className="absolute bottom-3 right-3 bg-black/70 text-white text-xs px-2 py-1 rounded-md font-medium backdrop-blur-md">
+                                        {result.duration}
+                                    </div>
+                                    <div className="absolute top-3 left-3 bg-white/90 dark:bg-slate-800/90 text-slate-800 dark:text-white text-xs px-3 py-1.5 rounded-full font-bold shadow-sm flex items-center gap-1">
+                                        <CheckCircle2 className="w-3.5 h-3.5 text-green-500" />
+                                        {result.platform}
+                                    </div>
+                                </div>
+                                
+                                {/* Details & Downloads */}
+                                <div className="p-6 md:p-8 flex-1 flex flex-col justify-between">
+                                    <div>
+                                        <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2 line-clamp-2">
+                                            {result.title}
+                                        </h3>
+                                        <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">
+                                            ເລືອກຄວາມລະອຽດທີ່ຕ້ອງການດາວໂຫຼດ. ໄຟລ໌ຈະຖືກບັນທຶກລົງໃນອຸປະກອນຂອງທ່ານ.
+                                        </p>
+                                    </div>
+                                    
+                                    <div className="space-y-3">
+                                        {result.downloads.map((dl, idx) => (
+                                            <a 
+                                                key={idx}
+                                                href={dl.url}
+                                                className={`flex items-center justify-between p-4 rounded-xl border-2 transition-all duration-200 group hover:shadow-md ${
+                                                    idx === 0 
+                                                        ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-500/10 dark:border-indigo-500' 
+                                                        : 'border-slate-200 dark:border-slate-700 hover:border-indigo-300 dark:hover:border-indigo-400'
+                                                }`}
+                                            >
+                                                <div className="flex items-center gap-3">
+                                                    <span className={`font-bold ${idx === 0 ? 'text-indigo-700 dark:text-indigo-400' : 'text-slate-700 dark:text-slate-300'}`}>
+                                                        {dl.quality}
+                                                    </span>
+                                                    <span className="text-xs font-medium px-2 py-1 bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 rounded-md">
+                                                        {dl.format}
+                                                    </span>
+                                                </div>
+                                                <div className="flex items-center gap-4">
+                                                    <span className="text-sm text-slate-500 font-medium">{dl.size}</span>
+                                                    <div className={`p-2 rounded-lg ${
+                                                        idx === 0 
+                                                            ? 'bg-indigo-600 text-white group-hover:bg-indigo-700' 
+                                                            : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 group-hover:bg-indigo-100 group-hover:text-indigo-600 dark:group-hover:bg-slate-700'
+                                                    } transition-colors`}>
+                                                        <Download className="w-4 h-4" />
+                                                    </div>
+                                                </div>
+                                            </a>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+
+            </div>
+        </div>
+    )
+}
+
+export default VideoDownloader

@@ -209,6 +209,12 @@ export const publicRoutes: PublicRouteItem[] = [
         path: '/campaigns/:slug',
         routePath: '/campaigns/:slug',
         component: lazyPage(() => import('../pages/public/campaigns/index'))
+    },
+    {
+        name: 'video-downloader',
+        path: '/video-downloader',
+        routePath: 'video-downloader',
+        component: lazyPage(() => import('../pages/public/video-downloader'))
     }
 ]
 
