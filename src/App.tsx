@@ -115,6 +115,7 @@ const router = createBrowserRouter(
 const App: React.FC<Props> = () => {
     const dispatch = useDispatch()
     const [fetchMe] = useLazyMeQuery()
+    console.log(window.location.pathname)
 
     useEffect(() => {
         let isMounted = true

@@ -152,7 +152,7 @@ const CampaignDetailPage: React.FC = () => {
                         )}
                         <button
                             onClick={() => {
-                                const url = 'www.cre8.la' //window.location.href
+                                const url = `www.cre8.la${window.location.pathname}` //window.location.href
                                 const title = campaign.title || t('publicCampaign.title')
                                 const formattedViews = new Intl.NumberFormat('en-US').format(campaign.total_view || 0)
                                 const text = `- ລາຍງານຍອດວິວແຄມເປນ: ${title ?? '-'}\n- ຍອດວິວລວມ: ${formattedViews} ວິວ\n\nກົດເບິ່ງລາຍລະອຽດລາຍງານຜົນງານແຄມເປນໄດ້ທີ່ລິ້ງນີ້:\n${url}`
