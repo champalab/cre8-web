@@ -17,10 +17,21 @@ const Youtube = (props: React.SVGProps<SVGSVGElement>) => (
 )
 
 const Instagram = (props: React.SVGProps<SVGSVGElement>) => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
-      <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
-      <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
-      <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        {...props}
+    >
+        <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+        <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+        <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
     </svg>
 )
 // Mock Data Type
@@ -40,8 +51,8 @@ type VideoResult = {
 const platforms = [
     { name: 'YouTube', icon: Youtube, color: 'text-red-500' },
     { name: 'Facebook', icon: Facebook, color: 'text-blue-500' },
-    { name: 'TikTok', icon: Music2, color: 'text-black dark:text-white' },
-    { name: 'Instagram', icon: Instagram, color: 'text-pink-500' }
+    { name: 'TikTok', icon: Music2, color: 'text-black dark:text-white' }
+    // { name: 'Instagram', icon: Instagram, color: 'text-pink-500' }
 ]
 
 const VideoDownloader: React.FC = () => {
@@ -49,6 +60,38 @@ const VideoDownloader: React.FC = () => {
     const [isLoading, setIsLoading] = useState(false)
     const [error, setError] = useState('')
     const [result, setResult] = useState<VideoResult | null>(null)
+    const [downloadingIdx, setDownloadingIdx] = useState<number | null>(null)
+
+    const handleDownloadFile = async (dlUrl: string, title: string, idx: number) => {
+        setDownloadingIdx(idx)
+        setError('')
+        try {
+            const response = await fetch(dlUrl)
+            if (!response.ok) throw new Error('Download failed')
+
+            let filename = `${title}.mp4`
+            const contentDisposition = response.headers.get('content-disposition')
+            if (contentDisposition && contentDisposition.includes('filename=')) {
+                const match = contentDisposition.match(/filename="?([^"]+)"?/)
+                if (match) filename = decodeURIComponent(match[1])
+            }
+
+            const blob = await response.blob()
+            const objectUrl = window.URL.createObjectURL(blob)
+            const a = document.createElement('a')
+            a.href = objectUrl
+            a.download = filename
+            document.body.appendChild(a)
+            a.click()
+            document.body.removeChild(a)
+            window.URL.revokeObjectURL(objectUrl)
+        } catch (err) {
+            console.error('Download error:', err)
+            setError('ເກີດຂໍ້ຜິດພາດໃນການດາວໂຫຼດວິດີໂອ. ອາດຈະໃຊ້ເວລາດົນເກີນໄປ.')
+        } finally {
+            setDownloadingIdx(null)
+        }
+    }
 
     const handleDownload = async (e: React.FormEvent) => {
         e.preventDefault()
@@ -69,7 +112,7 @@ const VideoDownloader: React.FC = () => {
         try {
             const apiUrl = `${env.VITE_APP_API_PATH}/v1/public/tools/download-video`
             const response = await axios.post(apiUrl, { url })
-            
+
             if (response.data && response.data.success) {
                 setResult(response.data.data)
             } else {
@@ -85,17 +128,16 @@ const VideoDownloader: React.FC = () => {
     return (
         <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 pt-20 pb-12 px-4 sm:px-6 lg:px-8 font-sans">
             <div className="max-w-4xl mx-auto">
-                
                 {/* Hero Section */}
                 <div className="text-center mb-12">
-                    <motion.h1 
+                    <motion.h1
                         initial={{ opacity: 0, y: -20 }}
                         animate={{ opacity: 1, y: 0 }}
                         className="text-4xl md:text-5xl font-extrabold text-slate-900 dark:text-white mb-4 tracking-tight"
                     >
                         ດາວໂຫຼດວິດີໂອ <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-indigo-600">ຄຸນນະພາບສູງ</span>
                     </motion.h1>
-                    <motion.p 
+                    <motion.p
                         initial={{ opacity: 0, y: -20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.1 }}
@@ -106,7 +148,7 @@ const VideoDownloader: React.FC = () => {
                 </div>
 
                 {/* Main Card */}
-                <motion.div 
+                <motion.div
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: 0.2 }}
@@ -124,7 +166,7 @@ const VideoDownloader: React.FC = () => {
                                     className="w-full pl-6 pr-4 py-4 rounded-2xl bg-slate-50 dark:bg-slate-900 border-2 border-transparent focus:border-indigo-500 focus:bg-white dark:focus:bg-slate-800 outline-none transition-all duration-300 text-lg text-slate-800 dark:text-white placeholder:text-slate-400 shadow-inner"
                                 />
                                 {url && (
-                                    <button 
+                                    <button
                                         type="button"
                                         onClick={() => setUrl('')}
                                         className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
@@ -148,10 +190,10 @@ const VideoDownloader: React.FC = () => {
                                 )}
                             </button>
                         </div>
-                        
+
                         <AnimatePresence>
                             {error && (
-                                <motion.div 
+                                <motion.div
                                     initial={{ opacity: 0, y: -10 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     exit={{ opacity: 0, y: -10 }}
@@ -168,7 +210,7 @@ const VideoDownloader: React.FC = () => {
                     <div className="flex flex-wrap items-center justify-center gap-6 pt-4 pb-2 border-t border-slate-200 dark:border-slate-700/50">
                         <span className="text-sm font-medium text-slate-500 dark:text-slate-400 w-full text-center md:w-auto">ຮອງຮັບ:</span>
                         {platforms.map((platform, index) => (
-                            <motion.div 
+                            <motion.div
                                 key={platform.name}
                                 whileHover={{ scale: 1.1, y: -2 }}
                                 className={`flex items-center gap-2 ${platform.color} opacity-80 hover:opacity-100 transition-opacity`}
@@ -192,11 +234,7 @@ const VideoDownloader: React.FC = () => {
                             <div className="flex flex-col md:flex-row">
                                 {/* Thumbnail */}
                                 <div className="md:w-2/5 relative h-64 md:h-auto bg-slate-200 dark:bg-slate-900">
-                                    <img 
-                                        src={result.thumbnail} 
-                                        alt={result.title} 
-                                        className="w-full h-full object-cover"
-                                    />
+                                    <img src={result.thumbnail} alt={result.title} className="w-full h-full object-cover" />
                                     <div className="absolute bottom-3 right-3 bg-black/70 text-white text-xs px-2 py-1 rounded-md font-medium backdrop-blur-md">
                                         {result.duration}
                                     </div>
@@ -205,31 +243,32 @@ const VideoDownloader: React.FC = () => {
                                         {result.platform}
                                     </div>
                                 </div>
-                                
+
                                 {/* Details & Downloads */}
                                 <div className="p-6 md:p-8 flex-1 flex flex-col justify-between">
                                     <div>
-                                        <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2 line-clamp-2">
-                                            {result.title}
-                                        </h3>
+                                        <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2 line-clamp-2">{result.title}</h3>
                                         <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">
                                             ເລືອກຄວາມລະອຽດທີ່ຕ້ອງການດາວໂຫຼດ. ໄຟລ໌ຈະຖືກບັນທຶກລົງໃນອຸປະກອນຂອງທ່ານ.
                                         </p>
                                     </div>
-                                    
+
                                     <div className="space-y-3">
                                         {result.downloads.map((dl, idx) => (
-                                            <a 
+                                            <button
                                                 key={idx}
-                                                href={dl.url}
-                                                className={`flex items-center justify-between p-4 rounded-xl border-2 transition-all duration-200 group hover:shadow-md ${
-                                                    idx === 0 
-                                                        ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-500/10 dark:border-indigo-500' 
+                                                onClick={() => handleDownloadFile(dl.url, result.title, idx)}
+                                                disabled={downloadingIdx !== null}
+                                                className={`w-full flex items-center justify-between p-4 rounded-xl border-2 transition-all duration-200 group hover:shadow-md ${
+                                                    idx === 0
+                                                        ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-500/10 dark:border-indigo-500'
                                                         : 'border-slate-200 dark:border-slate-700 hover:border-indigo-300 dark:hover:border-indigo-400'
-                                                }`}
+                                                } ${downloadingIdx !== null ? 'opacity-50 cursor-not-allowed' : ''}`}
                                             >
                                                 <div className="flex items-center gap-3">
-                                                    <span className={`font-bold ${idx === 0 ? 'text-indigo-700 dark:text-indigo-400' : 'text-slate-700 dark:text-slate-300'}`}>
+                                                    <span
+                                                        className={`font-bold ${idx === 0 ? 'text-indigo-700 dark:text-indigo-400' : 'text-slate-700 dark:text-slate-300'}`}
+                                                    >
                                                         {dl.quality}
                                                     </span>
                                                     <span className="text-xs font-medium px-2 py-1 bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 rounded-md">
@@ -238,15 +277,21 @@ const VideoDownloader: React.FC = () => {
                                                 </div>
                                                 <div className="flex items-center gap-4">
                                                     <span className="text-sm text-slate-500 font-medium">{dl.size}</span>
-                                                    <div className={`p-2 rounded-lg ${
-                                                        idx === 0 
-                                                            ? 'bg-indigo-600 text-white group-hover:bg-indigo-700' 
-                                                            : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 group-hover:bg-indigo-100 group-hover:text-indigo-600 dark:group-hover:bg-slate-700'
-                                                    } transition-colors`}>
-                                                        <Download className="w-4 h-4" />
+                                                    <div
+                                                        className={`p-2 rounded-lg ${
+                                                            idx === 0
+                                                                ? 'bg-indigo-600 text-white group-hover:bg-indigo-700'
+                                                                : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 group-hover:bg-indigo-100 group-hover:text-indigo-600 dark:group-hover:bg-slate-700'
+                                                        } transition-colors`}
+                                                    >
+                                                        {downloadingIdx === idx ? (
+                                                            <Loader2 className="w-4 h-4 animate-spin" />
+                                                        ) : (
+                                                            <Download className="w-4 h-4" />
+                                                        )}
                                                     </div>
                                                 </div>
-                                            </a>
+                                            </button>
                                         ))}
                                     </div>
                                 </div>
@@ -254,7 +299,6 @@ const VideoDownloader: React.FC = () => {
                         </motion.div>
                     )}
                 </AnimatePresence>
-
             </div>
         </div>
     )
