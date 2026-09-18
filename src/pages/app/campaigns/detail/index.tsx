@@ -31,10 +31,7 @@ const CampaignDetailPage: React.FC = () => {
     const initialTab = TAB_KEYS.indexOf(rawTab)
     const [tab, setTab] = useState(initialTab >= 0 ? TAB_KEYS[initialTab] : 'overview')
 
-    const { data, isLoading, isFetching, refetch } = useGetCampaignDetailByUuidQuery(
-        { uuid },
-        { skip: !uuid }
-    )
+    const { data, isLoading, isFetching, refetch } = useGetCampaignDetailByUuidQuery({ uuid }, { skip: !uuid })
     const campaign = data?.data
     const [fetchAllMetrics, { isLoading: isQueueing }] = useFetchAllMetricsMutation()
     const [getBatchStatus] = useGetMetricsBatchStatusMutation()
@@ -98,10 +95,10 @@ const CampaignDetailPage: React.FC = () => {
                         status: status.failed ? 'warning' : 'success',
                         message: status.failed
                             ? t('campaignDetail.metricsPartial', {
-                                completed: status.completed,
-                                total: status.total,
-                                failed: status.failed
-                            })
+                                  completed: status.completed,
+                                  total: status.total,
+                                  failed: status.failed
+                              })
                             : t('campaignDetail.metricsSuccess', { completed: status.completed })
                     })
                 }
@@ -122,9 +119,7 @@ const CampaignDetailPage: React.FC = () => {
             <div className="flex flex-col items-center justify-center py-20 text-center">
                 <BackdropComponent open={isLoading || isFetching} />
                 <p className="text-lg font-bold">{t('campaignDetail.notFound')}</p>
-                <p className="text-sm text-muted-foreground mt-1 mb-4">
-                    {t('campaignDetail.notFoundHint')}
-                </p>
+                <p className="text-sm text-muted-foreground mt-1 mb-4">{t('campaignDetail.notFoundHint')}</p>
                 <Button onClick={() => navigate('/app/campaigns')} className="gap-2">
                     <ArrowLeft className="size-4" /> {t('campaignDetail.backToList')}
                 </Button>
@@ -138,21 +133,12 @@ const CampaignDetailPage: React.FC = () => {
 
             <div className="mb-4 flex flex-wrap items-start justify-between gap-4 sm:items-center">
                 <div className="flex items-start gap-1.5 sm:items-center sm:gap-2">
-                    <Button
-                        variant="ghost"
-                        size="icon"
-                        className="mt-0.5 shrink-0 sm:mt-0"
-                        onClick={() => navigate('/app/campaigns')}
-                    >
+                    <Button variant="ghost" size="icon" className="mt-0.5 shrink-0 sm:mt-0" onClick={() => navigate('/app/campaigns')}>
                         <ArrowLeft className="size-5" />
                     </Button>
                     <div className="min-w-0">
-                        <h1 className="break-words text-xl font-bold sm:text-2xl">
-                            {campaign?.title || t('campaignDetail.fallbackTitle')}
-                        </h1>
-                        <p className="text-xs text-muted-foreground sm:text-sm">
-                            {t('campaignDetail.hubSubtitle')}
-                        </p>
+                        <h1 className="break-words text-xl font-bold sm:text-2xl">{campaign?.title || t('campaignDetail.fallbackTitle')}</h1>
+                        <p className="text-xs text-muted-foreground sm:text-sm">{t('campaignDetail.hubSubtitle')}</p>
                     </div>
                 </div>
 
@@ -164,10 +150,30 @@ const CampaignDetailPage: React.FC = () => {
                                 {t('campaignDetail.refreshMetrics')}
                             </Button>
                         )}
-                        <Button variant="outline" size="sm" onClick={handleCopy} className="gap-1.5">
-                            <Copy className="size-4" />
-                            Copy Link
-                        </Button>
+                        <button
+                            onClick={() => {
+                                const url = 'www.cre8.la' //window.location.href
+                                const title = campaign.title || t('publicCampaign.title')
+                                const formattedViews = new Intl.NumberFormat('en-US').format(campaign.total_view || 0)
+                                const text = `- ລາຍງານຍອດວິວແຄມເປນ: ${title ?? '-'}\n- ຍອດວິວລວມ: ${formattedViews} ວິວ\n\nກົດເບິ່ງລາຍລະອຽດລາຍງານຜົນງານແຄມເປນໄດ້ທີ່ລິ້ງນີ້:\n${url}`
+                                window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank')
+                            }}
+                            data-html2canvas-ignore="true"
+                            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#25D366] hover:bg-[#20bd5a] text-white transition-all text-sm font-semibold shadow-md shadow-[#25D366]/20 font-lao"
+                        >
+                            <svg
+                                className="w-4 h-4"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                            >
+                                <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
+                            </svg>
+                            Share to Whatsapp {campaign.description}
+                        </button>
                         <Button variant="outline" size="sm" onClick={handleOpen} className="gap-1.5">
                             <ExternalLink className="size-4" />
                             Open
