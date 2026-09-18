@@ -115,14 +115,17 @@ const router = createBrowserRouter(
 const App: React.FC<Props> = () => {
     const dispatch = useDispatch()
     const [fetchMe] = useLazyMeQuery()
-    console.log(window.location.pathname)
+    // const link = window.location.pathname.replace('/app', '')
+    // console.log(link)
 
     useEffect(() => {
         let isMounted = true
         const drawerState = Boolean(localStorage.getItem('drawer'))
         dispatch(setDrawerOpen({ open: drawerState }))
+        const authToken = localStorage.getItem(import.meta.env.VITE_APP_LOCAL_TOKEN ?? 'INFLUENCER')
 
         const refreshAuth = async () => {
+            if (!authToken) return
             try {
                 const result = await fetchMe()
                 if ('data' in result && result.data?.success && result.data.data?.user) {
