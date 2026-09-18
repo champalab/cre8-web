@@ -75,7 +75,7 @@ export const CampaignBanner: React.FC<{
                             const url = window.location.href
                             const title = campaign.title || t('publicCampaign.title')
                             const formattedViews = new Intl.NumberFormat('en-US').format(campaign.total_views || 0)
-                            const text = `- ລາຍງານຍອດວິວແຄມເປນ: ${title ?? '-'}\n👩- ຍອດວິວລວມ: ${formattedViews} ວິວ\n\nກົດເບິ່ງລາຍລະອຽດລາຍງານຜົນງານແຄມເປນໄດ້ທີ່ລິ້ງນີ້:\n${url}`
+                            const text = `- ລາຍງານຍອດວິວແຄມເປນ: ${title ?? '-'}\n- ຍອດວິວລວມ: ${formattedViews} ວິວ\n\nກົດເບິ່ງລາຍລະອຽດລາຍງານຜົນງານແຄມເປນໄດ້ທີ່ລິ້ງນີ້:\n${url}`
                             window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank')
                         }}
                         data-html2canvas-ignore="true"
