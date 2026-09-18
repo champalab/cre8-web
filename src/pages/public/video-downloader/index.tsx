@@ -1,7 +1,28 @@
 import React, { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Download, Youtube, Facebook, Music2, Instagram, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react'
+import { Download, Music2, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react'
+import axios from 'axios'
+import env from '../../../env'
 
+const Facebook = (props: React.SVGProps<SVGSVGElement>) => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" {...props}>
+        <path d="M22.675 0h-21.35c-.732 0-1.325.593-1.325 1.325v21.351c0 .731.593 1.324 1.325 1.324h11.495v-9.294h-3.128v-3.622h3.128v-2.671c0-3.1 1.893-4.788 4.659-4.788 1.325 0 2.463.099 2.795.143v3.24l-1.918.001c-1.504 0-1.795.715-1.795 1.763v2.312h3.587l-.467 3.622h-3.12v9.293h6.116c.73 0 1.323-.593 1.323-1.325v-21.35c0-.732-.593-1.325-1.325-1.325z" />
+    </svg>
+)
+
+const Youtube = (props: React.SVGProps<SVGSVGElement>) => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" {...props}>
+        <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
+    </svg>
+)
+
+const Instagram = (props: React.SVGProps<SVGSVGElement>) => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+      <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+      <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+      <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+    </svg>
+)
 // Mock Data Type
 type VideoResult = {
     title: string
@@ -35,35 +56,30 @@ const VideoDownloader: React.FC = () => {
             setError('ກະລຸນາວາງລິ້ງວິດີໂອທີ່ຕ້ອງການດາວໂຫຼດ')
             return
         }
+        if (!url.includes('http')) {
+            setError('ລິ້ງບໍ່ຖືກຕ້ອງ, ກະລຸນາກວດສອບຄືນໃໝ່.')
+            return
+        }
 
         // Reset states
         setError('')
         setResult(null)
         setIsLoading(true)
 
-        // Simulate API call (Mockup)
-        setTimeout(() => {
-            setIsLoading(false)
-
-            // Basic validation simulation
-            if (!url.includes('http')) {
-                setError('ລິ້ງບໍ່ຖືກຕ້ອງ, ກະລຸນາກວດສອບຄືນໃໝ່.')
-                return
+        try {
+            const apiUrl = `${env.VITE_APP_API_PATH}/v1/public/tools/download-video`
+            const response = await axios.post(apiUrl, { url })
+            
+            if (response.data && response.data.success) {
+                setResult(response.data.data)
+            } else {
+                setError(response.data?.message || 'ບໍ່ສາມາດດຶງຂໍ້ມູນວິດີໂອໄດ້')
             }
-
-            // Mock Success Response
-            setResult({
-                title: 'Video Title Example - Awesome Content',
-                thumbnail: 'https://images.unsplash.com/photo-1611162617474-5b21e879e113?q=80&w=1000&auto=format&fit=crop',
-                duration: '03:45',
-                platform: 'YouTube',
-                downloads: [
-                    { quality: '1080p', format: 'MP4', size: '45.2 MB', url: '#' },
-                    { quality: '720p', format: 'MP4', size: '22.1 MB', url: '#' },
-                    { quality: 'Audio', format: 'MP3', size: '4.5 MB', url: '#' }
-                ]
-            })
-        }, 1500)
+        } catch (err: any) {
+            setError(err.response?.data?.message || 'ເກີດຂໍ້ຜິດພາດໃນການເຊື່ອມຕໍ່ກັບເຊີບເວີ')
+        } finally {
+            setIsLoading(false)
+        }
     }
 
     return (

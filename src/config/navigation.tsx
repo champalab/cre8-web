@@ -1,15 +1,4 @@
-import {
-    Building2,
-    ClipboardList,
-    LayoutDashboard,
-    Megaphone,
-    ShieldCheck,
-    Smartphone,
-    TrendingUp,
-    Users,
-    Bell,
-    Wallet,
-} from 'lucide-react'
+import { Building2, ClipboardList, LayoutDashboard, Megaphone, ShieldCheck, Smartphone, TrendingUp, Users, Bell, Wallet } from 'lucide-react'
 import React, { lazy, LazyExoticComponent } from 'react'
 import { matchPath } from 'react-router-dom'
 import { Role } from '../pages/app/users/type.d'
@@ -52,7 +41,7 @@ export const navigation: NavItem[] = [
         group: true,
         name: 'Overview',
         nameKey: 'overview',
-        roles: [ROLE_SUPER_ADMIN, ROLE_ADMIN, ROLE_CAMPAIGN_MANAGER,]
+        roles: [ROLE_SUPER_ADMIN, ROLE_ADMIN, ROLE_CAMPAIGN_MANAGER]
     },
     {
         path: '/app',
@@ -62,7 +51,7 @@ export const navigation: NavItem[] = [
         nameKey: 'dashboard',
         component: lazyPage(() => import('../pages/app/dashboard')),
         icon: LayoutDashboard,
-        roles: [ROLE_SUPER_ADMIN, ROLE_ADMIN, ROLE_CAMPAIGN_MANAGER,]
+        roles: [ROLE_SUPER_ADMIN, ROLE_ADMIN, ROLE_CAMPAIGN_MANAGER]
     },
     {
         path: '',
@@ -91,7 +80,7 @@ export const navigation: NavItem[] = [
         nameKey: 'influencers',
         component: lazyPage(() => import('../pages/app/influencers')),
         icon: Users,
-        roles: [ROLE_SUPER_ADMIN, ROLE_ADMIN, ROLE_CAMPAIGN_MANAGER,]
+        roles: [ROLE_SUPER_ADMIN, ROLE_ADMIN, ROLE_CAMPAIGN_MANAGER]
     },
     {
         path: '/app/campaigns',
@@ -141,7 +130,7 @@ export const navigation: NavItem[] = [
         nameKey: 'viewLogs',
         component: lazyPage(() => import('../pages/app/view-logs')),
         icon: TrendingUp,
-        roles: [ROLE_SUPER_ADMIN, ROLE_ADMIN, ROLE_CAMPAIGN_MANAGER,]
+        roles: [ROLE_SUPER_ADMIN, ROLE_ADMIN, ROLE_CAMPAIGN_MANAGER]
     },
 
     // ─── Settings ────────────────────────────────────────────
