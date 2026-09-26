@@ -13,6 +13,7 @@ import Loader from './components/Loader'
 import { getAppRoutes, publicRoutes } from './config/navigation'
 import { SeoHead } from './components/seo-head'
 import { normalizeRole } from './config/roles'
+import env from './env'
 
 interface Props {}
 
@@ -115,6 +116,8 @@ const router = createBrowserRouter(
 const App: React.FC<Props> = () => {
     const dispatch = useDispatch()
     const [fetchMe] = useLazyMeQuery()
+    // const link = window.location.pathname.replace('/app', '')
+    // console.log(link)
 
     useEffect(() => {
         let isMounted = true

@@ -78,8 +78,10 @@ const formatAmountInput = (value: string) => {
 const todayInput = () => new Date().toISOString().slice(0, 10)
 
 const statusBadge = (status: PayoutStatus) => {
-    if (status === 'PAID') return <Badge className="bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-500/20">{i18n.t('status.paid', { ns: 'app' })}</Badge>
-    if (status === 'PARTIAL') return <Badge className="bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-500/20">{i18n.t('status.partial', { ns: 'app' })}</Badge>
+    if (status === 'PAID')
+        return <Badge className="bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-500/20">{i18n.t('status.paid', { ns: 'app' })}</Badge>
+    if (status === 'PARTIAL')
+        return <Badge className="bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-500/20">{i18n.t('status.partial', { ns: 'app' })}</Badge>
     return <Badge variant="secondary">{i18n.t('status.unpaid', { ns: 'app' })}</Badge>
 }
 
@@ -145,7 +147,9 @@ const CopyBankAccount = ({ number }: { number?: string | null }) => {
     useEffect(() => {
         setCopied(false)
         setFailed(false)
-        return () => { if (timer.current) clearTimeout(timer.current) }
+        return () => {
+            if (timer.current) clearTimeout(timer.current)
+        }
     }, [number])
 
     const copy = async () => {
@@ -170,14 +174,26 @@ const CopyBankAccount = ({ number }: { number?: string | null }) => {
             <div className="flex flex-wrap items-center gap-1.5">
                 <span className="break-all font-mono text-muted-foreground">{number || '—'}</span>
                 {number && (
-                    <Button type="button" variant="ghost" size="sm" className="h-7 gap-1 px-2 text-xs" onClick={copy} disabled={copying}
-                        aria-label={t('payments.copyBankAccount')} title={t('payments.copyBankAccount')}>
+                    <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="h-7 gap-1 px-2 text-xs"
+                        onClick={copy}
+                        disabled={copying}
+                        aria-label={t('payments.copyBankAccount')}
+                        title={t('payments.copyBankAccount')}
+                    >
                         {copied ? <Check className="size-3.5 text-emerald-600" /> : <Copy className="size-3.5" />}
                         <span role="status">{t(copied ? 'payments.accountCopied' : 'payments.copyAccount')}</span>
                     </Button>
                 )}
             </div>
-            {failed && <p role="alert" className="text-xs text-destructive">{t('payments.copyAccountFailed')}</p>}
+            {failed && (
+                <p role="alert" className="text-xs text-destructive">
+                    {t('payments.copyAccountFailed')}
+                </p>
+            )}
         </div>
     )
 }
@@ -189,12 +205,19 @@ const PaymentsPage = () => {
     const [searchParams, setSearchParams] = useSearchParams()
     const campaignUuid = searchParams.get('campaign') || ''
     const [viewMode, setViewMode] = useState<PaymentView>(() => {
-        try { return localStorage.getItem(PAYMENT_VIEW_KEY) === 'cards' ? 'cards' : 'table' }
-        catch { return 'table' }
+        try {
+            return localStorage.getItem(PAYMENT_VIEW_KEY) === 'cards' ? 'cards' : 'table'
+        } catch {
+            return 'table'
+        }
     })
     const changeViewMode = (mode: PaymentView) => {
         setViewMode(mode)
-        try { localStorage.setItem(PAYMENT_VIEW_KEY, mode) } catch { /* Storage may be unavailable. */ }
+        try {
+            localStorage.setItem(PAYMENT_VIEW_KEY, mode)
+        } catch {
+            /* Storage may be unavailable. */
+        }
     }
     const [sort, setSort] = useState<SortKey>('name')
     const [order, setOrder] = useState<'asc' | 'desc'>('asc')
@@ -213,10 +236,7 @@ const PaymentsPage = () => {
 
     const { data: campaignsData, isLoading: loadingCampaigns } = useGetPayableCampaignsQuery()
     const campaigns = Array.isArray(campaignsData?.data) ? campaignsData.data : []
-    const { currentData: payoutsData, isFetching } = useGetCampaignPayoutsQuery(
-        { campaign_uuid: campaignUuid, sort, order },
-        { skip: !campaignUuid }
-    )
+    const { currentData: payoutsData, isFetching } = useGetCampaignPayoutsQuery({ campaign_uuid: campaignUuid, sort, order }, { skip: !campaignUuid })
     const payouts = payoutsData?.data
     const payoutItems = Array.isArray(payouts?.items) ? payouts.items : []
     const [createPayment, { isLoading: isSaving }] = useCreateInfluencerPaymentMutation()
@@ -227,16 +247,38 @@ const PaymentsPage = () => {
     const summary = payouts?.summary
     const dueAmount = Number(summary?.due ?? 0)
     const percentageOfDue = (amount: number | undefined) =>
-        dueAmount > 0 && amount != null && Number.isFinite(Number(amount))
-            ? Number(amount) / dueAmount * 100
-            : null
+        dueAmount > 0 && amount != null && Number.isFinite(Number(amount)) ? (Number(amount) / dueAmount) * 100 : null
     const summaryCards = [
-        { key: 'amountDue', amount: summary?.due, percent: percentageOfDue(summary?.due), icon: Wallet,
-            color: 'text-indigo-600 dark:text-indigo-300', surface: 'from-indigo-500/10 to-indigo-500/[0.02] border-indigo-500/20', iconBg: 'bg-indigo-500/15', bar: 'bg-indigo-500' },
-        { key: 'paid', amount: summary?.paid, percent: percentageOfDue(summary?.paid), icon: CircleCheck,
-            color: 'text-emerald-600 dark:text-emerald-300', surface: 'from-emerald-500/10 to-emerald-500/[0.02] border-emerald-500/20', iconBg: 'bg-emerald-500/15', bar: 'bg-emerald-500' },
-        { key: 'remaining', amount: summary?.remaining, percent: percentageOfDue(summary?.remaining), icon: Clock3,
-            color: 'text-amber-600 dark:text-amber-300', surface: 'from-amber-500/10 to-amber-500/[0.02] border-amber-500/20', iconBg: 'bg-amber-500/15', bar: 'bg-amber-500' },
+        {
+            key: 'amountDue',
+            amount: summary?.due,
+            percent: percentageOfDue(summary?.due),
+            icon: Wallet,
+            color: 'text-indigo-600 dark:text-indigo-300',
+            surface: 'from-indigo-500/10 to-indigo-500/[0.02] border-indigo-500/20',
+            iconBg: 'bg-indigo-500/15',
+            bar: 'bg-indigo-500'
+        },
+        {
+            key: 'paid',
+            amount: summary?.paid,
+            percent: percentageOfDue(summary?.paid),
+            icon: CircleCheck,
+            color: 'text-emerald-600 dark:text-emerald-300',
+            surface: 'from-emerald-500/10 to-emerald-500/[0.02] border-emerald-500/20',
+            iconBg: 'bg-emerald-500/15',
+            bar: 'bg-emerald-500'
+        },
+        {
+            key: 'remaining',
+            amount: summary?.remaining,
+            percent: percentageOfDue(summary?.remaining),
+            icon: Clock3,
+            color: 'text-amber-600 dark:text-amber-300',
+            surface: 'from-amber-500/10 to-amber-500/[0.02] border-amber-500/20',
+            iconBg: 'bg-amber-500/15',
+            bar: 'bg-amber-500'
+        }
     ]
 
     const toggleSort = (key: SortKey) => {
@@ -252,7 +294,11 @@ const PaymentsPage = () => {
             <button type="button" className="inline-flex items-center gap-1 font-semibold" onClick={() => toggleSort(field)}>
                 {children}
                 {sort === field ? (
-                    order === 'asc' ? <ArrowUp className="size-3.5" /> : <ArrowDown className="size-3.5" />
+                    order === 'asc' ? (
+                        <ArrowUp className="size-3.5" />
+                    ) : (
+                        <ArrowDown className="size-3.5" />
+                    )
                 ) : (
                     <ArrowUpDown className="size-3.5 text-muted-foreground/50" />
                 )}
@@ -369,9 +415,7 @@ const PaymentsPage = () => {
         try {
             const res = await deletePayment(uuid).unwrap()
             ToastComponent(res)
-            setHistoryRow((row) =>
-                row ? { ...row, payments: (row.payments || []).filter((item) => item.uuid !== uuid) } : row
-            )
+            setHistoryRow((row) => (row ? { ...row, payments: (row.payments || []).filter((item) => item.uuid !== uuid) } : row))
         } catch (error: any) {
             alertError({ text: error?.data?.message || error?.message || t('payments.deleteFailed') })
         }
@@ -384,18 +428,11 @@ const PaymentsPage = () => {
 
     return (
         <div className="space-y-6">
-            <PageHeader
-                title={t('payments.title')}
-                description={t('payments.description')}
-            />
+            <PageHeader title={t('payments.title')} description={t('payments.description')} />
 
             <div className="max-w-xl">
                 <Label className="mb-2 block">{t('payments.campaign')}</Label>
-                <Select
-                    value={campaignUuid || undefined}
-                    onValueChange={(value) => setSearchParams({ campaign: value })}
-                    disabled={loadingCampaigns}
-                >
+                <Select value={campaignUuid || undefined} onValueChange={(value) => setSearchParams({ campaign: value })} disabled={loadingCampaigns}>
                     <SelectTrigger className="bg-background">
                         <SelectValue placeholder={loadingCampaigns ? t('payments.loadingCampaigns') : t('payments.selectCampaign')} />
                     </SelectTrigger>
@@ -414,25 +451,53 @@ const PaymentsPage = () => {
                 {viewMode === 'cards' && campaignUuid && (
                     <div className="flex items-center gap-2">
                         <Label htmlFor="payment-sort">{t('payments.sortBy')}</Label>
-                        <Select value={sort} onValueChange={value => setSort(value as SortKey)}>
-                            <SelectTrigger id="payment-sort" className="w-40"><SelectValue /></SelectTrigger>
+                        <Select value={sort} onValueChange={(value) => setSort(value as SortKey)}>
+                            <SelectTrigger id="payment-sort" className="w-40">
+                                <SelectValue />
+                            </SelectTrigger>
                             <SelectContent>
-                                {(['name', 'due', 'paid', 'remaining', 'status', 'last_paid_at'] as const).map(key => (
-                                    <SelectItem key={key} value={key}>{t(key === 'status' ? 'common:status' : `payments.${key === 'name' ? 'influencer' : key === 'last_paid_at' ? 'lastPaid' : key}`)}</SelectItem>
+                                {(['name', 'due', 'paid', 'remaining', 'status', 'last_paid_at'] as const).map((key) => (
+                                    <SelectItem key={key} value={key}>
+                                        {t(
+                                            key === 'status'
+                                                ? 'common:status'
+                                                : `payments.${key === 'name' ? 'influencer' : key === 'last_paid_at' ? 'lastPaid' : key}`
+                                        )}
+                                    </SelectItem>
                                 ))}
                             </SelectContent>
                         </Select>
-                        <Button type="button" variant="outline" size="icon" aria-label={t(order === 'asc' ? 'payments.ascending' : 'payments.descending')} onClick={() => setOrder(order === 'asc' ? 'desc' : 'asc')}>
+                        <Button
+                            type="button"
+                            variant="outline"
+                            size="icon"
+                            aria-label={t(order === 'asc' ? 'payments.ascending' : 'payments.descending')}
+                            onClick={() => setOrder(order === 'asc' ? 'desc' : 'asc')}
+                        >
                             {order === 'asc' ? <ArrowUp className="size-4" /> : <ArrowDown className="size-4" />}
                         </Button>
                     </div>
                 )}
                 <div role="group" aria-label={t('payments.displayMode')} className="flex gap-1 rounded-lg border p-1">
-                    <Button type="button" size="sm" variant={viewMode === 'table' ? 'default' : 'ghost'} aria-pressed={viewMode === 'table'} onClick={() => changeViewMode('table')}>
-                        <Table2 className="size-4" />{t('payments.tableView')}
+                    <Button
+                        type="button"
+                        size="sm"
+                        variant={viewMode === 'table' ? 'default' : 'ghost'}
+                        aria-pressed={viewMode === 'table'}
+                        onClick={() => changeViewMode('table')}
+                    >
+                        <Table2 className="size-4" />
+                        {t('payments.tableView')}
                     </Button>
-                    <Button type="button" size="sm" variant={viewMode === 'cards' ? 'default' : 'ghost'} aria-pressed={viewMode === 'cards'} onClick={() => changeViewMode('cards')}>
-                        <LayoutGrid className="size-4" />{t('payments.cardView')}
+                    <Button
+                        type="button"
+                        size="sm"
+                        variant={viewMode === 'cards' ? 'default' : 'ghost'}
+                        aria-pressed={viewMode === 'cards'}
+                        onClick={() => changeViewMode('cards')}
+                    >
+                        <LayoutGrid className="size-4" />
+                        {t('payments.cardView')}
                     </Button>
                 </div>
             </div>
@@ -447,7 +512,7 @@ const PaymentsPage = () => {
             ) : (
                 <>
                     <div className="grid gap-4 md:grid-cols-3" aria-busy={isFetching}>
-                        {summaryCards.map(item => (
+                        {summaryCards.map((item) => (
                             <Card key={item.key} className={`min-w-0 overflow-hidden rounded-2xl bg-gradient-to-br shadow-sm ${item.surface}`}>
                                 <CardContent className="space-y-5 p-5 lg:p-6">
                                     <div className="flex items-center justify-between gap-3">
@@ -457,7 +522,11 @@ const PaymentsPage = () => {
                                         </div>
                                     </div>
                                     <p className={`break-words text-2xl font-bold tracking-tight tabular-nums lg:text-3xl ${item.color}`}>
-                                        {isFetching && !summary ? <span className="block h-9 w-3/4 animate-pulse rounded-md bg-muted" aria-label={t('payments.loading')} /> : formatCurrency(item.amount)}
+                                        {isFetching && !summary ? (
+                                            <span className="block h-9 w-3/4 animate-pulse rounded-md bg-muted" aria-label={t('payments.loading')} />
+                                        ) : (
+                                            formatCurrency(item.amount)
+                                        )}
                                     </p>
                                     <div className="space-y-2.5">
                                         <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
@@ -467,8 +536,10 @@ const PaymentsPage = () => {
                                             </span>
                                         </div>
                                         <div className="h-2 overflow-hidden rounded-full bg-muted" aria-hidden="true">
-                                            <div className={`h-full rounded-full transition-[width] duration-500 motion-reduce:transition-none ${item.bar}`}
-                                                style={{ width: `${Math.max(0, Math.min(100, item.percent ?? 0))}%` }} />
+                                            <div
+                                                className={`h-full rounded-full transition-[width] duration-500 motion-reduce:transition-none ${item.bar}`}
+                                                style={{ width: `${Math.max(0, Math.min(100, item.percent ?? 0))}%` }}
+                                            />
                                         </div>
                                         {summary && dueAmount === 0 && <p className="text-xs text-muted-foreground">{t('payments.noAmountDue')}</p>}
                                     </div>
@@ -480,154 +551,182 @@ const PaymentsPage = () => {
                     {viewMode === 'cards' ? (
                         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
                             {isFetching && !payouts ? (
-                                <Card className="col-span-full p-10 text-center"><Loader2 className="mx-auto size-5 animate-spin" aria-label={t('payments.loading')} /></Card>
-                            ) : payoutItems.length === 0 ? (
-                                <Card className="col-span-full p-10 text-center text-muted-foreground">{t('payments.emptyCampaign', { campaign: selectedCampaignLabel })}</Card>
-                            ) : payoutItems.map(row => (
-                                <Card key={row.uuid} className="min-w-0 space-y-4 p-5">
-                                    <div className="flex items-start justify-between gap-3">
-                                        <button type="button" className="flex min-w-0 items-center gap-2 text-left" disabled={!row.actor.profile_url}
-                                            onClick={() => { if (row.actor.profile_url) setPreviewFile({ id: 0, uuid: `profile-${row.actor.uuid}`, original_name: row.actor.name, mime_type: 'image/*', public_url: row.actor.profile_url, file_size: 0 }) }}>
-                                            <Avatar className="size-10 shrink-0 overflow-hidden">
-                                                <SafeImage
-                                                    src={resolveFileUrl(row.actor.profile_url || '')}
-                                                    alt={row.actor.name}
-                                                    variant="avatar"
-                                                    fallbackName={row.actor.name}
-                                                    fallbackSrc="/images/person.jpg"
-                                                    className="h-full w-full object-cover"
-                                                />
-                                            </Avatar>
-                                            <span className="break-words font-semibold">{row.actor.name}</span>
-                                        </button>
-                                        {statusBadge(row.status)}
-                                    </div>
-                                    <div className="rounded-lg bg-muted/40 p-3 text-sm">
-                                        <p className="text-xs text-muted-foreground">{t('payments.bank')}</p>
-                                        <p className="break-words">{row.actor.bank_account_name || '—'}</p>
-                                        <CopyBankAccount number={row.actor.bank_account_number} />
-                                    </div>
-                                    <dl className="space-y-2 text-sm">
-                                        {(['due', 'paid', 'remaining'] as const).map(key => (
-                                            <div key={key} className="flex flex-wrap justify-between gap-2">
-                                                <dt className="text-muted-foreground">{t(`payments.${key}`)}</dt>
-                                                <dd className={`font-semibold tabular-nums ${key === 'paid' ? 'text-emerald-600' : key === 'remaining' ? 'text-amber-600' : ''}`}>{formatCurrency(row[key])}</dd>
-                                            </div>
-                                        ))}
-                                    </dl>
-                                    <p className="text-xs text-muted-foreground">{t('payments.lastPaid')}: {row.last_paid_at ? new Date(row.last_paid_at).toLocaleDateString() : '—'}</p>
-                                    <div className="flex flex-wrap justify-end gap-2 border-t pt-3">
-                                        <Button size="sm" variant="outline" onClick={() => setHistoryRow(row)} disabled={!row.payments?.length}>
-                                            <History className="size-4" />{t('payments.historyTitle')}
-                                        </Button>
-                                        <Button size="sm" onClick={() => openRecord(row)} disabled={row.status === 'PAID' || row.due <= 0}>
-                                            <Banknote className="size-4" />{t('payments.recordTitle')}
-                                        </Button>
-                                    </div>
+                                <Card className="col-span-full p-10 text-center">
+                                    <Loader2 className="mx-auto size-5 animate-spin" aria-label={t('payments.loading')} />
                                 </Card>
-                            ))}
+                            ) : payoutItems.length === 0 ? (
+                                <Card className="col-span-full p-10 text-center text-muted-foreground">
+                                    {t('payments.emptyCampaign', { campaign: selectedCampaignLabel })}
+                                </Card>
+                            ) : (
+                                payoutItems.map((row) => (
+                                    <Card key={row.uuid} className="min-w-0 space-y-4 p-5">
+                                        <div className="flex items-start justify-between gap-3">
+                                            <button
+                                                type="button"
+                                                className="flex min-w-0 items-center gap-2 text-left"
+                                                disabled={!row.actor.profile_url}
+                                                onClick={() => {
+                                                    if (row.actor.profile_url)
+                                                        setPreviewFile({
+                                                            id: 0,
+                                                            uuid: `profile-${row.actor.uuid}`,
+                                                            original_name: row.actor.name,
+                                                            mime_type: 'image/*',
+                                                            public_url: row.actor.profile_url,
+                                                            file_size: 0
+                                                        })
+                                                }}
+                                            >
+                                                <Avatar className="size-10 shrink-0 overflow-hidden">
+                                                    <SafeImage
+                                                        src={resolveFileUrl(row.actor.profile_url || '')}
+                                                        alt={row.actor.name}
+                                                        variant="avatar"
+                                                        fallbackName={row.actor.name}
+                                                        fallbackSrc="/images/person.jpg"
+                                                        className="h-full w-full object-cover"
+                                                    />
+                                                </Avatar>
+                                                <span className="break-words font-semibold">{row.actor.name}</span>
+                                            </button>
+                                            {statusBadge(row.status)}
+                                        </div>
+                                        <div className="rounded-lg bg-muted/40 p-3 text-sm">
+                                            <p className="text-xs text-muted-foreground">{t('payments.bank')}</p>
+                                            <p className="break-words">{row.actor.bank_account_name || '—'}</p>
+                                            <CopyBankAccount number={row.actor.bank_account_number} />
+                                        </div>
+                                        <dl className="space-y-2 text-sm">
+                                            {(['due', 'paid', 'remaining'] as const).map((key) => (
+                                                <div key={key} className="flex flex-wrap justify-between gap-2">
+                                                    <dt className="text-muted-foreground">{t(`payments.${key}`)}</dt>
+                                                    <dd
+                                                        className={`font-semibold tabular-nums ${key === 'paid' ? 'text-emerald-600' : key === 'remaining' ? 'text-amber-600' : ''}`}
+                                                    >
+                                                        {formatCurrency(row[key])}
+                                                    </dd>
+                                                </div>
+                                            ))}
+                                        </dl>
+                                        <p className="text-xs text-muted-foreground">
+                                            {t('payments.lastPaid')}: {row.last_paid_at ? new Date(row.last_paid_at).toLocaleDateString() : '—'}
+                                        </p>
+                                        <div className="flex flex-wrap justify-end gap-2 border-t pt-3">
+                                            <Button size="sm" variant="outline" onClick={() => setHistoryRow(row)} disabled={!row.payments?.length}>
+                                                <History className="size-4" />
+                                                {t('payments.historyTitle')}
+                                            </Button>
+                                            <Button size="sm" onClick={() => openRecord(row)} disabled={row.status === 'PAID' || row.due <= 0}>
+                                                <Banknote className="size-4" />
+                                                {t('payments.recordTitle')}
+                                            </Button>
+                                        </div>
+                                    </Card>
+                                ))
+                            )}
                         </div>
                     ) : (
-                    <Card>
-                        <CardContent className="p-0 overflow-x-auto">
-                            <Table>
-                                <TableHeader>
-                                    <TableRow>
-                                        <SortHead field="name">{t('payments.influencer')}</SortHead>
-                                        <TableHead>{t('payments.bank')}</TableHead>
-                                        <SortHead field="due">{t('payments.due')}</SortHead>
-                                        <SortHead field="paid">{t('payments.paid')}</SortHead>
-                                        <SortHead field="remaining">{t('payments.remaining')}</SortHead>
-                                        <SortHead field="status">{t('common:status')}</SortHead>
-                                        <SortHead field="last_paid_at">{t('payments.lastPaid')}</SortHead>
-                                        <TableHead className="text-right">{t('common:actions')}</TableHead>
-                                    </TableRow>
-                                </TableHeader>
-                                <TableBody>
-                                    {isFetching && !payouts ? (
+                        <Card>
+                            <CardContent className="p-0 overflow-x-auto">
+                                <Table>
+                                    <TableHeader>
                                         <TableRow>
-                                            <TableCell colSpan={8} className="py-10 text-center text-muted-foreground">
-                                                <Loader2 className="size-4 animate-spin inline mr-2" /> Loading…
-                                            </TableCell>
+                                            <SortHead field="name">{t('payments.influencer')}</SortHead>
+                                            <TableHead>{t('payments.bank')}</TableHead>
+                                            <SortHead field="due">{t('payments.due')}</SortHead>
+                                            <SortHead field="paid">{t('payments.paid')}</SortHead>
+                                            <SortHead field="remaining">{t('payments.remaining')}</SortHead>
+                                            <SortHead field="status">{t('common:status')}</SortHead>
+                                            <SortHead field="last_paid_at">{t('payments.lastPaid')}</SortHead>
+                                            <TableHead className="text-right">{t('common:actions')}</TableHead>
                                         </TableRow>
-                                    ) : payoutItems.length === 0 ? (
-                                        <TableRow>
-                                            <TableCell colSpan={8} className="py-10 text-center text-muted-foreground">
-                                                No approved influencers in {selectedCampaignLabel || 'this campaign'}.
-                                            </TableCell>
-                                        </TableRow>
-                                    ) : (
-                                        payoutItems.map((row) => (
-                                            <TableRow key={row.uuid}>
-                                                <TableCell>
-                                                    <button
-                                                        type="button"
-                                                        className="flex items-center gap-2 text-left"
-                                                        disabled={!row.actor.profile_url}
-                                                        onClick={() => {
-                                                            if (!row.actor.profile_url) return
-                                                            setPreviewFile({
-                                                                id: 0,
-                                                                uuid: `profile-${row.actor.uuid}`,
-                                                                original_name: row.actor.name,
-                                                                mime_type: 'image/*',
-                                                                public_url: row.actor.profile_url,
-                                                                file_size: 0
-                                                            })
-                                                        }}
-                                                    >
-                                                        <Avatar className="size-8 overflow-hidden">
-                                                            <SafeImage
-                                                                src={resolveFileUrl(row.actor.profile_url || '')}
-                                                                alt={row.actor.name}
-                                                                variant="avatar"
-                                                                fallbackName={row.actor.name}
-                                                                fallbackSrc="/images/person.jpg"
-                                                                className="h-full w-full object-cover"
-                                                            />
-                                                        </Avatar>
-                                                        <span className="font-medium">{row.actor.name}</span>
-                                                    </button>
-                                                </TableCell>
-                                                <TableCell className="text-xs">
-                                                    <div>{row.actor.bank_account_name || '—'}</div>
-                                                    <CopyBankAccount number={row.actor.bank_account_number} />
-                                                </TableCell>
-                                                <TableCell className="tabular-nums">{formatCurrency(row.due)}</TableCell>
-                                                <TableCell className="tabular-nums">{formatCurrency(row.paid)}</TableCell>
-                                                <TableCell className="tabular-nums font-semibold">{formatCurrency(row.remaining)}</TableCell>
-                                                <TableCell>{statusBadge(row.status)}</TableCell>
-                                                <TableCell className="text-xs text-muted-foreground">
-                                                    {row.last_paid_at ? new Date(row.last_paid_at).toLocaleDateString() : '—'}
-                                                </TableCell>
-                                                <TableCell className="text-right">
-                                                    <div className="flex justify-end gap-1">
-                                                        <Button
-                                                            size="sm"
-                                                            variant="outline"
-                                                            className="h-8"
-                                                            onClick={() => setHistoryRow(row)}
-                                                            disabled={!(row.payments?.length)}
-                                                        >
-                                                            <History className="size-3.5" />
-                                                        </Button>
-                                                        <Button
-                                                            size="sm"
-                                                            className="h-8"
-                                                            disabled={row.status === 'PAID' || row.due <= 0}
-                                                            onClick={() => openRecord(row)}
-                                                        >
-                                                            Record
-                                                        </Button>
-                                                    </div>
+                                    </TableHeader>
+                                    <TableBody>
+                                        {isFetching && !payouts ? (
+                                            <TableRow>
+                                                <TableCell colSpan={8} className="py-10 text-center text-muted-foreground">
+                                                    <Loader2 className="size-4 animate-spin inline mr-2" /> Loading…
                                                 </TableCell>
                                             </TableRow>
-                                        ))
-                                    )}
-                                </TableBody>
-                            </Table>
-                        </CardContent>
-                    </Card>
+                                        ) : payoutItems.length === 0 ? (
+                                            <TableRow>
+                                                <TableCell colSpan={8} className="py-10 text-center text-muted-foreground">
+                                                    No approved influencers in {selectedCampaignLabel || 'this campaign'}.
+                                                </TableCell>
+                                            </TableRow>
+                                        ) : (
+                                            payoutItems.map((row) => (
+                                                <TableRow key={row.uuid}>
+                                                    <TableCell>
+                                                        <button
+                                                            type="button"
+                                                            className="flex items-center gap-2 text-left"
+                                                            disabled={!row.actor.profile_url}
+                                                            onClick={() => {
+                                                                if (!row.actor.profile_url) return
+                                                                setPreviewFile({
+                                                                    id: 0,
+                                                                    uuid: `profile-${row.actor.uuid}`,
+                                                                    original_name: row.actor.name,
+                                                                    mime_type: 'image/*',
+                                                                    public_url: row.actor.profile_url,
+                                                                    file_size: 0
+                                                                })
+                                                            }}
+                                                        >
+                                                            <Avatar className="size-8 overflow-hidden">
+                                                                <SafeImage
+                                                                    src={resolveFileUrl(row.actor.profile_url || '')}
+                                                                    alt={row.actor.name}
+                                                                    variant="avatar"
+                                                                    fallbackName={row.actor.name}
+                                                                    fallbackSrc="/images/person.jpg"
+                                                                    className="h-full w-full object-cover"
+                                                                />
+                                                            </Avatar>
+                                                            <span className="font-medium">{row.actor.name}</span>
+                                                        </button>
+                                                    </TableCell>
+                                                    <TableCell className="text-xs">
+                                                        <div>{row.actor.bank_account_name || '—'}</div>
+                                                        <CopyBankAccount number={row.actor.bank_account_number} />
+                                                    </TableCell>
+                                                    <TableCell className="tabular-nums">{formatCurrency(row.due)}</TableCell>
+                                                    <TableCell className="tabular-nums">{formatCurrency(row.paid)}</TableCell>
+                                                    <TableCell className="tabular-nums font-semibold">{formatCurrency(row.remaining)}</TableCell>
+                                                    <TableCell>{statusBadge(row.status)}</TableCell>
+                                                    <TableCell className="text-xs text-muted-foreground">
+                                                        {row.last_paid_at ? new Date(row.last_paid_at).toLocaleDateString() : '—'}
+                                                    </TableCell>
+                                                    <TableCell className="text-right">
+                                                        <div className="flex justify-end gap-1">
+                                                            <Button
+                                                                size="sm"
+                                                                variant="outline"
+                                                                className="h-8"
+                                                                onClick={() => setHistoryRow(row)}
+                                                                disabled={!row.payments?.length}
+                                                            >
+                                                                <History className="size-3.5" />
+                                                            </Button>
+                                                            <Button
+                                                                size="sm"
+                                                                className="h-8"
+                                                                disabled={row.status === 'PAID' || row.due <= 0}
+                                                                onClick={() => openRecord(row)}
+                                                            >
+                                                                Record
+                                                            </Button>
+                                                        </div>
+                                                    </TableCell>
+                                                </TableRow>
+                                            ))
+                                        )}
+                                    </TableBody>
+                                </Table>
+                            </CardContent>
+                        </Card>
                     )}
                 </>
             )}
@@ -670,7 +769,12 @@ const PaymentsPage = () => {
                         </div>
                         <div className="grid gap-2">
                             <Label htmlFor="pay_ref">{t('payments.reference')}</Label>
-                            <Input id="pay_ref" value={reference} onChange={(e) => setReference(e.target.value)} placeholder={t('payments.referencePlaceholder')} />
+                            <Input
+                                id="pay_ref"
+                                value={reference}
+                                onChange={(e) => setReference(e.target.value)}
+                                placeholder={t('payments.referencePlaceholder')}
+                            />
                         </div>
                         <div className="grid gap-2">
                             <Label htmlFor="pay_notes">{t('payments.notes')}</Label>
@@ -744,11 +848,7 @@ const PaymentsPage = () => {
                         </div>
                     </div>
                     <DialogFooter>
-                        <Button
-                            variant="outline"
-                            onClick={() => setRecordRow(null)}
-                            disabled={isSaving}
-                        >
+                        <Button variant="outline" onClick={() => setRecordRow(null)} disabled={isSaving}>
                             {t('common:cancel')}
                         </Button>
                         <Button onClick={requestSubmitPayment} disabled={isSaving}>
@@ -825,7 +925,13 @@ const PaymentsPage = () => {
                                         <p className="text-xs text-muted-foreground">{new Date(payment.paid_at).toLocaleString()}</p>
                                     </div>
                                     {canDelete && (
-                                        <Button size="icon" variant="ghost" className="size-8 text-destructive" disabled={isDeleting} onClick={() => removePayment(payment.uuid)}>
+                                        <Button
+                                            size="icon"
+                                            variant="ghost"
+                                            className="size-8 text-destructive"
+                                            disabled={isDeleting}
+                                            onClick={() => removePayment(payment.uuid)}
+                                        >
                                             <Trash2 className="size-4" />
                                         </Button>
                                     )}
