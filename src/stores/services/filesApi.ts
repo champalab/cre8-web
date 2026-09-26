@@ -13,8 +13,11 @@ export const filesApi = createApi({
         }),
         uploadFiles: builder.mutation<{ status: string; data: string[] }, FormData>({
             query: (body) => ({ url: '/v1/files/upload', method: 'POST', body })
+        }),
+        deleteFile: builder.mutation<{ status: string; message?: string }, { url: string; actor_id?: number }>({
+            query: (body) => ({ url: '/v1/files/delete', method: 'POST', body })
         })
     })
 })
 
-export const { usePresignUploadMutation, useConfirmUploadMutation, useUploadFilesMutation } = filesApi
+export const { usePresignUploadMutation, useConfirmUploadMutation, useUploadFilesMutation, useDeleteFileMutation } = filesApi

@@ -1,11 +1,27 @@
 import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { alertError, alertWarning } from '../../../../utils/alerts'
-import { Actor } from '@/stores/services/actorApi'
-import { useUploadFilesMutation } from '@/stores/services/filesApi'
+import { alertError, alertWarning, alertSuccess, confirmDelete } from '../../../../utils/alerts'
+import { Actor, useUpdateActorMutation } from '@/stores/services/actorApi'
+import { useUploadFilesMutation, useDeleteFileMutation } from '@/stores/services/filesApi'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import SafeImage from '@/components/ui/SafeImage'
-import { Loader2, Camera, User, Phone, MapPin, Banknote, Trash2, Briefcase, FileImage, Contact, DollarSign, Mail, Check } from 'lucide-react'
+import {
+    Loader2,
+    Camera,
+    User,
+    Phone,
+    MapPin,
+    Banknote,
+    Trash2,
+    Briefcase,
+    FileImage,
+    Contact,
+    DollarSign,
+    Mail,
+    Check,
+    Star
+} from 'lucide-react'
+import { cn } from '@/lib/utils'
 
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
@@ -39,6 +55,9 @@ export const ActorFormDialog = ({ open, onOpenChange, actor, form, onFormChange,
     const { data: provinceData } = useGetProvincesQuery()
     const provinces = provinceData?.data || []
     const [uploadFiles, { isLoading: isUploading }] = useUploadFilesMutation()
+    const [deleteFile] = useDeleteFileMutation()
+    const [updateActor] = useUpdateActorMutation()
+    const [deletingUrl, setDeletingUrl] = useState<string | null>(null)
     const fileInputRef = useRef<HTMLInputElement>(null)
     const [activeTab, setActiveTab] = useState(steps[0].id)
     const [isDragging, setIsDragging] = useState(false)
@@ -137,13 +156,64 @@ export const ActorFormDialog = ({ open, onOpenChange, actor, form, onFormChange,
 
     const openFilePicker = () => fileInputRef.current?.click()
 
-    const removeImage = (index: number) => {
-        const newUrls = (form.profile_urls || []).filter((_, i) => i !== index)
+    const removeImage = async (url: string, index: number) => {
+        const confirmed = await confirmDelete({
+            text: t('influencers.confirmDeletePhoto')
+        })
+        if (!confirmed.isConfirmed) return
+
+        setDeletingUrl(url)
+        try {
+            // Delete file on storage and database (if actor exists)
+            await deleteFile({ url, actor_id: actor?.id }).unwrap()
+
+            const currentUrls = form.profile_urls || []
+            const newUrls = currentUrls.filter((_, i) => i !== index)
+            let newProfileUrl = form.profile_url
+            if (form.profile_url === url || !newUrls.includes(form.profile_url)) {
+                newProfileUrl = newUrls.length > 0 ? newUrls[0] : ''
+            }
+
+            onFormChange({
+                ...form,
+                profile_urls: newUrls,
+                profile_url: newProfileUrl
+            })
+
+            alertSuccess({ text: t('influencers.photoDeletedSuccess') })
+        } catch (error: any) {
+            console.error('Failed to delete image', error)
+            alertError({ text: error?.data?.message || t('influencers.deletePhotoFailed') })
+        } finally {
+            setDeletingUrl(null)
+        }
+    }
+
+    const handleSetPrimary = async (url: string) => {
+        const currentUrls = form.profile_urls || []
+        // Reorder list: make the selected primary photo first
+        const reorderedUrls = [url, ...currentUrls.filter((u) => u !== url)]
+
         onFormChange({
             ...form,
-            profile_urls: newUrls,
-            profile_url: newUrls.length > 0 ? newUrls[0] : ''
+            profile_url: url,
+            profile_urls: reorderedUrls
         })
+
+        // If editing existing actor, persist changes immediately to database
+        if (actor?.id) {
+            try {
+                await updateActor({
+                    id: actor.id,
+                    profile_url: url,
+                    profile_urls: reorderedUrls
+                }).unwrap()
+            } catch (error) {
+                console.error('Failed to update primary photo on server', error)
+            }
+        }
+
+        alertSuccess({ text: t('influencers.primaryPhotoUpdated') })
     }
 
     return (
@@ -620,36 +690,90 @@ export const ActorFormDialog = ({ open, onOpenChange, actor, form, onFormChange,
                                             )}
                                         </div>
 
-                                        {form.profile_urls.map((url, i) => (
-                                            <div
-                                                key={i}
-                                                className="group relative aspect-[3/4] rounded-xl overflow-hidden bg-muted/20 border border-border/40 shadow-sm hover:shadow-md transition-all"
-                                            >
-                                                <SafeImage
-                                                    src={url}
-                                                    alt={t('influencers.galleryAlt', { index: i + 1 })}
-                                                    variant="gallery"
-                                                    className="w-full h-full object-cover"
-                                                />
+                                        {form.profile_urls.map((url, i) => {
+                                            const isPrimary = form.profile_url ? form.profile_url === url : i === 0
+                                            const isDeleting = deletingUrl === url
 
+                                            return (
+                                                <div
+                                                    key={`${url}-${i}`}
+                                                    className={cn(
+                                                        'group relative aspect-[3/4] rounded-xl overflow-hidden bg-muted/20 border shadow-sm transition-all',
+                                                        isPrimary ? 'border-primary ring-2 ring-primary/50 shadow-md' : 'border-border/40 hover:shadow-md'
+                                                    )}
+                                                >
+                                                    <SafeImage
+                                                        src={url}
+                                                        alt={t('influencers.galleryAlt', { index: i + 1 })}
+                                                        variant="gallery"
+                                                        className="w-full h-full object-cover"
+                                                    />
 
-                                                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                                                    <Button
-                                                        size="icon"
-                                                        variant="destructive"
-                                                        className="size-8 rounded-full shadow-lg transform translate-y-4 group-hover:translate-y-0 transition-transform"
-                                                        onClick={() => removeImage(i)}
-                                                    >
-                                                        <Trash2 className="size-4" />
-                                                    </Button>
-                                                </div>
-                                                {i === 0 && (
-                                                    <div className="absolute top-2 left-2 bg-primary text-primary-foreground text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full shadow-sm">
-                                                        {t('influencers.primary')}
+                                                    {/* Primary Status Badge or Quick Set as Primary Button */}
+                                                    <div className="absolute top-2 left-2 z-10">
+                                                        {isPrimary ? (
+                                                            <div className="inline-flex items-center gap-1 rounded-full bg-primary px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-primary-foreground shadow-md">
+                                                                <Star className="size-3 fill-current text-yellow-300" />
+                                                                <span>{t('influencers.primaryPhoto')}</span>
+                                                            </div>
+                                                        ) : (
+                                                            <button
+                                                                type="button"
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation()
+                                                                    handleSetPrimary(url)
+                                                                }}
+                                                                title={t('influencers.setAsPrimary')}
+                                                                className="inline-flex items-center gap-1 rounded-full bg-black/70 hover:bg-primary px-2 py-0.5 text-[10px] font-semibold text-white hover:text-primary-foreground border border-white/20 shadow-md backdrop-blur-md opacity-0 group-hover:opacity-100 transition-all"
+                                                            >
+                                                                <Star className="size-3" />
+                                                                <span>{t('influencers.setAsPrimary')}</span>
+                                                            </button>
+                                                        )}
                                                     </div>
-                                                )}
-                                            </div>
-                                        ))}
+
+                                                    {/* Hover Overlay with Action Buttons */}
+                                                    <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2 p-2">
+                                                        {!isPrimary && (
+                                                            <Button
+                                                                type="button"
+                                                                size="sm"
+                                                                variant="secondary"
+                                                                onClick={() => handleSetPrimary(url)}
+                                                                className="h-8 text-xs px-3 rounded-full bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg font-semibold gap-1.5"
+                                                            >
+                                                                <Star className="size-3.5 fill-current text-yellow-300" />
+                                                                <span>{t('influencers.setAsPrimary')}</span>
+                                                            </Button>
+                                                        )}
+
+                                                        <Button
+                                                            type="button"
+                                                            size="sm"
+                                                            variant="destructive"
+                                                            disabled={isDeleting}
+                                                            onClick={() => removeImage(url, i)}
+                                                            className="h-8 text-xs px-3 rounded-full shadow-lg font-medium gap-1.5"
+                                                        >
+                                                            {isDeleting ? (
+                                                                <Loader2 className="size-3.5 animate-spin" />
+                                                            ) : (
+                                                                <Trash2 className="size-3.5" />
+                                                            )}
+                                                            <span>{t('delete')}</span>
+                                                        </Button>
+                                                    </div>
+
+                                                    {/* Deleting Spinner Overlay */}
+                                                    {isDeleting && (
+                                                        <div className="absolute inset-0 bg-background/80 backdrop-blur-sm flex flex-col items-center justify-center gap-2 z-20">
+                                                            <Loader2 className="size-6 animate-spin text-destructive" />
+                                                            <span className="text-[11px] font-medium text-destructive">{t('influencers.uploading')}</span>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            )
+                                        })}
                                     </div>
                                 ) : (
                                     <div
