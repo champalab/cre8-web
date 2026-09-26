@@ -38,6 +38,7 @@ import {
 import { useHeroAmbient } from './use-hero-ambient'
 import { ServicesGrid } from './components/services-grid'
 import { InfluencersGrid } from './components/influencers-grid'
+import { PreviousWorkGrid } from './components/previous-work-grid'
 
 const SKILL_KEYS = [
     'skillMarketResearch',
@@ -403,6 +404,37 @@ export default function Home() {
                     </motion.div>
 
                     <InfluencersGrid />
+                </div>
+            </section>
+
+            <section id="previousWork" className="relative isolate w-full scroll-mt-20 py-20">
+                {/* Background glow ambiance */}
+                <div
+                    className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,rgba(255,107,0,0.12),transparent)]"
+                    aria-hidden="true"
+                />
+
+                <div className="mx-auto max-w-[1440px] px-6 md:px-10">
+                    <motion.div
+                        variants={fadeUp}
+                        initial="hidden"
+                        whileInView="show"
+                        viewport={viewport}
+                        className="mb-12 text-center"
+                    >
+                        <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-orange/30 bg-orange/10 px-4 py-1.5 font-cre8 text-xs font-semibold uppercase tracking-wider text-orange-soft backdrop-blur-sm">
+                            <Sparkles className="size-3.5 text-orange" />
+                            {t('previousWorkBadge')}
+                        </div>
+                        <h2 className="mb-3 font-cre8 text-3xl font-bold md:text-5xl">
+                            <Trans i18nKey="previousWorkHeading" ns="home" components={headingComponents} />
+                        </h2>
+                        <p className="mx-auto max-w-2xl text-white/70">
+                            {t('previousWorkLead')}
+                        </p>
+                    </motion.div>
+
+                    <PreviousWorkGrid />
                 </div>
             </section>
 

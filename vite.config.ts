@@ -40,7 +40,7 @@ export default defineConfig(({ mode }) => ({
                 ? {
                       // media-src must allow R2 public URLs — without it, <video> falls back to default-src 'self' and is blocked
                       'Content-Security-Policy':
-                          "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; connect-src 'self' ws: wss: http: https:; img-src 'self' data: blob: https:; media-src 'self' blob: https:; font-src 'self' data: https://fonts.gstatic.com; worker-src 'self' blob:;"
+                          "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; connect-src 'self' ws: wss: http: https:; img-src 'self' data: blob: https:; media-src 'self' blob: https:; frame-src 'self' https://www.youtube.com https://www.youtube-nocookie.com; font-src 'self' data: https://fonts.gstatic.com; worker-src 'self' blob:;"
                   }
                 : undefined
     },
