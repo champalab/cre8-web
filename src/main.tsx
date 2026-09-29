@@ -12,6 +12,11 @@ import 'react-toastify/dist/ReactToastify.css'
 import './index.css'
 import './assets/css/app.css'
 
+// Auto-reload the page if a new deployment changes chunk hashes and causes dynamic imports to fail
+window.addEventListener('vite:preloadError', () => {
+  window.location.reload()
+})
+
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement)
 root.render(
   <React.StrictMode>
