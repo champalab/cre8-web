@@ -699,7 +699,12 @@
     "errDomainMustBe": "URL ຕ້ອງເປັນ facebook.com, tiktok.com ຫຼື instagram.com",
     "errChooseMedia": "ກະລຸນາເລືອກ ຮູບພາບ ຫຼື ວິດີໂອ",
     "errFailedUpdate": "ອັບເດດລິ້ງໂພສບໍ່ສຳເລັດ",
-    "msgSaved": "ບັນທຶກແລ້ວ {{count}} ລິ້ງໂພສ"
+    "msgSaved": "ບັນທຶກແລ້ວ {{count}} ລິ້ງໂພສ",
+    "getMetrics": "ດຶງຍອດສະຖິຕິ",
+    "getAllMetrics": "ດຶງສະຖິຕິທັງໝົດ",
+    "metricsUpdated": "ດຶງສະຖິຕິສຳເລັດແລ້ວ",
+    "unableToGetMetrics": "ບໍ່ສາມາດດຶງສະຖິຕິສຳລັບໂພສນີ້ໄດ້",
+    "errorBadge": "ດຶງບໍ່ສຳເລັດ"
   },
   "statusTab": {
     "unableToGetMetrics": "ບໍ່ສາມາດດຶງຍອດໂຕຊີ້ວັດ",

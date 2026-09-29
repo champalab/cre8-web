@@ -699,7 +699,12 @@
     "errDomainMustBe": "URL must be facebook.com, tiktok.com, or instagram.com",
     "errChooseMedia": "Please choose Photo or Video",
     "errFailedUpdate": "Failed to update post link",
-    "msgSaved": "Saved {{count}} post link(s)"
+    "msgSaved": "Saved {{count}} post link(s)",
+    "getMetrics": "Get metric",
+    "getAllMetrics": "Get all metrics",
+    "metricsUpdated": "Metrics updated successfully",
+    "unableToGetMetrics": "Unable to get metrics for this post",
+    "errorBadge": "Fetch failed"
   },
   "statusTab": {
     "unableToGetMetrics": "Unable to get metrics",

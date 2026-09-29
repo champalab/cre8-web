@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
-import { ExternalLink, Eye, Heart, Link2, Loader2, Pencil, Plus, Save, Trash2, X } from 'lucide-react'
+import { ExternalLink, Eye, Heart, Link2, Loader2, MessageSquare, Pencil, Plus, RefreshCw, Save, Share2, Trash2, X } from 'lucide-react'
 import { Campaign, useGetCampaignInfluencersQuery } from '@/stores/services/campaignApi'
 import { useGetPlatformsQuery } from '@/stores/services/platformApi'
 import {
@@ -9,6 +9,7 @@ import {
     useGetCampaignPostLinksQuery,
     useUpdateCampaignPostLinkMutation
 } from '@/stores/services/postLinksApi'
+import { useFetchMetricsMutation } from '@/stores/services/viewLogApi'
 import { inferPlatformFromUrl, inferPostMediaType, validatePostLink, type PostMediaType } from '@/utils/post-url'
 import { alertWarning, confirmDelete } from '@/utils/alerts'
 import ToastComponent from '@/components/ToastComponent'
@@ -103,6 +104,8 @@ export function PostLinksDialog({
     const [editPlatformId, setEditPlatformId] = useState('')
     const [editUrl, setEditUrl] = useState('')
     const [editMediaType, setEditMediaType] = useState<PostMediaType | ''>('')
+    const [fetchingLinkIds, setFetchingLinkIds] = useState<number[]>([])
+    const [fetchingAll, setFetchingAll] = useState(false)
 
     const { data: platformsRes } = useGetPlatformsQuery(undefined, { skip: !open })
     const platforms = platformsRes?.data ?? []
@@ -110,7 +113,7 @@ export function PostLinksDialog({
     const influencers = (influencersRes?.data ?? []).filter((item) => item.status !== 'REJECTED')
     const lockedActorId = defaultActorId ? String(defaultActorId) : ''
     const selectedActorId = lockedActorId || actorId
-    const { data: linksRes, isFetching } = useGetCampaignPostLinksQuery(
+    const { data: linksRes, isFetching, refetch } = useGetCampaignPostLinksQuery(
         {
             campaign_uuid: campaignUuid,
             actor_id: selectedActorId ? Number(selectedActorId) : undefined,
@@ -130,6 +133,43 @@ export function PostLinksDialog({
     const [createPostLinks] = useCreateCampaignPostLinksMutation()
     const [deletePostLink, { isLoading: deleting }] = useDeleteCampaignPostLinkMutation()
     const [updatePostLink, { isLoading: updating }] = useUpdateCampaignPostLinkMutation()
+    const [fetchMetrics] = useFetchMetricsMutation()
+
+    const handleGetLinkMetrics = async (postLinkId: number) => {
+        setFetchingLinkIds((prev) => [...new Set([...prev, postLinkId])])
+        try {
+            await fetchMetrics(postLinkId).unwrap()
+            await refetch()
+            ToastComponent({ status: 'success', message: t('postLinksDialog.metricsUpdated') })
+        } catch (error: any) {
+            ToastComponent({ status: 'error', message: error?.data?.message || error?.message || t('postLinksDialog.unableToGetMetrics') })
+        } finally {
+            setFetchingLinkIds((prev) => prev.filter((id) => id !== postLinkId))
+        }
+    }
+
+    const handleGetAllMetrics = async () => {
+        if (!existingLinks.length) return
+        const ids = existingLinks.map((link) => link.id)
+        setFetchingAll(true)
+        setFetchingLinkIds(ids)
+        try {
+            for (const link of existingLinks) {
+                try {
+                    await fetchMetrics(link.id).unwrap()
+                } catch (err: any) {
+                    console.warn(`Failed to fetch metrics for post link #${link.id}:`, err?.message)
+                }
+            }
+            await refetch()
+            ToastComponent({ status: 'success', message: t('postLinksDialog.metricsUpdated') })
+        } catch (error: any) {
+            ToastComponent({ status: 'error', message: error?.data?.message || t('postLinksDialog.unableToGetMetrics') })
+        } finally {
+            setFetchingAll(false)
+            setFetchingLinkIds([])
+        }
+    }
 
     useEffect(() => {
         if (!open) return
@@ -402,7 +442,22 @@ export function PostLinksDialog({
                         </div>
 
                         <div className="space-y-2">
-                            <Label>{t('postLinksDialog.savedLinks', { count: existingLinks.length })}</Label>
+                            <div className="flex items-center justify-between gap-2">
+                                <Label>{t('postLinksDialog.savedLinks', { count: existingLinks.length })}</Label>
+                                {existingLinks.length > 0 && (
+                                    <Button
+                                        type="button"
+                                        variant="outline"
+                                        size="sm"
+                                        className="h-8 gap-1 text-xs"
+                                        disabled={fetchingAll || fetchingLinkIds.length > 0}
+                                        onClick={handleGetAllMetrics}
+                                    >
+                                        {fetchingAll ? <Loader2 className="size-3.5 animate-spin" /> : <RefreshCw className="size-3.5" />}
+                                        {t('postLinksDialog.getAllMetrics')}
+                                    </Button>
+                                )}
+                            </div>
                             {isFetching ? (
                                 <p className="flex items-center gap-2 text-xs text-muted-foreground">
                                     <Loader2 className="size-3.5 animate-spin" /> {t('postLinksDialog.loadingLinks')}
@@ -477,6 +532,21 @@ export function PostLinksDialog({
                                                             <span className="inline-flex items-center gap-1 text-[10px] text-muted-foreground">
                                                                 <Heart className="size-3" /> {Number(link.metrics?.likes || 0).toLocaleString()}
                                                             </span>
+                                                            {link.metrics?.comments != null && (
+                                                                <span className="inline-flex items-center gap-1 text-[10px] text-muted-foreground">
+                                                                    <MessageSquare className="size-3" /> {Number(link.metrics.comments).toLocaleString()}
+                                                                </span>
+                                                            )}
+                                                            {link.metrics?.shares != null && (
+                                                                <span className="inline-flex items-center gap-1 text-[10px] text-muted-foreground">
+                                                                    <Share2 className="size-3" /> {Number(link.metrics.shares).toLocaleString()}
+                                                                </span>
+                                                            )}
+                                                            {link.metrics_error ? (
+                                                                <Badge variant="outline" className="border-destructive/40 text-destructive bg-destructive/10 text-[9px] px-1.5 py-0" title={link.metrics_error}>
+                                                                    {t('postLinksDialog.errorBadge')}
+                                                                </Badge>
+                                                            ) : null}
                                                         </div>
                                                         <a
                                                             href={link.post_url}
@@ -501,16 +571,33 @@ export function PostLinksDialog({
                                                         </Button>
                                                     </>
                                                 ) : (
-                                                    <Button type="button" variant="ghost" size="icon" className="size-8" onClick={() => startEdit(link.uuid, link.platform.id, link.post_url, link.media_type)}>
-                                                        <Pencil className="size-4" />
-                                                    </Button>
+                                                    <>
+                                                        <Button
+                                                            type="button"
+                                                            variant="ghost"
+                                                            size="icon"
+                                                            className="size-8 text-primary hover:text-primary hover:bg-primary/10"
+                                                            title={t('postLinksDialog.getMetrics')}
+                                                            disabled={fetchingLinkIds.includes(link.id) || fetchingAll}
+                                                            onClick={() => handleGetLinkMetrics(link.id)}
+                                                        >
+                                                            {fetchingLinkIds.includes(link.id) ? (
+                                                                <Loader2 className="size-4 animate-spin text-primary" />
+                                                            ) : (
+                                                                <RefreshCw className="size-4" />
+                                                            )}
+                                                        </Button>
+                                                        <Button type="button" variant="ghost" size="icon" className="size-8" onClick={() => startEdit(link.uuid, link.platform.id, link.post_url, link.media_type)}>
+                                                            <Pencil className="size-4" />
+                                                        </Button>
+                                                    </>
                                                 )}
                                                 <Button
                                                     type="button"
                                                     variant="ghost"
                                                     size="icon"
                                                     className="size-8 text-destructive"
-                                                    disabled={deleting}
+                                                    disabled={deleting || fetchingLinkIds.includes(link.id)}
                                                     onClick={() => handleDelete(link.uuid)}
                                                 >
                                                     <Trash2 className="size-4" />
