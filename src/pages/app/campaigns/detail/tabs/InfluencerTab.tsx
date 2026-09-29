@@ -1204,7 +1204,7 @@ const InfluencerTab: React.FC<Props> = ({ campaign, onChanged }) => {
                                                 variant="avatar"
                                                 fallbackName={actor?.name}
                                                 fallbackSrc="/images/person.jpg"
-                                                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                                                className="w-full h-full transition-transform duration-500 group-hover:scale-105"
                                             />
                                         </button>
 
@@ -1445,7 +1445,7 @@ const InfluencerTab: React.FC<Props> = ({ campaign, onChanged }) => {
                                                                 variant="avatar"
                                                                 fallbackName={actor?.name}
                                                                 fallbackSrc="/images/person.jpg"
-                                                                className="w-full h-full object-cover"
+                                                                className="w-full h-full"
                                                             />
                                                         </Avatar>
                                                         <div className="min-w-0">
@@ -1817,7 +1817,7 @@ const InfluencerTab: React.FC<Props> = ({ campaign, onChanged }) => {
                                                                 variant="avatar"
                                                                 fallbackName={actor.name}
                                                                 fallbackSrc="/images/person.jpg"
-                                                                className="w-full h-full object-cover"
+                                                                className="w-full h-full"
                                                             />
                                                         </Avatar>
                                                         <div className="min-w-0">
@@ -1871,7 +1871,7 @@ const InfluencerTab: React.FC<Props> = ({ campaign, onChanged }) => {
                                                     variant="avatar"
                                                     fallbackName={selectedActor.name}
                                                     fallbackSrc="/images/person.jpg"
-                                                    className="w-full h-full object-cover"
+                                                    className="w-full h-full"
                                                 />
                                             </Avatar>
                                             <div>
