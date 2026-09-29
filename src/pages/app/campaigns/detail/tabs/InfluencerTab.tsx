@@ -1866,7 +1866,8 @@ const InfluencerTab: React.FC<Props> = ({ campaign, onChanged }) => {
                                         <div className="flex items-center gap-2">
                                             <Avatar className="size-7 overflow-hidden">
                                                 <SafeImage
-                                                    src={selectedActor.profile_url}
+                                                    // src={selectedActor.profile_url}
+                                                    src='https://cre8.la/api/uploads/c5d0159b-a7f8-4c8b-b9eb-8b34e2fc7ae4.png'
                                                     alt={selectedActor.name}
                                                     variant="avatar"
                                                     fallbackName={selectedActor.name}
