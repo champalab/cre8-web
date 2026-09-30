@@ -386,7 +386,9 @@ export default function PostLinksMonitorPage() {
                             {rows.map((row) => {
                                 const fetching = fetchingIds.includes(row.id)
                                 const hasError = Boolean(row.metrics_error)
+                                const stale = Boolean(row.metrics_error && row.view_log_id)
                                 const pending = !hasError && !row.view_log_id
+                                const displayUrl = row.canonical_post_url?.trim() || row.post_url
                                 return (
                                     <TableRow key={row.id}>
                                         <TableCell className="max-w-[180px]">
@@ -410,19 +412,36 @@ export default function PostLinksMonitorPage() {
                                         </TableCell>
                                         <TableCell className="max-w-[220px]">
                                             <a
-                                                href={row.post_url}
+                                                href={displayUrl}
                                                 target="_blank"
                                                 rel="noreferrer"
                                                 className="inline-flex max-w-full items-center gap-1 text-sm text-primary hover:underline"
                                             >
                                                 <ExternalLink className="size-3.5 shrink-0" />
-                                                <p className="overflow-auto h-auto w-full text-wrap text-nowrap text-left break-words">{row.post_url}</p>
+                                                <span className="truncate">{displayUrl}</span>
                                             </a>
+                                            {row.canonical_post_url && row.canonical_post_url !== row.post_url ? (
+                                                <p className="mt-1 truncate text-xs text-muted-foreground" title={row.post_url}>
+                                                    {t('postLinksMonitor.originalShareUrl')}: {row.post_url}
+                                                </p>
+                                            ) : null}
                                         </TableCell>
                                         <TableCell className="tabular-nums">{formatMetric(row.metrics?.views)}</TableCell>
                                         <TableCell className="tabular-nums">{formatMetric(row.metrics?.likes)}</TableCell>
                                         <TableCell className="max-w-[240px]">
-                                            {hasError ? (
+                                            {stale ? (
+                                                <div className="space-y-1">
+                                                    <Badge variant="secondary">{t('postLinksMonitor.staleMetrics')}</Badge>
+                                                    {row.metrics?.checked_at ? (
+                                                        <p className="text-xs text-muted-foreground">
+                                                            {t('postLinksMonitor.snapshotAt', {
+                                                                date: formatDateTime(row.metrics.checked_at)
+                                                            })}
+                                                        </p>
+                                                    ) : null}
+                                                    <p className="text-xs text-destructive">{row.metrics_error}</p>
+                                                </div>
+                                            ) : hasError ? (
                                                 <Badge
                                                     variant="outline"
                                                     className="whitespace-normal border-destructive/40 bg-destructive/10 text-left font-normal text-destructive"

@@ -11,6 +11,9 @@ export type PostLinkMetrics = {
     reposts: number | null
     source: string | null
     checked_at: string | null
+    metrics_error?: string | null
+    last_fetch_failed_at?: string | null
+    metrics_stale?: boolean
 }
 
 export type PostMediaType = 'photo' | 'video'
@@ -27,6 +30,7 @@ export type CampaignPostLink = {
     uuid: string
     media_type: PostMediaType
     post_url: string
+    canonical_post_url?: string | null
     platform: { id: number; name: string }
     influencer: { id: number; uuid: string; name: string; profile_url: string | null } | null
     campaign?: PostLinkCampaignRef | null
@@ -34,6 +38,7 @@ export type CampaignPostLink = {
     view_log_id: string | null
     metrics: PostLinkMetrics
     metrics_error: string | null
+    last_fetch_failed_at?: string | null
     created_at: string
     updated_at: string
 }

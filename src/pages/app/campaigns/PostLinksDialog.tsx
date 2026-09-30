@@ -542,7 +542,11 @@ export function PostLinksDialog({
                                                                     <Share2 className="size-3" /> {Number(link.metrics.shares).toLocaleString()}
                                                                 </span>
                                                             )}
-                                                            {link.metrics_error ? (
+                                                            {link.metrics_error && link.view_log_id ? (
+                                                                <Badge variant="secondary" className="text-[9px] px-1.5 py-0" title={link.metrics_error}>
+                                                                    {t('postLinksMonitor.staleMetrics')}
+                                                                </Badge>
+                                                            ) : link.metrics_error ? (
                                                                 <Badge variant="outline" className="border-destructive/40 text-destructive bg-destructive/10 text-[9px] px-1.5 py-0" title={link.metrics_error}>
                                                                     {t('postLinksDialog.errorBadge')}
                                                                 </Badge>
