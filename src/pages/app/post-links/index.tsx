@@ -388,7 +388,7 @@ export default function PostLinksMonitorPage() {
                                                 className="inline-flex max-w-full items-center gap-1 text-sm text-primary hover:underline"
                                             >
                                                 <ExternalLink className="size-3.5 shrink-0" />
-                                                <span className="truncate">{row.post_url}</span>
+                                                <p className="overflow-auto h-auto w-full text-wrap text-nowrap text-left break-words">{row.post_url}</p>
                                             </a>
                                         </TableCell>
                                         <TableCell className="tabular-nums">{formatMetric(row.metrics?.views)}</TableCell>
@@ -404,7 +404,7 @@ export default function PostLinksMonitorPage() {
                                             ) : pending ? (
                                                 <Badge variant="secondary">{t('postLinksMonitor.statusPending')}</Badge>
                                             ) : (
-                                                <Badge className="bg-emerald-600 hover:bg-emerald-600">
+                                                <Badge className="bg-emerald-600 hover:bg-emerald-600 text-white">
                                                     {t('postLinksMonitor.statusOk')}
                                                 </Badge>
                                             )}
