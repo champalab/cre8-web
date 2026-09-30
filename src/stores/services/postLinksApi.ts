@@ -67,10 +67,17 @@ export const postLinksApi = createApi({
                 limit?: number
             }
         >({
-            query: (params) => ({
-                url: '/v1/post-links',
-                params
-            }),
+            query: ({ campaign_id, metrics_status, q, page, limit }) => {
+                const params: Record<string, string | number> = {
+                    page: page ?? 1,
+                    limit: limit ?? 25,
+                    metrics_status: metrics_status ?? 'all'
+                }
+                if (campaign_id != null && campaign_id > 0) params.campaign_id = campaign_id
+                const term = q?.trim()
+                if (term) params.q = term
+                return { url: '/v1/post-links', params }
+            },
             providesTags: ['PostLinks']
         }),
         getCampaignPostLinks: builder.query<

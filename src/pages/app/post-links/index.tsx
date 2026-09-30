@@ -98,12 +98,12 @@ export default function PostLinksMonitorPage() {
     const { data: campaignsRes, isLoading: campaignsLoading } = useGetViewLogCampaignsQuery()
     const campaigns = campaignsRes?.status === 'success' ? campaignsRes.data : []
 
-    const { data: monitorRes, isFetching, refetch } = useGetPostLinksMonitorQuery({
+    const { data: monitorRes, isFetching, isError, refetch } = useGetPostLinksMonitorQuery({
         page,
         limit: 25,
         campaign_id: campaignId,
         metrics_status: metricsStatus,
-        q: searchQ || undefined
+        q: searchQ.trim() || undefined
     })
 
     const payload = monitorRes?.status === 'success' ? monitorRes.data : null
@@ -142,7 +142,14 @@ export default function PostLinksMonitorPage() {
     }, [batchId, getBatchStatus, refetch, t])
 
     const applySearch = () => {
-        setSearchQ(searchInput.trim())
+        const next = searchInput.trim()
+        setSearchQ(next)
+        setPage(1)
+    }
+
+    const clearSearch = () => {
+        setSearchInput('')
+        setSearchQ('')
         setPage(1)
     }
 
@@ -309,12 +316,27 @@ export default function PostLinksMonitorPage() {
                                     value={searchInput}
                                     placeholder={t('postLinksMonitor.searchPlaceholder')}
                                     onChange={(e) => setSearchInput(e.target.value)}
-                                    onKeyDown={(e) => e.key === 'Enter' && applySearch()}
+                                    onKeyDown={(e) => {
+                                        if (e.key === 'Enter') {
+                                            e.preventDefault()
+                                            applySearch()
+                                        }
+                                    }}
                                 />
-                                <Button type="button" variant="secondary" onClick={applySearch}>
+                                <Button type="button" variant="secondary" aria-label={t('common:search')} onClick={applySearch}>
                                     <Search className="size-4" />
                                 </Button>
+                                {searchQ ? (
+                                    <Button type="button" variant="outline" onClick={clearSearch}>
+                                        {t('postLinksMonitor.clearSearch')}
+                                    </Button>
+                                ) : null}
                             </div>
+                            {searchQ ? (
+                                <p className="text-xs text-muted-foreground">
+                                    {t('postLinksMonitor.searchActive', { q: searchQ })}
+                                </p>
+                            ) : null}
                         </div>
                     </div>
                     <div className="flex flex-wrap gap-2">
@@ -333,6 +355,12 @@ export default function PostLinksMonitorPage() {
                     </div>
                 </div>
             </Card>
+
+            {(isError || (monitorRes && monitorRes.status !== 'success')) && (
+                <p role="alert" className="text-sm text-destructive">
+                    {t('postLinksMonitor.loadFailed')}
+                </p>
+            )}
 
             <Card className="overflow-hidden">
                 <div className="overflow-x-auto">
