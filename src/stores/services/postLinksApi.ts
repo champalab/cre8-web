@@ -15,6 +15,13 @@ export type PostLinkMetrics = {
 
 export type PostMediaType = 'photo' | 'video'
 
+export type PostLinkCampaignRef = {
+    id: number
+    uuid: string
+    title: string
+    campaign_code: string | null
+}
+
 export type CampaignPostLink = {
     id: number
     uuid: string
@@ -22,6 +29,7 @@ export type CampaignPostLink = {
     post_url: string
     platform: { id: number; name: string }
     influencer: { id: number; uuid: string; name: string; profile_url: string | null } | null
+    campaign?: PostLinkCampaignRef | null
     campaign_influencer_uuid: string | null
     view_log_id: string | null
     metrics: PostLinkMetrics
@@ -36,11 +44,35 @@ export type PostLinksResponse = {
     pagination: { page: number; limit: number; total: number; totalPages: number }
 }
 
+export type PostLinksMonitorMetricsStatus = 'all' | 'error' | 'ok' | 'pending'
+
+export type PostLinksMonitorResponse = {
+    items: CampaignPostLink[]
+    summary: { total: number; error: number; ok: number; pending: number }
+    pagination: { page: number; limit: number; total: number; totalPages: number }
+}
+
 export const postLinksApi = createApi({
     reducerPath: 'postLinksApi',
     tagTypes: ['PostLinks'],
     baseQuery: customBaseQuery,
     endpoints: (builder) => ({
+        getPostLinksMonitor: builder.query<
+            { status: string; data: PostLinksMonitorResponse },
+            {
+                campaign_id?: number
+                metrics_status?: PostLinksMonitorMetricsStatus
+                q?: string
+                page?: number
+                limit?: number
+            }
+        >({
+            query: (params) => ({
+                url: '/v1/post-links',
+                params
+            }),
+            providesTags: ['PostLinks']
+        }),
         getCampaignPostLinks: builder.query<
             { status: string; data: PostLinksResponse },
             { campaign_uuid: string; actor_id?: number; page?: number; limit?: number }
@@ -84,6 +116,7 @@ export const postLinksApi = createApi({
 })
 
 export const {
+    useGetPostLinksMonitorQuery,
     useGetCampaignPostLinksQuery,
     useCreateCampaignPostLinksMutation,
     useUpdateCampaignPostLinkMutation,

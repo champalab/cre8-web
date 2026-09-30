@@ -440,6 +440,23 @@
     "markRead": "ໝາຍວ່າອ່ານແລ້ວ",
     "empty": "ຍັງບໍ່ມີແຈ້ງເຕືອນ"
   },
+  "postLinksMonitor": {
+    "title": "ດຶງສະຖິຕິຈາກລິ້ງໂພສ",
+    "subtitle": "ດຶງ views ແລະ engagement ຈາກ post URL — ກອງຕາມແຄມເປນ ຫຼື ຂໍ້ຜິດພາດການດຶງຂໍ້ມູນ",
+    "filterStatus": "ສະຖານະການດຶງ",
+    "searchUrl": "ຄົ້ນຫາ URL",
+    "searchPlaceholder": "facebook.com, tiktok.com/...",
+    "statusAll": "ລິ້ງທັງໝົດ",
+    "statusError": "ດຶງຂໍ້ມູນຜິດພາດ",
+    "statusOk": "ດຶງສຳເລັດ",
+    "statusPending": "ຍັງບໍ່ໄດ້ດຶງ",
+    "colStatus": "ສະຖານະ",
+    "refresh": "ໂຫຼດລາຍການໃໝ່",
+    "fetchPage": "ດຶງໜ້ານີ້",
+    "batchStarted": "ຈັດຄິວດຶງສະຖິຕິ {{count}} ລິ້ງ",
+    "batchDone": "ດຶງສະຖິຕິຊຸດນີ້ສຳເລັດແລ້ວ",
+    "nothingToQueue": "ບໍ່ມີລິ້ງທີ່ຮອງຮັບໃນໜ້ານີ້"
+  },
   "viewLogs": {
     "title": "ຍອດໂຕຊີ້ວັດການມີສ່ວນຮ່ວມ",
     "postLinkId": "ລະຫັດລິ້ງໂພສ",

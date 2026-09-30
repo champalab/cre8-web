@@ -440,6 +440,23 @@
     "markRead": "Mark read",
     "empty": "No notifications yet"
   },
+  "postLinksMonitor": {
+    "title": "Post link metrics",
+    "subtitle": "Fetch views and engagement from post URLs. Filter by campaign or fetch errors.",
+    "filterStatus": "Fetch status",
+    "searchUrl": "Search URL",
+    "searchPlaceholder": "facebook.com, tiktok.com/...",
+    "statusAll": "All links",
+    "statusError": "Fetch errors",
+    "statusOk": "Fetched OK",
+    "statusPending": "Not fetched yet",
+    "colStatus": "Status",
+    "refresh": "Refresh list",
+    "fetchPage": "Fetch this page",
+    "batchStarted": "Queued {{count}} links for metrics fetch",
+    "batchDone": "Batch metrics fetch finished",
+    "nothingToQueue": "No supported links to queue on this page"
+  },
   "viewLogs": {
     "title": "Engagement Metrics",
     "postLinkId": "Post Link ID",

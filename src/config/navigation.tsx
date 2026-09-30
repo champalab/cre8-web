@@ -1,4 +1,4 @@
-import { Building2, ClipboardList, LayoutDashboard, Megaphone, ShieldCheck, Smartphone, TrendingUp, Users, Bell, Wallet } from 'lucide-react'
+import { Building2, ClipboardList, LayoutDashboard, Link2, Megaphone, ShieldCheck, Smartphone, TrendingUp, Users, Bell, Wallet } from 'lucide-react'
 import React, { lazy, LazyExoticComponent } from 'react'
 import { matchPath } from 'react-router-dom'
 import { Role } from '../pages/app/users/type.d'
@@ -121,6 +121,16 @@ export const navigation: NavItem[] = [
         component: lazyPage(() => import('../pages/app/notifications')),
         icon: Bell,
         roles: [ROLE_SUPER_ADMIN, ROLE_ADMIN, ROLE_CAMPAIGN_MANAGER, 'STAFF', 'CUSTOMER', 'CUSTOMER_ADMIN', 'CUSTOMER_REVIEWER', 'INFLUENCER']
+    },
+    {
+        path: '/app/post-links',
+        routePath: 'post-links',
+        group: false,
+        name: 'Post Links',
+        nameKey: 'postLinks',
+        component: lazyPage(() => import('../pages/app/post-links')),
+        icon: Link2,
+        roles: [ROLE_SUPER_ADMIN, ROLE_ADMIN, ROLE_CAMPAIGN_MANAGER]
     },
     {
         path: '/app/view-logs',
