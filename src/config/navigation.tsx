@@ -1,4 +1,4 @@
-import { Building2, ClipboardList, LayoutDashboard, Link2, Megaphone, ShieldCheck, Smartphone, TrendingUp, Users, Bell, Wallet } from 'lucide-react'
+import { BarChart3, Building2, ClipboardList, LayoutDashboard, Link2, Megaphone, ShieldCheck, Smartphone, TrendingUp, Users, Bell, Wallet } from 'lucide-react'
 import React, { lazy, LazyExoticComponent } from 'react'
 import { matchPath } from 'react-router-dom'
 import { Role } from '../pages/app/users/type.d'
@@ -90,6 +90,16 @@ export const navigation: NavItem[] = [
         nameKey: 'campaigns',
         component: lazyPage(() => import('../pages/app/campaigns')),
         icon: Megaphone,
+        roles: [ROLE_SUPER_ADMIN, ROLE_ADMIN, ROLE_CAMPAIGN_MANAGER, 'CUSTOMER', 'CUSTOMER_ADMIN', 'CUSTOMER_REVIEWER', 'CUSTOMER_VIEWER']
+    },
+    {
+        path: '/app/campaign-reports',
+        routePath: 'campaign-reports',
+        group: false,
+        name: 'Campaign Reports',
+        nameKey: 'campaignReports',
+        component: lazyPage(() => import('../pages/app/campaigns/detail')),
+        icon: BarChart3,
         roles: [ROLE_SUPER_ADMIN, ROLE_ADMIN, ROLE_CAMPAIGN_MANAGER, 'CUSTOMER', 'CUSTOMER_ADMIN', 'CUSTOMER_REVIEWER', 'CUSTOMER_VIEWER']
     },
     {
@@ -256,12 +266,19 @@ export function findNavByPathname(pathname: string): NavItem | undefined {
     if (pathname.startsWith('/app/campaigns')) {
         return navigation.find((item) => item.path === '/app/campaigns')
     }
+    if (pathname.startsWith('/app/campaign-reports')) {
+        return navigation.find((item) => item.path === '/app/campaign-reports')
+    }
     return navigation.find((item) => !item.group && matchPath({ path: item.path, end: true }, pathname) != null)
 }
 
 export function canAccessPath(role: Role | null, pathname: string): boolean {
     if (pathname.startsWith('/app/campaigns/') && pathname !== '/app/campaigns') {
         const item = navigation.find((entry) => entry.path === '/app/campaigns/:uuid')
+        return item ? canAccess(role, item.roles, item.strictRoles ? { strict: true } : undefined) : false
+    }
+    if (pathname.startsWith('/app/campaign-reports')) {
+        const item = navigation.find((entry) => entry.path === '/app/campaign-reports')
         return item ? canAccess(role, item.roles, item.strictRoles ? { strict: true } : undefined) : false
     }
     const item = findNavByPathname(pathname)

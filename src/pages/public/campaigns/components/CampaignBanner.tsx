@@ -9,11 +9,13 @@ export const CampaignBanner: React.FC<{
     loading: boolean
     onExportPDF?: () => void
     isExporting?: boolean
-}> = ({ campaign, onRefresh, loading, onExportPDF, isExporting }) => {
+    status?: string | null
+    extraActions?: React.ReactNode
+}> = ({ campaign, onRefresh, loading, onExportPDF, isExporting, status, extraActions }) => {
     const { t } = useTranslation('app')
 
     return (
-        <section className="relative px-6 py-8 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-sm mb-8 overflow-hidden rounded-b-3xl">
+        <section className="relative px-6 py-8 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm mb-8 overflow-hidden rounded-3xl">
             <div className="absolute -right-20 -top-24 w-96 h-96 rounded-full bg-indigo-500/10 blur-3xl pointer-events-none"></div>
             <div className="relative flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 max-w-7xl mx-auto">
                 <div className="flex flex-col gap-1.5 max-w-2xl">
@@ -25,9 +27,15 @@ export const CampaignBanner: React.FC<{
                             </span>
                             <span>{t('publicCampaign.liveAnalytics')} • Active</span>
                         </div>
+                        {status && (
+                            <div className="inline-flex items-center px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-semibold border border-slate-200 dark:border-slate-700 text-[11px] uppercase tracking-wider">
+                                {status}
+                            </div>
+                        )}
                         <div
                             className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 text-xs font-mono group cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
                             onClick={() => navigator.clipboard?.writeText(campaign.uuid)}
+                            title="Click to copy UUID"
                         >
                             <span className="text-slate-400">UUID:</span>
                             <span className="font-medium text-slate-900 dark:text-slate-200">{campaign.uuid}</span>
@@ -35,13 +43,15 @@ export const CampaignBanner: React.FC<{
                     </div>
 
                     <div className="flex items-baseline gap-3 mt-1">
-                        <h1 className="text-3xl sm:text-4xl text-slate-900 dark:text-white tracking-tight font-extrabold">
+                        <h1 className="text-3xl sm:text-4xl text-slate-900 dark:text-white tracking-tight font-extrabold font-lao">
                             {campaign.title || t('publicCampaign.title')}
                         </h1>
                     </div>
-                    <div className="flex items-baseline gap-3 mt-1">
-                        <h2 className="text-xl sm:text-1xl text-slate-900 dark:text-white tracking-tight font-extrabold">{campaign.description || ''}</h2>
-                    </div>
+                    {campaign.description && (
+                        <div className="flex items-baseline gap-3 mt-1">
+                            <h2 className="text-lg sm:text-xl text-slate-600 dark:text-slate-300 tracking-normal font-medium font-lao">{campaign.description}</h2>
+                        </div>
+                    )}
 
                     <p className="text-sm text-slate-500 flex flex-wrap items-center gap-2 mt-2 font-lao">
                         <span className="font-semibold text-slate-800 dark:text-slate-300">{t('publicCampaign.reportingWindow')}</span>
@@ -72,7 +82,7 @@ export const CampaignBanner: React.FC<{
                     )}
                     <button
                         onClick={() => {
-                            const url = `www.cre8.la${window.location.pathname}` //window.location.href
+                            const url = `www.cre8.la/campaigns/${campaign.uuid}`
                             const title = campaign.title || t('publicCampaign.title')
                             const formattedViews = new Intl.NumberFormat('en-US').format(campaign.total_views || 0)
                             const text = `- ລາຍງານຍອດວິວແຄມເປນ: ${title ?? '-'}\n- ຍອດວິວລວມ: ${formattedViews} ວິວ\n\nກົດເບິ່ງລາຍລະອຽດລາຍງານຜົນງານແຄມເປນໄດ້ທີ່ລິ້ງນີ້:\n${url}`
@@ -92,8 +102,9 @@ export const CampaignBanner: React.FC<{
                         >
                             <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
                         </svg>
-                        Share to Whatsapp {campaign.description}
+                        <span>Share to WhatsApp</span>
                     </button>
+                    {extraActions}
                 </div>
             </div>
         </section>
