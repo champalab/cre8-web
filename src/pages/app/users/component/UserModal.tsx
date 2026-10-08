@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Plus, Pencil, Save, Eye, EyeOff, Check, Circle } from 'lucide-react'
+import { Plus, Pencil, Save, Eye, EyeOff, Check, Circle, Sparkles, Copy } from 'lucide-react'
 import { User, UserCreate } from '../type'
 import ToastComponent from '../../../../components/ToastComponent'
 import PhoneNumber from '../../../../components/PhoneNumber'
@@ -14,6 +14,8 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog'
+import { generateAutoPassword } from '@/utils/password'
+import { ToastSuccess } from '@/utils/toasts'
 
 interface UserModalProps {
     onSubmit: (values: UserCreate) => void
@@ -36,11 +38,12 @@ const ROLES = ['ADMIN', 'FINANCE', 'EMPLOYEE', 'AGENT']
 const STATUS = ['ACTIVE', 'INACTIVE']
 
 const UserModal: React.FC<UserModalProps> = ({ onSubmit, refetch, initialValues, mode }) => {
-    const { t } = useTranslation('app')
+    const { t } = useTranslation(['app', 'auth'])
     const [values, setValues] = useState<UserCreate>(defaultValues)
     const [open, setOpen] = useState(false)
 
     const [showPassword, setShowPassword] = useState(false)
+    const [copied, setCopied] = useState(false)
     const password = values.password || ''
     const passwordRules = [
         { key: 'passwordLength', valid: Array.from(password).length >= 8 },
@@ -54,12 +57,37 @@ const UserModal: React.FC<UserModalProps> = ({ onSubmit, refetch, initialValues,
 
     useEffect(() => {
         setShowPassword(false)
+        setCopied(false)
         if (initialValues) {
             setValues({ ...defaultValues, ...initialValues })
         } else {
             setValues(defaultValues)
         }
     }, [initialValues, open])
+
+    const handleGeneratePassword = () => {
+        const newPassword = generateAutoPassword(14)
+        setValues((prev) => ({ ...prev, password: newPassword }))
+        setShowPassword(true)
+        if (typeof navigator !== 'undefined' && navigator.clipboard) {
+            navigator.clipboard.writeText(newPassword).then(() => {
+                ToastSuccess(t('auth:passwordCopied'))
+                setCopied(true)
+                setTimeout(() => setCopied(false), 2000)
+            }).catch(() => {})
+        }
+    }
+
+    const handleCopyPassword = () => {
+        if (!password) return
+        if (typeof navigator !== 'undefined' && navigator.clipboard) {
+            navigator.clipboard.writeText(password).then(() => {
+                ToastSuccess(t('auth:passwordCopied'))
+                setCopied(true)
+                setTimeout(() => setCopied(false), 2000)
+            }).catch(() => {})
+        }
+    }
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target
@@ -120,18 +148,43 @@ const UserModal: React.FC<UserModalProps> = ({ onSubmit, refetch, initialValues,
                             />
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="user-password">{t('auth:password')}</Label>
+                            <div className="flex items-center justify-between">
+                                <Label htmlFor="user-password">{t('auth:password')}</Label>
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={handleGeneratePassword}
+                                    className="h-7 px-2.5 text-xs gap-1.5 font-normal text-muted-foreground hover:text-foreground"
+                                >
+                                    <Sparkles className="size-3.5 text-primary" />
+                                    {t('auth:autoPassword')}
+                                </Button>
+                            </div>
                             <div className="relative">
                                 <Input id="user-password" name="password" type={showPassword ? 'text' : 'password'} autoComplete="new-password"
-                                    value={password} onChange={handleChange} className="pr-12"
+                                    value={password} onChange={handleChange} className={password ? "pr-20" : "pr-11"}
                                     aria-describedby="user-password-hint user-password-rules user-password-status"
                                     aria-invalid={password.length > 0 && !passwordValid} />
-                                <button type="button" onClick={() => setShowPassword(previous => !previous)}
-                                    aria-label={t(showPassword ? 'auth:hidePassword' : 'auth:showPassword')}
-                                    aria-pressed={showPassword}
-                                    className="absolute inset-y-0 right-0 flex w-11 items-center justify-center rounded-r-md text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
-                                    {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
-                                </button>
+                                <div className="absolute inset-y-0 right-0 flex items-center pr-1.5 gap-0.5">
+                                    {password && (
+                                        <button
+                                            type="button"
+                                            onClick={handleCopyPassword}
+                                            title={t('auth:copyPassword')}
+                                            aria-label={t('auth:copyPassword')}
+                                            className="flex size-7 items-center justify-center rounded-md text-muted-foreground hover:text-foreground hover:bg-muted/50 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                                        >
+                                            {copied ? <Check className="size-3.5 text-emerald-600 dark:text-emerald-400" /> : <Copy className="size-3.5" />}
+                                        </button>
+                                    )}
+                                    <button type="button" onClick={() => setShowPassword(previous => !previous)}
+                                        aria-label={t(showPassword ? 'auth:hidePassword' : 'auth:showPassword')}
+                                        aria-pressed={showPassword}
+                                        className="flex size-7 items-center justify-center rounded-md text-muted-foreground hover:text-foreground hover:bg-muted/50 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring">
+                                        {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+                                    </button>
+                                </div>
                             </div>
                             <p id="user-password-hint" className="text-xs text-muted-foreground">{t('auth:passwordAdminHint')}</p>
                             <ul id="user-password-rules" className="grid gap-1 text-xs sm:grid-cols-2">

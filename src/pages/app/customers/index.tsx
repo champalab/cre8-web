@@ -29,10 +29,15 @@ import CustomerFormDialog, { CustomerFormData } from './components/CustomerFormD
 
 const emptyForm: CustomerFormData = {
     full_name: '',
+    brand_name: '',
+    business_type: '',
+    website: '',
+    address: '',
     email: '',
     phone: '',
     comment: '',
     status: 'ACTIVE',
+    password: '',
 }
 
 const CUSTOMER_VIEW_KEY = 'customers:display-mode'
@@ -84,10 +89,15 @@ const CustomersPage: React.FC = () => {
         setEditUuid(customer.uuid)
         setForm({
             full_name: getCustomerFullName(customer) === '-' ? '' : getCustomerFullName(customer),
+            brand_name: customer.brand_name || '',
+            business_type: customer.business_type || '',
+            website: customer.website || '',
+            address: customer.address || '',
             email: getCustomerEmail(customer) === '-' ? '' : getCustomerEmail(customer),
             phone: getCustomerPhone(customer) === '-' ? '' : getCustomerPhone(customer),
             comment: getCustomerComment(customer) === '-' ? '' : getCustomerComment(customer),
             status: customer.status,
+            password: '',
         })
         setOpen(true)
     }
@@ -99,10 +109,15 @@ const CustomersPage: React.FC = () => {
 
         const payload = {
             full_name: form.full_name.trim(),
+            brand_name: form.brand_name?.trim() || undefined,
+            business_type: form.business_type?.trim() || undefined,
+            website: form.website?.trim() || undefined,
+            address: form.address?.trim() || undefined,
             email: form.email?.trim() || undefined,
             phone: form.phone?.trim() || undefined,
             comment: form.comment?.trim() || undefined,
             status: form.status,
+            ...(form.password?.trim() ? { password: form.password.trim() } : {}),
         }
 
         const response = editUuid
