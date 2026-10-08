@@ -32,7 +32,15 @@
     "colActor": "ອິນຟລູເອັນເຊີ",
     "colCampaign": "ແຄມເປນ",
     "colPlatform": "ແພລດຟອມ",
-    "colUpdated": "ອັບເດດ"
+    "colUpdated": "ອັບເດດ",
+    "liveData": "ຂໍ້ມູນສົດ",
+    "refresh": "ໂຫຼດໃໝ່",
+    "viewAll": "ເບິ່ງທັງໝົດ",
+    "openPost": "ເປີດລິ້ງ",
+    "noActiveCampaigns": "ບໍ່ມີແຄມເປນທີ່ກຳລັງດຳເນີນ",
+    "noTopActors": "ຍັງບໍ່ມີຂໍ້ມູນອິນຟລູເອັນເຊີ",
+    "noRecentLinks": "ຍັງບໍ່ມີລິ້ງໂພສລ້າສຸດ",
+    "engagement": "ອັດຕາການມີສ່ວນຮ່ວມ"
   },
   "customers": {
     "title": "ລູກຄ້າ",
@@ -68,7 +76,14 @@
     "copyPhone": "ຄັດລອກເບີໂທບໍລິສັດ",
     "phoneCopied": "ຄັດລອກແລ້ວ",
     "copy": "ຄັດລອກ",
-    "copyPhoneFailed": "ຄັດລອກບໍ່ສຳເລັດ ກະລຸນາເລືອກເບີໂທແລ້ວຄັດລອກເອງ"
+    "copyPhoneFailed": "ຄັດລອກບໍ່ສຳເລັດ ກະລຸນາເລືອກເບີໂທແລ້ວຄັດລອກເອງ",
+    "phoneRequired": "ເບີໂທລະສັບ (10 ໂຕເລກ) *",
+    "phone8DigitsRequired": "ກະລຸນາປ້ອນໝາຍເລກໂທລະສັບ 10 ໂຕເລກ",
+    "phone10DigitsRequired": "ກະລຸນາປ້ອນໝາຍເລກໂທລະສັບ 10 ໂຕເລກ",
+    "phoneHint": "ປ້ອນໝາຍເລກໂທລະສັບ 10 ໂຕເລກ (ຕົວຢ່າງ: 2099999999)",
+    "phonePlaceholder": "20XXXXXXXX",
+    "country": "ປະເທດ",
+    "digits": "ໂຕເລກ"
   },
   "campaigns": {
     "title": "ແຄມເປນ",
@@ -634,7 +649,11 @@
     "access": "ສິດເຂົ້າເຖິງ",
     "active": "ໃຊ້ງານ",
     "inactive": "ບໍ່ໃຊ້ງານ",
-    "email": "ອີເມລ໌"
+    "email": "ອີເມລ໌",
+    "allRoles": "ບົດບາດທັງໝົດ",
+    "allStatuses": "ສະຖານະທັງໝົດ",
+    "status": "ສະຖານະ",
+    "reset": "ລ້າງຄ່າ"
   },
   "auditLogs": {
     "title": "ບັນທຶກກວດສອບ",

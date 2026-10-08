@@ -314,7 +314,20 @@ const ActorsPage: React.FC = () => {
     const handleSubmit = async () => {
         if (!form.name.trim()) return alertWarning({ text: t('influencers.enterName') })
 
-        const response = editActor ? await updateActor({ id: editActor.id, ...buildActorBody() }) : await createActor(buildActorBody())
+        const rawPhone = (form.phone_number || '').trim()
+        if (rawPhone) {
+            const cleanPhone = rawPhone.replace(/\D/g, '')
+            if (cleanPhone.length !== 10) {
+                return alertWarning({ text: t('customers.phone10DigitsRequired', { defaultValue: 'ກະລຸນາປ້ອນໝາຍເລກໂທລະສັບ 10 ໂຕເລກ' }) })
+            }
+        }
+
+        const body = buildActorBody()
+        if (rawPhone) {
+            body.phone_number = rawPhone.replace(/\D/g, '').slice(0, 10)
+        }
+
+        const response = editActor ? await updateActor({ id: editActor.id, ...body }) : await createActor(body)
 
         const data = getMutationPayload(response)
         if (data) ToastComponent(data)

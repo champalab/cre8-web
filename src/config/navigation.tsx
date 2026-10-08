@@ -163,16 +163,6 @@ export const navigation: NavItem[] = [
         roles: [ROLE_ADMIN]
     },
     {
-        path: '/app/platforms',
-        routePath: 'platforms',
-        group: false,
-        name: 'Social Platforms',
-        nameKey: 'socialPlatforms',
-        component: lazyPage(() => import('../pages/app/platforms')),
-        icon: Smartphone,
-        roles: [ROLE_ADMIN]
-    },
-    {
         path: '/app/users',
         routePath: 'users',
         group: false,
@@ -182,6 +172,18 @@ export const navigation: NavItem[] = [
         icon: ShieldCheck,
         roles: [ROLE_SUPER_ADMIN, ROLE_ADMIN]
     },
+
+    {
+        path: '/app/platforms',
+        routePath: 'platforms',
+        group: false,
+        name: 'Social Platforms',
+        nameKey: 'socialPlatforms',
+        component: lazyPage(() => import('../pages/app/platforms')),
+        icon: Smartphone,
+        roles: [ROLE_ADMIN]
+    },
+
     {
         path: '/app/audit-logs',
         routePath: 'audit-logs',

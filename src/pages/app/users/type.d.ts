@@ -49,6 +49,8 @@ export interface UserCreate {
 
 export interface Filter {
     keyword: string | null
+    role?: Role | 'ALL' | string | null
+    status?: string | 'ALL' | null
 }
 
 

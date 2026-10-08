@@ -32,7 +32,15 @@
     "colActor": "Actor",
     "colCampaign": "Campaign",
     "colPlatform": "Platform",
-    "colUpdated": "Updated"
+    "colUpdated": "Updated",
+    "liveData": "Live Data",
+    "refresh": "Refresh",
+    "viewAll": "View all",
+    "openPost": "Open Post",
+    "noActiveCampaigns": "No active campaigns",
+    "noTopActors": "No influencer data yet",
+    "noRecentLinks": "No recent post links",
+    "engagement": "Engagement"
   },
   "customers": {
     "title": "Customers",
@@ -68,7 +76,14 @@
     "copyPhone": "Copy company phone number",
     "phoneCopied": "Copied",
     "copy": "Copy",
-    "copyPhoneFailed": "Unable to copy. Please select and copy the number manually."
+    "copyPhoneFailed": "Unable to copy. Please select and copy the number manually.",
+    "phoneRequired": "Phone (10 digits) *",
+    "phone8DigitsRequired": "Please enter a 10-digit phone number",
+    "phone10DigitsRequired": "Please enter a 10-digit phone number",
+    "phoneHint": "Enter a 10-digit phone number (e.g. 2099999999)",
+    "phonePlaceholder": "20XXXXXXXX",
+    "country": "Country",
+    "digits": "digits"
   },
   "campaigns": {
     "title": "Campaigns",
@@ -620,7 +635,7 @@
   },
   "users": {
     "title": "Users",
-    "create": "Create User",
+    "create": "Create User Admin",
     "edit": "Edit User",
     "searchLabel": "Search",
     "searchPlaceholder": "Enter search keywords...",
@@ -634,7 +649,11 @@
     "access": "Access",
     "active": "Active",
     "inactive": "Inactive",
-    "email": "Email"
+    "email": "Email",
+    "allRoles": "All Roles",
+    "allStatuses": "All Statuses",
+    "status": "Status",
+    "reset": "Reset"
   },
   "auditLogs": {
     "title": "Audit Logs",

@@ -5,22 +5,7 @@ import { Actor, useUpdateActorMutation } from '@/stores/services/actorApi'
 import { useUploadFilesMutation, useDeleteFileMutation } from '@/stores/services/filesApi'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import SafeImage from '@/components/ui/SafeImage'
-import {
-    Loader2,
-    Camera,
-    User,
-    Phone,
-    MapPin,
-    Banknote,
-    Trash2,
-    Briefcase,
-    FileImage,
-    Contact,
-    DollarSign,
-    Mail,
-    Check,
-    Star
-} from 'lucide-react'
+import { Loader2, Camera, User, Phone, MapPin, Banknote, Trash2, Briefcase, FileImage, Contact, DollarSign, Mail, Check, Star } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 import { Button } from '@/components/ui/button'
@@ -32,6 +17,7 @@ import { Tabs, TabsContent } from '@/components/ui/tabs'
 import { ActorFormValues } from './utils'
 import { useGetProvincesQuery } from '@/stores/services/provinceApi'
 import { ScrollArea } from '@/components/ui/scroll-area'
+import CountryPhoneInput, { combinePhoneWithDialCode, parsePhoneAndCountry } from '@/components/CountryPhoneInput'
 
 interface ActorFormDialogProps {
     open: boolean
@@ -62,12 +48,19 @@ export const ActorFormDialog = ({ open, onOpenChange, actor, form, onFormChange,
     const [activeTab, setActiveTab] = useState(steps[0].id)
     const [isDragging, setIsDragging] = useState(false)
     const dragDepth = useRef(0)
+    const [country, setCountry] = useState<string>('LA')
 
     useEffect(() => {
         if (open) {
             setActiveTab(steps[0].id)
             setIsDragging(false)
             dragDepth.current = 0
+            if (form.phone_number) {
+                const parsed = parsePhoneAndCountry(form.phone_number, 'LA')
+                setCountry(parsed.country)
+            } else {
+                setCountry('LA')
+            }
         }
     }, [open])
 
@@ -300,7 +293,9 @@ export const ActorFormDialog = ({ open, onOpenChange, actor, form, onFormChange,
                                             </div>
                                         )}
                                     </div>
-                                    <div className="text-[10px] text-muted-foreground/70 uppercase tracking-widest font-semibold">{t('influencers.primaryPhoto')}</div>
+                                    <div className="text-[10px] text-muted-foreground/70 uppercase tracking-widest font-semibold">
+                                        {t('influencers.primaryPhoto')}
+                                    </div>
                                 </div>
 
                                 <div className="flex-1 grid gap-5 w-full">
@@ -426,20 +421,42 @@ export const ActorFormDialog = ({ open, onOpenChange, actor, form, onFormChange,
                         <TabsContent value="contact" className="m-0 space-y-6">
                             <div className="grid gap-6">
                                 <div className="grid sm:grid-cols-2 gap-5">
-                                    <div className="grid gap-2">
-                                        <Label htmlFor="actor_phone_number" className="flex items-center gap-2">
-                                            <Phone className="size-3.5 text-muted-foreground" /> {t('influencers.phoneNumber')}
-                                        </Label>
-                                        <Input
-                                            id="actor_phone_number"
-                                            type="tel"
-                                            inputMode="tel"
-                                            value={form.phone_number}
-                                            onChange={(e) => onFormChange({ ...form, phone_number: e.target.value })}
-                                            placeholder="020 5555 5555"
-                                            className="bg-muted/30"
-                                        />
-                                    </div>
+                                    <CountryPhoneInput
+                                        id="actor_phone_number"
+                                        phone={(() => {
+                                            const parsed = parsePhoneAndCountry(form.phone_number, country)
+                                            return parsed.phone
+                                        })()}
+                                        country={country}
+                                        onPhoneChange={(phone) => {
+                                            const combined = phone ? combinePhoneWithDialCode(phone, country) : ''
+                                            onFormChange({ ...form, phone_number: combined })
+                                        }}
+                                        onCountryChange={(newCountry) => {
+                                            setCountry(newCountry)
+                                            const currentParsed = parsePhoneAndCountry(form.phone_number, country)
+                                            if (currentParsed.phone) {
+                                                const combined = combinePhoneWithDialCode(currentParsed.phone, newCountry)
+                                                onFormChange({ ...form, phone_number: combined })
+                                            }
+                                        }}
+                                        label={
+                                            <span className="flex items-center gap-2">
+                                                <Phone className="size-3.5 text-muted-foreground" />
+                                                {t('influencers.phoneNumber')}
+                                            </span>
+                                        }
+                                        placeholder="20XXXXXXXX"
+                                        inputClassName="bg-muted/30"
+                                        triggerClassName="bg-muted/30"
+                                        maxLength={10}
+                                        error={
+                                            form.phone_number && form.phone_number.replace(/\D/g, '').length !== 10
+                                                ? `${t('customers.phone10DigitsRequired', { defaultValue: 'ກະລຸນາປ້ອນໝາຍເລກໂທລະສັບ 10 ໂຕເລກ' })} (${form.phone_number.replace(/\D/g, '').length}/10)`
+                                                : null
+                                        }
+                                        hint={`${(form.phone_number || '').replace(/\D/g, '').length}/10 ${t('customers.digits', { defaultValue: 'ໂຕເລກ' })}`}
+                                    />
                                     <div className="grid gap-2">
                                         <Label htmlFor="actor_email" className="flex items-center gap-2">
                                             <Mail className="size-3.5 text-muted-foreground" /> {t('influencers.emailAddress')}
@@ -452,7 +469,9 @@ export const ActorFormDialog = ({ open, onOpenChange, actor, form, onFormChange,
                                             placeholder="name@example.com"
                                             className="bg-muted/30"
                                         />
-                                        <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">{t('influencers.otpLoginHint')}</p>
+                                        <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">
+                                            {t('influencers.otpLoginHint')}
+                                        </p>
                                     </div>
                                 </div>
 
@@ -663,9 +682,7 @@ export const ActorFormDialog = ({ open, onOpenChange, actor, form, onFormChange,
                                 <div className="flex items-center justify-between border-b border-border/40 pb-4">
                                     <div>
                                         <h4 className="text-sm font-semibold">{t('influencers.mediaGallery')}</h4>
-                                        <p className="text-xs text-muted-foreground mt-1">
-                                            {t('influencers.mediaGalleryDesc')}
-                                        </p>
+                                        <p className="text-xs text-muted-foreground mt-1">{t('influencers.mediaGalleryDesc')}</p>
                                     </div>
                                     <Button onClick={openFilePicker} variant="secondary" disabled={isUploading} className="gap-2">
                                         {isUploading ? <Loader2 className="size-4 animate-spin" /> : <FileImage className="size-4" />}
@@ -755,11 +772,7 @@ export const ActorFormDialog = ({ open, onOpenChange, actor, form, onFormChange,
                                                             onClick={() => removeImage(url, i)}
                                                             className="h-8 text-xs px-3 rounded-full shadow-lg font-medium gap-1.5"
                                                         >
-                                                            {isDeleting ? (
-                                                                <Loader2 className="size-3.5 animate-spin" />
-                                                            ) : (
-                                                                <Trash2 className="size-3.5" />
-                                                            )}
+                                                            {isDeleting ? <Loader2 className="size-3.5 animate-spin" /> : <Trash2 className="size-3.5" />}
                                                             <span>{t('delete')}</span>
                                                         </Button>
                                                     </div>

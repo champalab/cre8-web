@@ -3,7 +3,8 @@ import { useTranslation } from 'react-i18next'
 import { Plus, Pencil, Save, Eye, EyeOff, Check, Circle, Sparkles, Copy } from 'lucide-react'
 import { User, UserCreate } from '../type'
 import ToastComponent from '../../../../components/ToastComponent'
-import PhoneNumber from '../../../../components/PhoneNumber'
+import CountryPhoneInput, { combinePhoneWithDialCode, parsePhoneAndCountry, isValid10DigitPhone } from '@/components/CountryPhoneInput'
+import { alertWarning } from '@/utils/alerts'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -11,6 +12,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { generateAutoPassword } from '@/utils/password'
 import { ToastSuccess } from '@/utils/toasts'
+import UserStatus from '@/components/UserStatus'
 
 interface UserModalProps {
     onSubmit: (values: UserCreate) => void
@@ -29,11 +31,7 @@ const defaultValues: UserCreate = {
     comments: null
 }
 
-const ROLES = ['ADMIN', 'CUSTOMER']
-const STATUS = [
-    { label: 'active', value: 'ACTIVE' },
-    { label: 'inactive', value: 'INACTIVE' }
-]
+const ROLES = ['ADMIN', 'INFLUENCER', 'CUSTOMER']
 
 const UserModal: React.FC<UserModalProps> = ({ onSubmit, refetch, initialValues, mode }) => {
     const { t } = useTranslation(['app', 'auth'])
@@ -53,12 +51,18 @@ const UserModal: React.FC<UserModalProps> = ({ onSubmit, refetch, initialValues,
     ]
     const passwordValid = passwordRules.every((rule) => rule.valid)
 
+    const [country, setCountry] = useState<string>('LA')
+
     useEffect(() => {
         setShowPassword(false)
         setCopied(false)
         if (initialValues) {
+            const rawPhone = (initialValues as any).tel || initialValues.username || ''
+            const parsed = parsePhoneAndCountry(rawPhone, 'LA')
+            setCountry(parsed.country)
             setValues({ ...defaultValues, ...initialValues })
         } else {
+            setCountry('LA')
             setValues(defaultValues)
         }
     }, [initialValues, open])
@@ -106,7 +110,17 @@ const UserModal: React.FC<UserModalProps> = ({ onSubmit, refetch, initialValues,
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
         if (password && !passwordValid) return
-        const result = await onSubmit({ ...values, password: values.password || undefined })
+
+        const cleanPhone = (values.username || '').replace(/\D/g, '')
+        if (cleanPhone.length !== 10) {
+            return alertWarning({ text: t('app:customers.phone10DigitsRequired', { defaultValue: 'ກະລຸນາປ້ອນໝາຍເລກໂທລະສັບ 10 ໂຕເລກ' }) })
+        }
+
+        const result = await onSubmit({
+            ...values,
+            username: cleanPhone,
+            password: values.password || undefined
+        })
         const data = (result as any)?.data
         ToastComponent(data)
         if (data && data.status === 'success') {
@@ -136,7 +150,7 @@ const UserModal: React.FC<UserModalProps> = ({ onSubmit, refetch, initialValues,
             <Dialog open={open} onOpenChange={setOpen}>
                 <DialogContent className="max-w-lg max-h-[90dvh] overflow-y-auto">
                     <DialogHeader>
-                        <DialogTitle>{mode === 'create' ? t('users.create') : t('users.edit')}</DialogTitle>
+                        <DialogTitle>{mode === 'create' ? t('users.create') : `${t('users.edit')} [${values.role}]`} </DialogTitle>
                     </DialogHeader>
                     <form onSubmit={handleSubmit} className="space-y-4">
                         <div className="space-y-2">
@@ -225,7 +239,36 @@ const UserModal: React.FC<UserModalProps> = ({ onSubmit, refetch, initialValues,
                                     : ''}
                             </p>
                         </div>
-                        <PhoneNumber label={t('users.phoneNumber')} placeholder="9999 9999" name="tel" value={values.username} onChange={handleChange} />
+                        <CountryPhoneInput
+                            id="user_phone"
+                            phone={(() => {
+                                const parsed = parsePhoneAndCountry(values.username || '', country)
+                                return parsed.phone
+                            })()}
+                            country={country}
+                            onPhoneChange={(phone) => {
+                                const combined = phone ? combinePhoneWithDialCode(phone, country) : ''
+                                setValues((prev) => ({ ...prev, username: combined }))
+                            }}
+                            onCountryChange={(newCountry) => {
+                                setCountry(newCountry)
+                                const currentParsed = parsePhoneAndCountry(values.username || '', country)
+                                if (currentParsed.phone) {
+                                    const combined = combinePhoneWithDialCode(currentParsed.phone, newCountry)
+                                    setValues((prev) => ({ ...prev, username: combined }))
+                                }
+                            }}
+                            label={t('users.phoneNumber')}
+                            required
+                            placeholder="20XXXXXXXX"
+                            maxLength={10}
+                            error={
+                                values.username && values.username.replace(/\D/g, '').length !== 10
+                                    ? `${t('app:customers.phone10DigitsRequired', { defaultValue: 'ກະລຸນາປ້ອນໝາຍເລກໂທລະສັບ 10 ໂຕເລກ' })} (${values.username.replace(/\D/g, '').length}/10)`
+                                    : null
+                            }
+                            hint={`${(values.username || '').replace(/\D/g, '').length}/10 ${t('app:customers.digits', { defaultValue: 'ໂຕເລກ' })}`}
+                        />
                         <div className="space-y-2">
                             <Label htmlFor="email">{t('users.emailOtp')}</Label>
                             <Input
@@ -261,24 +304,7 @@ const UserModal: React.FC<UserModalProps> = ({ onSubmit, refetch, initialValues,
                                 ))}
                             </div>
                         </fieldset>
-                        <fieldset className="space-y-2">
-                            <legend className="text-sm font-medium">{t('users.access')}</legend>
-                            <div className="flex flex-wrap gap-4">
-                                {STATUS.map((status) => (
-                                    <label key={status.value} className="flex items-center gap-2 text-sm">
-                                        <input
-                                            type="radio"
-                                            name="status"
-                                            value={status.value}
-                                            checked={values.status === status.value}
-                                            onChange={handleChange}
-                                            className="size-4"
-                                        />
-                                        {t(`auth:${status.label}`)}
-                                    </label>
-                                ))}
-                            </div>
-                        </fieldset>
+                        <UserStatus values={values} handleChange={handleChange} />
                         <div className="flex justify-end gap-2 pt-2">
                             <Button type="button" variant="outline" onClick={handleClose}>
                                 {t('common:cancel')}

@@ -6,11 +6,14 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { alertWarning } from '@/utils/alerts'
 import { generateAutoPassword } from '@/utils/password'
 import { ToastSuccess } from '@/utils/toasts'
+import UserStatus from '@/components/UserStatus'
+import CountryPhoneInput, { COUNTRIES, CountryOption } from '@/components/CountryPhoneInput'
 
-export const CUSTOMER_STATUSES = ['ACTIVE', 'INACTIVE', 'SUSPENDED'] as const
+export { COUNTRIES }
+export type { CountryOption }
 
 export type CustomerFormData = {
     full_name: string
@@ -20,6 +23,7 @@ export type CustomerFormData = {
     address?: string
     email: string
     phone: string
+    country?: string
     comment: string
     status: string
     password?: string
@@ -39,6 +43,9 @@ const CustomerFormDialog: React.FC<CustomerFormDialogProps> = ({ open, onOpenCha
     const [showPassword, setShowPassword] = useState(false)
     const [copied, setCopied] = useState(false)
 
+    const cleanPhone = (form.phone || '').replace(/\D/g, '')
+    const isPhoneValid = cleanPhone.length === 10
+
     const password = form.password || ''
     const passwordRules = [
         { key: 'passwordLength', valid: Array.from(password).length >= 8 },
@@ -49,7 +56,7 @@ const CustomerFormDialog: React.FC<CustomerFormDialogProps> = ({ open, onOpenCha
         { key: 'passwordMaxBytes', valid: password.length > 0 && new TextEncoder().encode(password).length <= 72 }
     ]
     const passwordValid = passwordRules.every((rule) => rule.valid)
-    const canSubmit = !password || passwordValid
+    const canSubmit = (!password || passwordValid) && Boolean(form.full_name?.trim()) && isPhoneValid
 
     useEffect(() => {
         if (!open) {
@@ -89,6 +96,12 @@ const CustomerFormDialog: React.FC<CustomerFormDialogProps> = ({ open, onOpenCha
     }
 
     const handleSave = () => {
+        if (!form.full_name?.trim()) {
+            return alertWarning({ text: t('customers.enterFullName') })
+        }
+        if (!isPhoneValid) {
+            return alertWarning({ text: t('customers.phone10DigitsRequired') })
+        }
         if (password && !passwordValid) return
         onSubmit()
     }
@@ -173,13 +186,19 @@ const CustomerFormDialog: React.FC<CustomerFormDialogProps> = ({ open, onOpenCha
                                 placeholder="name@company.com"
                             />
                         </div>
-                        <div className="grid gap-2">
-                            <Label htmlFor="phone" className="text-sm font-medium flex items-center justify-between">
-                                <span>{t('common:phone')}</span>
-                                <span className="text-xs text-muted-foreground font-normal">{t('common:optional')}</span>
-                            </Label>
-                            <Input id="phone" value={form.phone} onChange={(e) => onChange({ ...form, phone: e.target.value })} placeholder="020 9999 9999" />
-                        </div>
+                        <CountryPhoneInput
+                            id="phone"
+                            phone={form.phone}
+                            country={form.country || 'LA'}
+                            onPhoneChange={(phone) => onChange({ ...form, phone })}
+                            onCountryChange={(country) => onChange({ ...form, country })}
+                            label={t('common:phone')}
+                            required
+                            placeholder={t('customers.phonePlaceholder')}
+                            error={form.phone && !isPhoneValid ? `${t('customers.phone10DigitsRequired')} (${cleanPhone.length}/10)` : null}
+                            hint={`${cleanPhone.length}/10 ${t('customers.digits')}`}
+                            maxLength={10}
+                        />
                     </div>
 
                     {/* Password Field with Auto Generate */}
@@ -290,21 +309,8 @@ const CustomerFormDialog: React.FC<CustomerFormDialogProps> = ({ open, onOpenCha
 
                     {/* Status & Comment */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div className="grid gap-2">
-                            <Label className="text-sm font-medium">{t('common:status')}</Label>
-                            <Select value={form.status} onValueChange={(value) => onChange({ ...form, status: value })}>
-                                <SelectTrigger>
-                                    <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {CUSTOMER_STATUSES.map((status) => (
-                                        <SelectItem key={status} value={status}>
-                                            {t(`customers.status.${status.toLowerCase()}`, { defaultValue: status })}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                        </div>
+                        <UserStatus values={form.status} handleChange={(value) => onChange({ ...form, status: value.target.value })} />
+
                         <div className="grid gap-2">
                             <Label htmlFor="comment" className="text-sm font-medium flex items-center justify-between">
                                 <span>{t('common:comment')}</span>
