@@ -1,13 +1,13 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { BarChart3, Eye, Pencil, Trash2, CheckCircle2, User2, ExternalLink } from 'lucide-react'
+import { BarChart3, Eye, Pencil, Trash2, CheckCircle2, User2, ExternalLink, Heart } from 'lucide-react'
 import { Actor } from '@/stores/services/actorApi'
 import SafeImage from '@/components/ui/SafeImage'
 import { Badge } from '@/components/ui/badge'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import { actorStatusClass, formatCount, getActorStatus, PLATFORM_META } from './utils'
+import { actorStatusClass, formatCount, getActorStatus, getFollowerTier, PLATFORM_META } from './utils'
 
 interface ActorGridCardProps {
     actor: Actor
@@ -27,6 +27,12 @@ export const ActorGridCard = ({ actor, onEdit, onSocialAccounts, onDetail, onDel
     const totalFollowers = (actor.influencer_social_accounts ?? []).reduce((sum, acc) => {
         return sum + Number(acc.follower_count ?? 0)
     }, 0)
+    const hasSocialAccounts = (actor.influencer_social_accounts ?? []).length > 0
+    const followerTier = hasSocialAccounts ? getFollowerTier(totalFollowers) : null
+    const totalLikes = (actor.influencer_social_accounts ?? []).reduce((sum, acc) => {
+        return sum + Number(acc.like_count ?? 0)
+    }, 0)
+    const hasLikes = (actor.influencer_social_accounts ?? []).some((acc) => acc.like_count != null && Number(acc.like_count) > 0)
 
     return (
         <Card className="group overflow-hidden rounded-2xl border border-border/50 bg-card shadow-sm transition-all duration-300 hover:shadow-xl hover:shadow-primary/5 hover:-translate-y-0.5">
@@ -56,11 +62,20 @@ export const ActorGridCard = ({ actor, onEdit, onSocialAccounts, onDetail, onDel
                 {/* Overlay gradient */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
 
-                {/* Status badge */}
-                <div className="absolute top-2 left-2">
-                    <Badge variant="secondary" className={`text-[9px] font-bold uppercase tracking-widest px-2 h-5 ${actorStatusClass(actor.status)}`}>
+                {/* Status & Tier badges */}
+                <div className="absolute top-2 left-2 flex items-center gap-1.5 flex-wrap max-w-[calc(100%-2.5rem)]">
+                    <Badge variant="secondary" className={`text-[9px] font-bold uppercase tracking-widest px-2 h-5 backdrop-blur-md shadow-xs ${actorStatusClass(actor.status)}`}>
                         {getActorStatus(actor.status)}
                     </Badge>
+                    {followerTier && (
+                        <Badge
+                            variant="outline"
+                            className={`text-[9px] font-bold tracking-wider px-2 h-5 border backdrop-blur-md shadow-xs bg-background/85 ${followerTier.className}`}
+                            title={`${followerTier.name} Influencer (${formatCount(totalFollowers)} ${t('influencers.followers')})`}
+                        >
+                            {followerTier.label}
+                        </Badge>
+                    )}
                 </div>
 
                 {/* Active check */}
@@ -89,9 +104,17 @@ export const ActorGridCard = ({ actor, onEdit, onSocialAccounts, onDetail, onDel
                     </div>
                     {actor.social_handle && <p className="text-white/70 text-[10px] mt-0.5">@{actor.social_handle}</p>}
                     {(actor.influencer_social_accounts ?? []).length > 0 && (
-                        <p className="text-white/60 text-[10px] mt-0.5 font-medium">
-                            {formatCount(totalFollowers)} {t('influencers.followers')}
-                        </p>
+                        <div className="flex items-center flex-wrap gap-x-2 gap-y-0.5 text-white/75 text-[10px] mt-0.5 font-medium">
+                            <span>
+                                {formatCount(totalFollowers)} {t('influencers.followers')}
+                            </span>
+                            {hasLikes && (
+                                <span className="inline-flex items-center gap-0.5 text-rose-300">
+                                    <Heart className="size-2.5 fill-rose-400 text-rose-400" />
+                                    {formatCount(totalLikes)} {t('influencers.likes')}
+                                </span>
+                            )}
+                        </div>
                     )}
                 </div>
             </div>

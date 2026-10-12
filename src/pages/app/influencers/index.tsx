@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSearchParams } from 'react-router-dom'
 import { Loader2, Plus, LayoutList, LayoutGrid, TableProperties, Globe2Icon } from 'lucide-react'
@@ -29,13 +29,7 @@ import { emptyForm as emptyActorForm, getActorStatus } from './components/utils'
 import { useDebounce } from '@/hooks/useDebounce'
 import { ActorGridCard } from './components/ActorGridCard'
 import { ActorTableRow } from './components/ActorTableRow'
-import {
-    Table,
-    TableBody,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from '@/components/ui/table'
+import { Table, TableBody, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 
 const ACTORS_VIEW_KEY = 'influencers:display-mode'
@@ -52,12 +46,16 @@ const ActorsPage: React.FC = () => {
             const saved = localStorage.getItem(ACTORS_VIEW_KEY)
             return saved === 'grid' || saved === 'table' ? saved : 'card'
         } catch {
-            return 'card'
+            return 'grid'
         }
     })
     const changeViewMode = (mode: ActorsViewMode) => {
         setViewMode(mode)
-        try { localStorage.setItem(ACTORS_VIEW_KEY, mode) } catch { /* Keep the selection usable when storage is unavailable. */ }
+        try {
+            localStorage.setItem(ACTORS_VIEW_KEY, mode)
+        } catch {
+            /* Keep the selection usable when storage is unavailable. */
+        }
     }
     const [open, setOpen] = useState(false)
     const [editActor, setEditActor] = useState<Actor | null>(null)
@@ -90,6 +88,7 @@ const ActorsPage: React.FC = () => {
     const [deleteActor, { isLoading: isLoadingDeleting }] = useDeleteActorMutation()
     const [refreshAllActorsFollowers, { isLoading: queueingFollowAll }] = useRefreshAllActorsSocialAccountsMutation()
     const [getFollowBatchStatus] = useGetProfileMetricsBatchStatusMutation()
+    const lastFollowFinishedRef = useRef<number>(0)
 
     const refetch = async (nextPage = page, nextKeyword = keyword) => {
         const res = await getActors({
@@ -124,7 +123,10 @@ const ActorsPage: React.FC = () => {
     }, [page, genderFilter, familyFilter, provinceFilter, debouncedStandardPriceFilter, debouncedTagsFilter, sourceFilter])
 
     useEffect(() => {
-        if (!followBatchId) return
+        if (!followBatchId) {
+            lastFollowFinishedRef.current = 0
+            return
+        }
 
         let cancelled = false
         let checking = false
@@ -140,8 +142,15 @@ const ActorsPage: React.FC = () => {
                     finished: status.finished,
                     failed: status.failed
                 })
+
+                if (status.finished > lastFollowFinishedRef.current && !status.done) {
+                    lastFollowFinishedRef.current = status.finished
+                    void refetch()
+                }
+
                 if (status.done) {
                     setFollowBatchId(null)
+                    lastFollowFinishedRef.current = 0
                     await refetch()
                     ToastComponent({
                         status: status.failed > 0 ? 'warning' : 'success',
@@ -287,9 +296,9 @@ const ActorsPage: React.FC = () => {
         family_status: form.marital_status || null,
         tags: form.tags.trim()
             ? form.tags
-                .split(',')
-                .map((t) => t.trim())
-                .filter(Boolean)
+                  .split(',')
+                  .map((t) => t.trim())
+                  .filter(Boolean)
             : null,
         standard_price: form.standard_price ? Number(form.standard_price) : null,
         province_id: form.province_id ? Number(form.province_id) : null,
@@ -376,7 +385,9 @@ const ActorsPage: React.FC = () => {
                             disabled={!!followBatchId || queueingFollowAll}
                         >
                             {queueingFollowAll || followBatchId ? <Loader2 className="size-4 animate-spin" /> : <Globe2Icon className="size-4" />}
-                            {followBatchId ? t('influencers.gettingFollow', { finished: followBatchProgress.finished, total: followBatchProgress.total }) : t('influencers.getFollowAll')}
+                            {followBatchId
+                                ? t('influencers.gettingFollow', { finished: followBatchProgress.finished, total: followBatchProgress.total })
+                                : t('influencers.getFollowAll')}
                         </Button>
                         <Button className="w-full sm:w-auto" onClick={openCreate}>
                             <Plus />
@@ -409,12 +420,18 @@ const ActorsPage: React.FC = () => {
             {/* View mode toggle */}
             <div className="flex items-center justify-end mb-2">
                 <TooltipProvider delayDuration={200}>
-                    <div role="group" aria-label={t('influencers.displayMode')} className="flex flex-wrap items-center gap-0.5 rounded-xl border bg-muted/30 p-1">
-                        {([
-                            { mode: 'card' as const, icon: LayoutList, label: t('influencers.viewCard') },
-                            { mode: 'grid' as const, icon: LayoutGrid, label: t('influencers.viewGrid') },
-                            { mode: 'table' as const, icon: TableProperties, label: t('influencers.viewTable') },
-                        ] as const).map(({ mode, icon: Icon, label }) => (
+                    <div
+                        role="group"
+                        aria-label={t('influencers.displayMode')}
+                        className="flex flex-wrap items-center gap-0.5 rounded-xl border bg-muted/30 p-1"
+                    >
+                        {(
+                            [
+                                { mode: 'card' as const, icon: LayoutList, label: t('influencers.viewCard') },
+                                { mode: 'grid' as const, icon: LayoutGrid, label: t('influencers.viewGrid') },
+                                { mode: 'table' as const, icon: TableProperties, label: t('influencers.viewTable') }
+                            ] as const
+                        ).map(({ mode, icon: Icon, label }) => (
                             <Tooltip key={mode}>
                                 <TooltipTrigger asChild>
                                     <button
@@ -423,9 +440,7 @@ const ActorsPage: React.FC = () => {
                                         aria-label={label}
                                         aria-pressed={viewMode === mode}
                                         className={`flex h-9 items-center justify-center gap-2 rounded-lg px-3 text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
-                                            viewMode === mode
-                                                ? 'bg-background text-foreground shadow-sm'
-                                                : 'text-muted-foreground hover:text-foreground'
+                                            viewMode === mode ? 'bg-background text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'
                                         }`}
                                     >
                                         <Icon className="size-4" aria-hidden="true" />
@@ -486,6 +501,7 @@ const ActorsPage: React.FC = () => {
                                 <TableHead>{t('common:status')}</TableHead>
                                 <TableHead>{t('influencers.socialProfileMetrics')}</TableHead>
                                 <TableHead>{t('influencers.followers')}</TableHead>
+                                <TableHead>{t('influencers.likes')}</TableHead>
                                 <TableHead>{t('influencers.rateStandard')}</TableHead>
                                 <TableHead>{t('influencers.tags')}</TableHead>
                                 <TableHead className="text-right">{t('common:actions')}</TableHead>
@@ -504,7 +520,7 @@ const ActorsPage: React.FC = () => {
                             ))}
                             {rows.length === 0 && !loadingActors && (
                                 <TableRow>
-                                    <td colSpan={7} className="py-12 text-center text-muted-foreground">
+                                    <td colSpan={8} className="py-12 text-center text-muted-foreground">
                                         {t('influencers.empty')}
                                     </td>
                                 </TableRow>

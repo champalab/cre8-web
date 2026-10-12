@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next'
-import { BarChart3, ExternalLink, Eye, Pencil, Trash2 } from 'lucide-react'
+import { BarChart3, ExternalLink, Eye, Heart, Pencil, Trash2 } from 'lucide-react'
 import { Actor } from '@/stores/services/actorApi'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -22,6 +22,13 @@ export const ActorTableRow = ({ actor, onEdit, onSocialAccounts, onDetail, onDel
     const totalFollowers = (actor.influencer_social_accounts ?? []).reduce(
         (sum, acc) => sum + Number(acc.follower_count ?? 0),
         0
+    )
+    const totalLikes = (actor.influencer_social_accounts ?? []).reduce(
+        (sum, acc) => sum + Number(acc.like_count ?? 0),
+        0
+    )
+    const hasLikes = (actor.influencer_social_accounts ?? []).some(
+        (acc) => acc.like_count != null && Number(acc.like_count) > 0
     )
     const hasSocial = (actor.influencer_social_accounts ?? []).length > 0
 
@@ -119,6 +126,18 @@ export const ActorTableRow = ({ actor, onEdit, onSocialAccounts, onDetail, onDel
             {/* Followers */}
             <TableCell className="tabular-nums text-sm">
                 {hasSocial ? formatCount(totalFollowers) : '—'}
+            </TableCell>
+
+            {/* Likes */}
+            <TableCell className="tabular-nums text-sm">
+                {hasLikes ? (
+                    <span className="inline-flex items-center gap-1 font-medium text-rose-600 dark:text-rose-400">
+                        <Heart className="size-3 fill-rose-500/20 text-rose-500" />
+                        {formatCount(totalLikes)}
+                    </span>
+                ) : (
+                    <span className="text-muted-foreground/60">—</span>
+                )}
             </TableCell>
 
             {/* Price */}

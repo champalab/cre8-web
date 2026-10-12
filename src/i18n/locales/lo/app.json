@@ -279,6 +279,7 @@
     "copiedBankAccount": "ຄັດລອກເລກບັນຊີທະນາຄານສຳເລັດແລ້ວ",
     "followers": "ຜູ້ຕິດຕາມ",
     "following": "ກຳລັງຕິດຕາມ",
+    "likes": "ຍອດຖືກໃຈ",
     "addPlatform": "ເພີ່ມ {{platform}}",
     "profileTitle": "ໂປຣໄຟລ໌ອິນຟລູເອັນເຊີ",
     "linkedPlatforms": "{{count}} ແພລດຟອມທີ່ເຊື່ອມຕໍ່",

@@ -354,7 +354,7 @@ export function ActorDetailDialog({ actor, open, onOpenChange, onEdit, onSocialA
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                        <div className="mt-4 grid grid-cols-2 gap-2">
+                                                        <div className={`mt-4 grid ${account.like_count != null || account.platform.toLowerCase() === 'tiktok' ? 'grid-cols-3' : 'grid-cols-2'} gap-2`}>
                                                             <div className="rounded-lg bg-background/80 p-2.5">
                                                                 <p className="text-xs text-muted-foreground">
                                                                     {t('influencers.followers')}
@@ -371,6 +371,16 @@ export function ActorDetailDialog({ actor, open, onOpenChange, onEdit, onSocialA
                                                                     {formatFollowers(account.following_count)}
                                                                 </p>
                                                             </div>
+                                                            {(account.like_count != null || account.platform.toLowerCase() === 'tiktok') && (
+                                                                <div className="rounded-lg bg-background/80 p-2.5">
+                                                                    <p className="text-xs text-muted-foreground">
+                                                                        {t('influencers.likes')}
+                                                                    </p>
+                                                                    <p className="mt-1 text-lg font-bold tabular-nums text-rose-500">
+                                                                        {formatFollowers(account.like_count)}
+                                                                    </p>
+                                                                </div>
+                                                            )}
                                                         </div>
                                                         <p className="mt-3 text-[11px] text-muted-foreground">
                                                             {t('influencers.syncedAt', { date: formatDateTime(account.last_scraped_at) })}

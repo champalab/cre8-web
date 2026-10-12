@@ -12,6 +12,7 @@ import {
     ExternalLink,
     Eye,
     Globe2Icon,
+    Heart,
     Link2,
     Loader2,
     Mail,
@@ -37,7 +38,7 @@ import { Card } from '@/components/ui/card'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { formatDate } from '@/utils/datetime'
-import { actorStatusClass, formatCount, getActorStatus, PLATFORM_META } from './utils'
+import { actorStatusClass, formatCount, getActorStatus, getFollowerTier, PLATFORM_META } from './utils'
 
 interface ActorCardProps {
     actor: Actor
@@ -57,24 +58,6 @@ const getAge = (dobString: string) => {
         age--
     }
     return age
-}
-
-type FollowerTier = {
-    name: string
-    label: string
-    className: string
-}
-
-const getFollowerTier = (totalFollowers: number): FollowerTier => {
-    if (totalFollowers >= 1_000_000) {
-        return { name: 'Mega', label: '👑 Mega', className: 'bg-amber-500/15 text-amber-600 border-amber-400/40 dark:text-amber-400' }
-    } else if (totalFollowers >= 100_000) {
-        return { name: 'Macro', label: '🔥 Macro', className: 'bg-purple-500/15 text-purple-600 border-purple-400/40 dark:text-purple-400' }
-    } else if (totalFollowers >= 1_000) {
-        return { name: 'Micro', label: '⚡ Micro', className: 'bg-blue-500/15 text-blue-600 border-blue-400/40 dark:text-blue-400' }
-    } else {
-        return { name: 'Nano', label: '🌱 Nano', className: 'bg-green-500/15 text-green-600 border-green-400/40 dark:text-green-400' }
-    }
 }
 
 export const ActorCard = ({ actor, onEdit, onSocialAccounts, onDetail, onDelete, onMetricsUpdated }: ActorCardProps) => {
@@ -145,7 +128,14 @@ export const ActorCard = ({ actor, onEdit, onSocialAccounts, onDetail, onDelete,
         const count = typeof acc.follower_count === 'number' ? acc.follower_count : Number(acc.follower_count ?? 0)
         return sum + count
     }, 0)
+    const totalLikes = (actor.influencer_social_accounts ?? []).reduce((sum, acc) => {
+        const count = typeof acc.like_count === 'number' ? acc.like_count : Number(acc.like_count ?? 0)
+        return sum + count
+    }, 0)
     const hasSocialAccounts = (actor.influencer_social_accounts ?? []).length > 0
+    const hasLikes = (actor.influencer_social_accounts ?? []).some(
+        (acc) => acc.like_count != null && Number(acc.like_count) > 0
+    )
     const followerTier = hasSocialAccounts ? getFollowerTier(totalFollowers) : null
     const fetchableCount = (actor.influencer_social_accounts ?? []).filter((account) => {
         const platform = account.platform.toLowerCase()
@@ -382,6 +372,15 @@ export const ActorCard = ({ actor, onEdit, onSocialAccounts, onDetail, onDelete,
                                     {followerTier.label}
                                 </Badge>
                             )}
+                            {hasLikes && (
+                                <Badge
+                                    variant="outline"
+                                    className="h-7 rounded-full border-rose-500/30 bg-rose-500/10 text-rose-600 dark:text-rose-400 px-3 text-[10px] font-bold tracking-wider inline-flex items-center gap-1"
+                                >
+                                    <Heart className="size-3 fill-rose-500/30 text-rose-500" />
+                                    {formatCount(totalLikes)} {t('influencers.likes')}
+                                </Badge>
+                            )}
                         </div>
 
                         <div className="flex items-center gap-2 shrink-0">
@@ -540,6 +539,15 @@ export const ActorCard = ({ actor, onEdit, onSocialAccounts, onDetail, onDelete,
                                             </span>
                                             <span className="text-[10px] text-muted-foreground">{t('influencers.followers')}</span>
                                         </div>
+                                        {account.like_count != null && (
+                                            <div className="flex items-baseline gap-1 mt-0.5 text-rose-600 dark:text-rose-400">
+                                                <Heart className="size-3 fill-rose-500/20 text-rose-500 shrink-0" />
+                                                <span className="text-sm font-semibold tabular-nums">
+                                                    {formatCount(account.like_count)}
+                                                </span>
+                                                <span className="text-[10px] text-muted-foreground">{t('influencers.likes')}</span>
+                                            </div>
+                                        )}
                                         {account.following_count != null && (
                                             <div className="flex items-baseline gap-1 mt-0.5">
                                                 <span className="text-sm font-medium tabular-nums text-muted-foreground">

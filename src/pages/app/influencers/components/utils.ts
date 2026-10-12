@@ -105,3 +105,21 @@ export const PLATFORM_META = {
 } as const
 
 export type ActorPlatform = keyof typeof PLATFORM_META
+
+export type FollowerTier = {
+    name: string
+    label: string
+    className: string
+}
+
+export const getFollowerTier = (totalFollowers: number): FollowerTier => {
+    if (totalFollowers >= 1_000_000) {
+        return { name: 'Mega', label: '👑 Mega', className: 'bg-amber-500/15 text-amber-600 border-amber-400/40 dark:text-amber-400' }
+    } else if (totalFollowers >= 100_000) {
+        return { name: 'Macro', label: '🔥 Macro', className: 'bg-purple-500/15 text-purple-600 border-purple-400/40 dark:text-purple-400' }
+    } else if (totalFollowers >= 1_000) {
+        return { name: 'Micro', label: '⚡ Micro', className: 'bg-blue-500/15 text-blue-600 border-blue-400/40 dark:text-blue-400' }
+    } else {
+        return { name: 'Nano', label: '🌱 Nano', className: 'bg-green-500/15 text-green-600 border-green-400/40 dark:text-green-400' }
+    }
+}
