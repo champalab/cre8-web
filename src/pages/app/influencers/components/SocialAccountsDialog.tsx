@@ -47,6 +47,15 @@ const formatCount = (value: string | number | null | undefined) => {
     return num.toLocaleString()
 }
 
+const getCountFontSize = (value: string | number | null | undefined) => {
+    if (value == null || value === '') return 'text-base sm:text-lg'
+    const len = String(formatCount(value)).length
+    if (len >= 12) return 'text-[11px] sm:text-xs'
+    if (len >= 9) return 'text-xs sm:text-sm'
+    if (len >= 7) return 'text-sm sm:text-base'
+    return 'text-base sm:text-lg'
+}
+
 const canFetchProfileMetrics = (platform: string) => PROFILE_METRIC_PLATFORMS.includes(platform.toLowerCase() as (typeof PROFILE_METRIC_PLATFORMS)[number])
 
 type Props = {
@@ -424,7 +433,7 @@ export function SocialAccountsDialog({ actor, open, onOpenChange, onUpdated }: P
                                 <CardContent className="p-0 pb-4">
                                     {accounts.length > 0 ? (
                                         <>
-                                            <div className="grid gap-3 px-4 sm:grid-cols-2 xl:grid-cols-3">
+                                            <div className="grid gap-3.5 px-4 sm:grid-cols-2">
                                                 {accounts.map((account) => (
                                                     <div
                                                         key={account.uuid}
@@ -448,22 +457,43 @@ export function SocialAccountsDialog({ actor, open, onOpenChange, onUpdated }: P
                                                         <div
                                                             className={`mt-4 grid ${account.like_count != null || account.platform.toLowerCase() === 'tiktok' ? 'grid-cols-3' : 'grid-cols-2'} gap-2`}
                                                         >
-                                                            <div className="rounded-lg border bg-background/80 p-3">
-                                                                <p className="text-xs text-muted-foreground">{t('influencers.followers')}</p>
-                                                                <p className="mt-1 text-xl font-bold tracking-tight tabular-nums">
+                                                            <div
+                                                                className="rounded-lg border bg-background/80 p-2 sm:p-2.5 min-w-0 overflow-hidden"
+                                                                title={formatCount(account.follower_count)}
+                                                            >
+                                                                <p className="text-[10px] sm:text-xs text-muted-foreground truncate">
+                                                                    {t('influencers.followers')}
+                                                                </p>
+                                                                <p
+                                                                    className={`mt-0.5 font-bold tracking-tight tabular-nums truncate ${getCountFontSize(account.follower_count)}`}
+                                                                >
                                                                     {formatCount(account.follower_count)}
                                                                 </p>
                                                             </div>
-                                                            <div className="rounded-lg border bg-background/80 p-3">
-                                                                <p className="text-xs text-muted-foreground">{t('influencers.following')}</p>
-                                                                <p className="mt-1 text-xl font-bold tracking-tight tabular-nums">
+                                                            <div
+                                                                className="rounded-lg border bg-background/80 p-2 sm:p-2.5 min-w-0 overflow-hidden"
+                                                                title={formatCount(account.following_count)}
+                                                            >
+                                                                <p className="text-[10px] sm:text-xs text-muted-foreground truncate">
+                                                                    {t('influencers.following')}
+                                                                </p>
+                                                                <p
+                                                                    className={`mt-0.5 font-bold tracking-tight tabular-nums truncate ${getCountFontSize(account.following_count)}`}
+                                                                >
                                                                     {formatCount(account.following_count)}
                                                                 </p>
                                                             </div>
                                                             {(account.like_count != null || account.platform.toLowerCase() === 'tiktok') && (
-                                                                <div className="rounded-lg border bg-background/80 p-3">
-                                                                    <p className="text-xs text-muted-foreground">{t('influencers.likes')}</p>
-                                                                    <p className="mt-1 text-xl font-bold tracking-tight tabular-nums text-rose-500">
+                                                                <div
+                                                                    className="rounded-lg border bg-background/80 p-2 sm:p-2.5 min-w-0 overflow-hidden"
+                                                                    title={formatCount(account.like_count)}
+                                                                >
+                                                                    <p className="text-[10px] sm:text-xs text-muted-foreground truncate">
+                                                                        {t('influencers.likes')}
+                                                                    </p>
+                                                                    <p
+                                                                        className={`mt-0.5 font-bold tracking-tight tabular-nums truncate text-rose-500 ${getCountFontSize(account.like_count)}`}
+                                                                    >
                                                                         {formatCount(account.like_count)}
                                                                     </p>
                                                                 </div>
