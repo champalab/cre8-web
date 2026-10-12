@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
+    Banknote,
     BarChart3,
     ExternalLink,
     ImageOff,
@@ -294,6 +295,32 @@ export function ActorDetailDialog({ actor, open, onOpenChange, onEdit, onSocialA
                                 </Card>
                             )}
 
+                            {(detail.bank_account_name || detail.bank_account_number) && (
+                                <Card className="mx-4 sm:mx-6 border-emerald-500/20 bg-gradient-to-br from-emerald-500/5 to-background">
+                                    <CardHeader className="pb-3">
+                                        <CardTitle className="flex items-center gap-2 text-base">
+                                            <Banknote className="size-4 text-emerald-500" />
+                                            {t('influencers.bankAccount')}
+                                        </CardTitle>
+                                    </CardHeader>
+                                    <CardContent className="grid gap-3 sm:grid-cols-2">
+                                        <DetailField label={t('influencers.accountName')} value={detail.bank_account_name || '—'} />
+                                        <DetailField
+                                            label={t('influencers.accountNumber')}
+                                            value={
+                                                detail.bank_account_number ? (
+                                                    <span className="font-mono font-medium tracking-wider text-foreground">
+                                                        {detail.bank_account_number}
+                                                    </span>
+                                                ) : (
+                                                    '—'
+                                                )
+                                            }
+                                        />
+                                    </CardContent>
+                                </Card>
+                            )}
+
                             <Card className="mx-4 overflow-hidden border-primary/15 sm:mx-6">
                                 <CardHeader className="pb-3">
                                     <CardTitle className="flex items-center gap-2 text-base">
@@ -364,8 +391,8 @@ export function ActorDetailDialog({ actor, open, onOpenChange, onEdit, onSocialA
                                                             <a
                                                                 href={account.profile_url}
                                                                 target="_blank"
-                                                                rel="noreferrer"
-                                                                className="mt-2 inline-flex items-center gap-1 break-all text-xs text-primary hover:underline"
+                                                                rel="noopener noreferrer"
+                                                                className="mt-3 inline-flex items-center gap-1.5 rounded-lg border border-primary/25 bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary hover:bg-primary/20 transition-colors w-fit"
                                                             >
                                                                 <ExternalLink className="size-3" />
                                                                 {t('influencers.profileLink')}

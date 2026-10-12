@@ -537,9 +537,25 @@ export function SocialAccountsDialog({ actor, open, onOpenChange, onUpdated }: P
                                                                 </p>
                                                             </div>
                                                         </div>
-                                                        <p className="mt-3 truncate text-xs text-muted-foreground" title={account.profile_url}>
-                                                            {account.profile_url}
-                                                        </p>
+                                                        {account.profile_url ? (
+                                                            <a
+                                                                href={account.profile_url}
+                                                                target="_blank"
+                                                                rel="noopener noreferrer"
+                                                                onClick={(e) => e.stopPropagation()}
+                                                                className="mt-3 inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-primary transition-colors group/link max-w-full"
+                                                                title={`Open ${account.platform} profile in new tab`}
+                                                            >
+                                                                <ExternalLink className="size-3 shrink-0 text-muted-foreground group-hover/link:text-primary transition-colors" />
+                                                                <span className="truncate underline-offset-4 group-hover/link:underline">
+                                                                    {account.profile_url}
+                                                                </span>
+                                                            </a>
+                                                        ) : (
+                                                            <p className="mt-3 truncate text-xs text-muted-foreground">
+                                                                —
+                                                            </p>
+                                                        )}
                                                         <p className="mt-1 text-[11px] text-muted-foreground">
                                                             {t('influencers.lastSync', { date: formatDateTime(account.last_scraped_at) })}
                                                         </p>

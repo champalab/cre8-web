@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { BarChart3, Eye, Pencil, Trash2, CheckCircle2, User2 } from 'lucide-react'
+import { BarChart3, Eye, Pencil, Trash2, CheckCircle2, User2, ExternalLink } from 'lucide-react'
 import { Actor } from '@/stores/services/actorApi'
 import SafeImage from '@/components/ui/SafeImage'
 import { Badge } from '@/components/ui/badge'
@@ -31,10 +31,7 @@ export const ActorGridCard = ({ actor, onEdit, onSocialAccounts, onDetail, onDel
     return (
         <Card className="group overflow-hidden rounded-2xl border border-border/50 bg-card shadow-sm transition-all duration-300 hover:shadow-xl hover:shadow-primary/5 hover:-translate-y-0.5">
             {/* Photo */}
-            <div
-                className="relative aspect-[4/5] w-full cursor-pointer overflow-hidden bg-muted/30"
-                onClick={() => onDetail(actor)}
-            >
+            <div className="relative aspect-[4/5] w-full cursor-pointer overflow-hidden bg-muted/30" onClick={() => onDetail(actor)}>
                 {photo ? (
                     <SafeImage
                         src={photo}
@@ -46,8 +43,6 @@ export const ActorGridCard = ({ actor, onEdit, onSocialAccounts, onDetail, onDel
                         onError={() => setImgFailed(true)}
                     />
                 ) : (
-
-
                     <div className="flex h-full w-full flex-col items-center justify-center bg-gradient-to-br from-slate-900 via-zinc-900 to-neutral-950 text-slate-300 p-4 text-center select-none">
                         <div className="relative mb-2 flex items-center justify-center">
                             <div className="size-14 sm:size-16 rounded-full bg-slate-800/80 border border-slate-700/60 shadow-inner flex items-center justify-center">
@@ -63,10 +58,7 @@ export const ActorGridCard = ({ actor, onEdit, onSocialAccounts, onDetail, onDel
 
                 {/* Status badge */}
                 <div className="absolute top-2 left-2">
-                    <Badge
-                        variant="secondary"
-                        className={`text-[9px] font-bold uppercase tracking-widest px-2 h-5 ${actorStatusClass(actor.status)}`}
-                    >
+                    <Badge variant="secondary" className={`text-[9px] font-bold uppercase tracking-widest px-2 h-5 ${actorStatusClass(actor.status)}`}>
                         {getActorStatus(actor.status)}
                     </Badge>
                 </div>
@@ -79,11 +71,23 @@ export const ActorGridCard = ({ actor, onEdit, onSocialAccounts, onDetail, onDel
                 )}
 
                 {/* Bottom info */}
-                <div className="absolute bottom-0 inset-x-0 p-3 text-white">
-                    <p className="font-bold text-sm leading-tight line-clamp-1">{actor.name}</p>
-                    {actor.social_handle && (
-                        <p className="text-white/70 text-[10px] mt-0.5">@{actor.social_handle}</p>
-                    )}
+                <div className="absolute bottom-0 inset-x-0 p-3 text-white pointer-events-none">
+                    <div className="flex items-center justify-between gap-1.5">
+                        <p className="font-bold text-sm leading-tight line-clamp-1 drop-shadow-sm">{actor.name}</p>
+                        {actor.profile_url && (
+                            <a
+                                href={actor.profile_url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                onClick={(e) => e.stopPropagation()}
+                                className="pointer-events-auto inline-flex size-6 items-center justify-center rounded-full bg-black/40 hover:bg-black/60 backdrop-blur-md text-white/90 hover:text-white transition-all hover:scale-110 active:scale-95 shrink-0 shadow-sm"
+                                title="Open profile in new tab"
+                            >
+                                <ExternalLink className="size-3" />
+                            </a>
+                        )}
+                    </div>
+                    {actor.social_handle && <p className="text-white/70 text-[10px] mt-0.5">@{actor.social_handle}</p>}
                     {(actor.influencer_social_accounts ?? []).length > 0 && (
                         <p className="text-white/60 text-[10px] mt-0.5 font-medium">
                             {formatCount(totalFollowers)} {t('influencers.followers')}
@@ -95,17 +99,31 @@ export const ActorGridCard = ({ actor, onEdit, onSocialAccounts, onDetail, onDel
             {/* Platform indicators */}
             <CardContent className="p-2">
                 <div className="flex items-center justify-between gap-1">
-                    <div className="flex gap-1">
+                    <div className="flex gap-1.5">
                         {(Object.keys(PLATFORM_META) as Array<keyof typeof PLATFORM_META>).map((platform) => {
                             const meta = PLATFORM_META[platform]
-                            const account = (actor.influencer_social_accounts ?? []).find(
-                                (a) => a.platform.toLowerCase() === platform
-                            )
+                            const account = (actor.influencer_social_accounts ?? []).find((a) => a.platform.toLowerCase() === platform)
+                            if (account?.profile_url) {
+                                return (
+                                    <a
+                                        key={platform}
+                                        href={account.profile_url}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        onClick={(e) => e.stopPropagation()}
+                                        className={`flex size-5.5 items-center justify-center rounded-md text-[8px] font-bold shadow-xs transition-all hover:scale-110 active:scale-95 ${meta.iconClass}`}
+                                        title={`Open ${meta.label} profile in new tab`}
+                                    >
+                                        {meta.short}
+                                    </a>
+                                )
+                            }
                             return (
                                 <div
                                     key={platform}
-                                    className={`flex size-5 items-center justify-center rounded-md text-[8px] font-bold ${account ? meta.iconClass : 'bg-muted text-muted-foreground/30'
-                                        }`}
+                                    className={`flex size-5.5 items-center justify-center rounded-md text-[8px] font-bold ${
+                                        account ? meta.iconClass : 'bg-muted text-muted-foreground/30'
+                                    }`}
                                     title={meta.label}
                                 >
                                     {meta.short}

@@ -276,6 +276,7 @@
     "repostNo": "ບໍ່ອະນຸຍາດ",
     "noRates": "ຍັງບໍ່ມີອັດຕາລາຄາ",
     "bankAccount": "ບັນຊີທະນາຄານ",
+    "copiedBankAccount": "ຄັດລອກເລກບັນຊີທະນາຄານສຳເລັດແລ້ວ",
     "followers": "ຜູ້ຕິດຕາມ",
     "following": "ກຳລັງຕິດຕາມ",
     "addPlatform": "ເພີ່ມ {{platform}}",

@@ -276,6 +276,7 @@
     "repostNo": "Not allowed",
     "noRates": "Service rates not set yet",
     "bankAccount": "Bank account",
+    "copiedBankAccount": "Copied bank account number",
     "followers": "Followers",
     "following": "Following",
     "addPlatform": "+ Add",

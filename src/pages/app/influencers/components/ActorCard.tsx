@@ -1,6 +1,26 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { BarChart3, Camera, CheckCircle2, ChevronLeft, ChevronRight, ExternalLink, Eye, Globe2Icon, Link2, Loader2, Mail, MoreHorizontal, Pencil, Phone, Trash2, User2 } from 'lucide-react'
+import {
+    Banknote,
+    BarChart3,
+    Camera,
+    Check,
+    CheckCircle2,
+    ChevronLeft,
+    ChevronRight,
+    Copy,
+    ExternalLink,
+    Eye,
+    Globe2Icon,
+    Link2,
+    Loader2,
+    Mail,
+    MoreHorizontal,
+    Pencil,
+    Phone,
+    Trash2,
+    User2
+} from 'lucide-react'
 import {
     Actor,
     PROFILE_METRIC_PLATFORMS,
@@ -62,8 +82,24 @@ export const ActorCard = ({ actor, onEdit, onSocialAccounts, onDetail, onDelete,
     const [refreshAllSocialAccounts, { isLoading: queueingMetrics }] = useRefreshAllInfluencerSocialAccountsMutation()
     const [getMetricsBatchStatus] = useGetProfileMetricsBatchStatusMutation()
     const [metricsBatchId, setMetricsBatchId] = useState<string | null>(null)
+    const [copiedBank, setCopiedBank] = useState(false)
     const { data: provincesResponse } = useGetProvincesQuery()
     const provinceName = actor.province_id ? provincesResponse?.data?.find((p) => p.id === actor.province_id)?.nameLao || actor.province_id : null
+
+    const handleCopyBankAccount = useCallback(
+        (e: React.MouseEvent, accountNo?: string | null) => {
+            e.stopPropagation()
+            if (!accountNo) return
+            navigator.clipboard.writeText(accountNo)
+            setCopiedBank(true)
+            ToastComponent({
+                status: 'success',
+                message: t('influencers.copiedBankAccount') || 'Copied bank account number'
+            })
+            setTimeout(() => setCopiedBank(false), 2000)
+        },
+        [t]
+    )
 
     const allPhotosRaw = useMemo(() => {
         return actor.profile_urls && actor.profile_urls.length > 0 ? actor.profile_urls : actor.profile_url ? [actor.profile_url] : []
@@ -83,15 +119,21 @@ export const ActorCard = ({ actor, onEdit, onSocialAccounts, onDetail, onDelete,
     const mainPhoto = validPhotos[activeImageIndex] || null
     const hasMultiple = validPhotos.length > 1
 
-    const goPrev = useCallback((e: React.MouseEvent) => {
-        e.stopPropagation()
-        setActiveImageIndex((i) => (i - 1 + validPhotos.length) % validPhotos.length)
-    }, [validPhotos.length])
+    const goPrev = useCallback(
+        (e: React.MouseEvent) => {
+            e.stopPropagation()
+            setActiveImageIndex((i) => (i - 1 + validPhotos.length) % validPhotos.length)
+        },
+        [validPhotos.length]
+    )
 
-    const goNext = useCallback((e: React.MouseEvent) => {
-        e.stopPropagation()
-        setActiveImageIndex((i) => (i + 1) % validPhotos.length)
-    }, [validPhotos.length])
+    const goNext = useCallback(
+        (e: React.MouseEvent) => {
+            e.stopPropagation()
+            setActiveImageIndex((i) => (i + 1) % validPhotos.length)
+        },
+        [validPhotos.length]
+    )
 
     const goTo = useCallback((idx: number, e: React.MouseEvent) => {
         e.stopPropagation()
@@ -107,10 +149,7 @@ export const ActorCard = ({ actor, onEdit, onSocialAccounts, onDetail, onDelete,
     const followerTier = hasSocialAccounts ? getFollowerTier(totalFollowers) : null
     const fetchableCount = (actor.influencer_social_accounts ?? []).filter((account) => {
         const platform = account.platform.toLowerCase()
-        return (
-            PROFILE_METRIC_PLATFORMS.includes(platform as (typeof PROFILE_METRIC_PLATFORMS)[number]) &&
-            Boolean(account.profile_url?.trim())
-        )
+        return PROFILE_METRIC_PLATFORMS.includes(platform as (typeof PROFILE_METRIC_PLATFORMS)[number]) && Boolean(account.profile_url?.trim())
     }).length
     const isGettingMetrics = queueingMetrics || Boolean(metricsBatchId)
 
@@ -159,10 +198,10 @@ export const ActorCard = ({ actor, onEdit, onSocialAccounts, onDetail, onDelete,
                         message:
                             status.failed > 0
                                 ? t('influencers.followPartial', {
-                                    completed: status.completed,
-                                    total: status.total,
-                                    failed: status.failed
-                                })
+                                      completed: status.completed,
+                                      total: status.total,
+                                      failed: status.failed
+                                  })
                                 : t('influencers.followSuccess', { completed: status.completed })
                     })
                 }
@@ -193,7 +232,7 @@ export const ActorCard = ({ actor, onEdit, onSocialAccounts, onDetail, onDelete,
                             backgroundImage: mainPhoto ? `url(${mainPhoto})` : undefined,
                             backgroundSize: 'cover',
                             backgroundPosition: 'center',
-                            transition: 'background-image 0.6s ease',
+                            transition: 'background-image 0.6s ease'
                         }}
                     />
 
@@ -205,16 +244,12 @@ export const ActorCard = ({ actor, onEdit, onSocialAccounts, onDetail, onDelete,
                                 width: `${validPhotos.length * 100}%`,
                                 transform: `translateX(-${(activeImageIndex / validPhotos.length) * 100}%)`,
                                 transition: 'transform 420ms cubic-bezier(0.4, 0, 0.2, 1)',
-                                willChange: 'transform',
+                                willChange: 'transform'
                             }}
                             onClick={() => onDetail(actor)}
                         >
                             {validPhotos.map((url, idx) => (
-                                <div
-                                    key={idx}
-                                    className="relative shrink-0 cursor-pointer"
-                                    style={{ width: `${100 / validPhotos.length}%` }}
-                                >
+                                <div key={idx} className="relative shrink-0 cursor-pointer" style={{ width: `${100 / validPhotos.length}%` }}>
                                     <SafeImage
                                         src={url}
                                         alt={`${actor.name} ${idx + 1}`}
@@ -225,10 +260,8 @@ export const ActorCard = ({ actor, onEdit, onSocialAccounts, onDetail, onDelete,
                                         draggable={false}
                                         onError={() => handleImageError(url)}
                                     />
-
                                 </div>
                             ))}
-
                         </div>
                     ) : (
                         <div
@@ -243,12 +276,8 @@ export const ActorCard = ({ actor, onEdit, onSocialAccounts, onDetail, onDelete,
                                     <Camera className="size-3.5 text-slate-300" />
                                 </div>
                             </div>
-                            <span className="text-3xl font-black tracking-wider text-slate-100 uppercase opacity-90">
-                                {actor.name.charAt(0).toUpperCase()}
-                            </span>
-                            <span className="mt-1 text-[11px] font-medium text-slate-400">
-                                {t('influencers.noPhotosYet')}
-                            </span>
+                            <span className="text-3xl font-black tracking-wider text-slate-100 uppercase opacity-90">{actor.name.charAt(0).toUpperCase()}</span>
+                            <span className="mt-1 text-[11px] font-medium text-slate-400">{t('influencers.noPhotosYet')}</span>
                         </div>
                     )}
 
@@ -293,10 +322,9 @@ export const ActorCard = ({ actor, onEdit, onSocialAccounts, onDetail, onDelete,
                                     key={idx}
                                     type="button"
                                     onClick={(e) => goTo(idx, e)}
-                                    className={`rounded-full transition-all duration-300 ease-out ${idx === activeImageIndex
-                                        ? 'w-5 h-1.5 bg-white shadow'
-                                        : 'size-1.5 bg-white/40 hover:bg-white/70'
-                                        }`}
+                                    className={`rounded-full transition-all duration-300 ease-out ${
+                                        idx === activeImageIndex ? 'w-5 h-1.5 bg-white shadow' : 'size-1.5 bg-white/40 hover:bg-white/70'
+                                    }`}
                                 />
                             ))}
                         </div>
@@ -308,11 +336,25 @@ export const ActorCard = ({ actor, onEdit, onSocialAccounts, onDetail, onDelete,
                             <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-white drop-shadow-md">{actor.name}</h2>
                             {actor.status === 'ACTIVE' && <CheckCircle2 className="size-6 text-blue-400 drop-shadow-sm fill-white" />}
                         </div>
-                        {actor.social_handle && <p className="text-white/80 font-medium tracking-wide drop-shadow mt-1">@{actor.social_handle}</p>}
+                        <div className="flex items-center gap-2 mt-1 pointer-events-auto flex-wrap">
+                            {actor.social_handle && <p className="text-white/85 font-medium tracking-wide drop-shadow text-sm">@{actor.social_handle}</p>}
+                            {actor.profile_url && (
+                                <a
+                                    href={actor.profile_url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    onClick={(e) => e.stopPropagation()}
+                                    className="inline-flex items-center gap-1 rounded-full bg-white/20 hover:bg-white/35 backdrop-blur-md px-2.5 py-0.5 text-[11px] font-semibold text-white transition-all hover:scale-105 active:scale-95 shadow-sm"
+                                    title="Open profile in new tab"
+                                >
+                                    <span>Profile</span>
+                                    <ExternalLink className="size-3" />
+                                </a>
+                            )}
+                        </div>
                     </div>
                 </div>
             </div>
-
 
             {/* Right Information Section */}
             <div className="flex min-w-0 flex-1 flex-col justify-between p-5 sm:p-6 lg:p-8">
@@ -438,7 +480,6 @@ export const ActorCard = ({ actor, onEdit, onSocialAccounts, onDetail, onDelete,
                                     )
                                 }
 
-
                                 return (
                                     <div
                                         key={platform}
@@ -451,26 +492,46 @@ export const ActorCard = ({ actor, onEdit, onSocialAccounts, onDetail, onDelete,
                                                 {meta.short}
                                             </span>
                                             <span className="text-xs font-semibold text-muted-foreground">{meta.label}</span>
-                                            <div className="ml-auto flex items-center gap-2">
+                                            <div className="ml-auto flex items-center gap-1.5" onClick={(e) => e.stopPropagation()}>
                                                 {account.profile_url && (
-                                                    <a
-                                                        href={account.profile_url}
-                                                        target="_blank"
-                                                        rel="noopener noreferrer"
-                                                        className="text-muted-foreground px-3 hover:text-foreground transition-colors"
-                                                        title={`Open ${meta.label} profile`}
-                                                    >
-                                                        <ExternalLink className="size-3.5" />
-                                                    </a>
+                                                    <TooltipProvider delayDuration={150}>
+                                                        <Tooltip>
+                                                            <TooltipTrigger asChild>
+                                                                <a
+                                                                    href={account.profile_url}
+                                                                    target="_blank"
+                                                                    rel="noopener noreferrer"
+                                                                    className="inline-flex size-7 items-center justify-center rounded-lg border border-border/40 bg-muted/40 text-muted-foreground shadow-xs transition-all hover:scale-105 hover:border-primary/40 hover:bg-primary/10 hover:text-primary active:scale-95"
+                                                                    title={`Open ${meta.label} profile in new tab`}
+                                                                    aria-label={`Open ${meta.label} profile in new tab`}
+                                                                >
+                                                                    <ExternalLink className="size-3.5" />
+                                                                </a>
+                                                            </TooltipTrigger>
+                                                            <TooltipContent side="top">
+                                                                <p className="text-xs">{t('influencers.openProfile') || `Open ${meta.label} profile`}</p>
+                                                            </TooltipContent>
+                                                        </Tooltip>
+                                                    </TooltipProvider>
                                                 )}
-                                                <button
-                                                    type="button"
-                                                    onClick={() => onSocialAccounts(actor)}
-                                                    className="text-muted-foreground hover:text-primary transition-colors"
-                                                    title={`Edit ${meta.label} profile link`}
-                                                >
-                                                    <Pencil className="size-3.5" />
-                                                </button>
+                                                <TooltipProvider delayDuration={150}>
+                                                    <Tooltip>
+                                                        <TooltipTrigger asChild>
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => onSocialAccounts(actor)}
+                                                                className="inline-flex size-7 items-center justify-center rounded-lg border border-border/40 bg-muted/40 text-muted-foreground shadow-xs transition-all hover:scale-105 hover:border-border hover:bg-muted/80 hover:text-foreground active:scale-95 cursor-pointer"
+                                                                title={`Edit ${meta.label} profile link`}
+                                                                aria-label={`Edit ${meta.label} profile link`}
+                                                            >
+                                                                <Pencil className="size-3.5" />
+                                                            </button>
+                                                        </TooltipTrigger>
+                                                        <TooltipContent side="top">
+                                                            <p className="text-xs">{t('influencers.updateMetrics') || `Edit ${meta.label}`}</p>
+                                                        </TooltipContent>
+                                                    </Tooltip>
+                                                </TooltipProvider>
                                             </div>
                                         </div>
                                         <div className="flex items-baseline gap-1">
@@ -620,12 +681,32 @@ export const ActorCard = ({ actor, onEdit, onSocialAccounts, onDetail, onDelete,
                             </div>
 
                             {(actor.bank_account_name || actor.bank_account_number) && (
-                                <div>
-                                    <h3 className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-1">{t('influencers.bankAccount')}</h3>
-                                    <div className="text-xs">
-                                        {actor.bank_account_name && <div className="font-semibold text-foreground">{actor.bank_account_name}</div>}
+                                <div className="rounded-xl border border-border/50 bg-muted/20 p-3 transition-colors hover:bg-muted/30">
+                                    <div className="flex items-center justify-between mb-1.5">
+                                        <h3 className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-1.5">
+                                            <Banknote className="size-3.5 text-emerald-500" />
+                                            {t('influencers.bankAccount')}
+                                        </h3>
                                         {actor.bank_account_number && (
-                                            <div className="font-mono text-muted-foreground mt-0.5 tracking-wider">{actor.bank_account_number}</div>
+                                            <button
+                                                type="button"
+                                                onClick={(e) => handleCopyBankAccount(e, actor.bank_account_number)}
+                                                className="inline-flex items-center gap-1 text-[10px] font-medium text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+                                                title="Copy bank account number"
+                                            >
+                                                {copiedBank ? <Check className="size-3 text-emerald-500" /> : <Copy className="size-3" />}
+                                                <span>{copiedBank ? t('common:copied') : t('common:copy')}</span>
+                                            </button>
+                                        )}
+                                    </div>
+                                    <div className="text-xs space-y-0.5">
+                                        {actor.bank_account_name && (
+                                            <div className="font-semibold text-foreground tracking-tight">{actor.bank_account_name}</div>
+                                        )}
+                                        {actor.bank_account_number && (
+                                            <div className="font-mono text-xs text-muted-foreground font-medium tracking-wider">
+                                                {actor.bank_account_number}
+                                            </div>
                                         )}
                                     </div>
                                 </div>
@@ -636,7 +717,9 @@ export const ActorCard = ({ actor, onEdit, onSocialAccounts, onDetail, onDelete,
 
                 {/* Footer Section */}
                 <div className="mt-8 flex items-center justify-between border-t border-border/40 pt-5">
-                    <div className="text-xs font-medium text-muted-foreground/60 uppercase tracking-widest">{t('influencers.addedOn', { date: formatDate(actor.created_at) })}</div>
+                    <div className="text-xs font-medium text-muted-foreground/60 uppercase tracking-widest">
+                        {t('influencers.addedOn', { date: formatDate(actor.created_at) })}
+                    </div>
 
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
