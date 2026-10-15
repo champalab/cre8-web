@@ -30,7 +30,7 @@ const LoadingSkeleton = () => (
     </div>
 )
 
-const ErrorState: React.FC<{ message: string, onRetry: () => void }> = ({ message, onRetry }) => {
+const ErrorState: React.FC<{ message: string; onRetry: () => void }> = ({ message, onRetry }) => {
     const { t } = useTranslation('app')
     return (
         <div className="min-h-screen flex flex-col items-center justify-center text-center p-6 bg-slate-50 dark:bg-[#0B1120]">
@@ -39,7 +39,10 @@ const ErrorState: React.FC<{ message: string, onRetry: () => void }> = ({ messag
             </div>
             <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">{t('publicCampaign.failedToLoad')}</h2>
             <p className="text-slate-500 mb-6 max-w-md">{message}</p>
-            <button onClick={onRetry} className="px-6 py-2 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-xl font-medium hover:opacity-90 transition-opacity">
+            <button
+                onClick={onRetry}
+                className="px-6 py-2 bg-slate-900 dark:bg-white text-black dark:text-slate-900 rounded-xl font-medium hover:opacity-90 transition-opacity"
+            >
                 {t('publicCampaign.tryAgain')}
             </button>
         </div>
@@ -88,89 +91,89 @@ const CampaignPerformancePage = () => {
     }
 
     const handleExportPDF = async () => {
-        const element = document.getElementById('campaign-report-content');
-        if (!element) return;
-        setIsExporting(true);
+        const element = document.getElementById('campaign-report-content')
+        if (!element) return
+        setIsExporting(true)
         // Wait for React to apply pdf-export-mode classes
-        await new Promise(resolve => setTimeout(resolve, 300));
-        
+        await new Promise((resolve) => setTimeout(resolve, 300))
+
         try {
             const canvas = await toCanvas(element, {
                 cacheBust: true,
                 pixelRatio: 2,
                 filter: (node) => {
                     if (node.nodeType === 1) {
-                        const el = node as HTMLElement;
+                        const el = node as HTMLElement
                         if (el.getAttribute('data-html2canvas-ignore') === 'true') {
-                            return false;
+                            return false
                         }
                     }
-                    return true;
+                    return true
                 }
-            });
+            })
 
-            const pdf = new jsPDF('p', 'mm', 'a4');
-            const pdfWidth = pdf.internal.pageSize.getWidth();
-            const pdfHeight = pdf.internal.pageSize.getHeight();
-            
-            const pxToMm = pdfWidth / canvas.width;
-            const mmToPx = canvas.width / pdfWidth;
-            const pagePxHeight = pdfHeight * mmToPx;
+            const pdf = new jsPDF('p', 'mm', 'a4')
+            const pdfWidth = pdf.internal.pageSize.getWidth()
+            const pdfHeight = pdf.internal.pageSize.getHeight()
 
-            const elements = Array.from(element.querySelectorAll('.pdf-avoid-break'));
-            const parentRect = element.getBoundingClientRect();
-            const breakPoints = elements.map(el => {
-                const rect = el.getBoundingClientRect();
+            const pxToMm = pdfWidth / canvas.width
+            const mmToPx = canvas.width / pdfWidth
+            const pagePxHeight = pdfHeight * mmToPx
+
+            const elements = Array.from(element.querySelectorAll('.pdf-avoid-break'))
+            const parentRect = element.getBoundingClientRect()
+            const breakPoints = elements.map((el) => {
+                const rect = el.getBoundingClientRect()
                 return {
                     top: (rect.top - parentRect.top) * 2,
                     bottom: (rect.bottom - parentRect.top) * 2
-                };
-            });
+                }
+            })
 
-            let currentY = 0;
-            let pageNum = 0;
+            let currentY = 0
+            let pageNum = 0
 
             while (currentY < canvas.height) {
-                let targetBottom = currentY + pagePxHeight;
-                
+                let targetBottom = currentY + pagePxHeight
+
                 if (targetBottom >= canvas.height) {
-                    targetBottom = canvas.height;
+                    targetBottom = canvas.height
                 } else {
                     for (const bp of breakPoints) {
                         if (bp.top < targetBottom && bp.bottom > targetBottom) {
                             if (bp.top > currentY) {
-                                targetBottom = bp.top;
+                                targetBottom = bp.top
                             }
-                            break;
+                            break
                         }
                     }
                 }
 
-                const sliceHeight = targetBottom - currentY;
-                const tempCanvas = document.createElement('canvas');
-                tempCanvas.width = canvas.width;
-                tempCanvas.height = sliceHeight;
-                const tempCtx = tempCanvas.getContext('2d');
+                const sliceHeight = targetBottom - currentY
+                const tempCanvas = document.createElement('canvas')
+                tempCanvas.width = canvas.width
+                tempCanvas.height = sliceHeight
+                const tempCtx = tempCanvas.getContext('2d')
                 if (tempCtx) {
-                    tempCtx.drawImage(canvas, 0, currentY, canvas.width, sliceHeight, 0, 0, canvas.width, sliceHeight);
-                    const imgData = tempCanvas.toDataURL('image/jpeg', 0.95);
-                    
+                    tempCtx.drawImage(canvas, 0, currentY, canvas.width, sliceHeight, 0, 0, canvas.width, sliceHeight)
+                    const imgData = tempCanvas.toDataURL('image/jpeg', 0.95)
+
                     if (pageNum > 0) {
-                        pdf.addPage();
+                        pdf.addPage()
                     }
-                    const mmSliceHeight = sliceHeight * pxToMm;
-                    pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, mmSliceHeight);
+                    const mmSliceHeight = sliceHeight * pxToMm
+                    pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, mmSliceHeight)
                 }
 
-                currentY = targetBottom;
-                pageNum++;
+                currentY = targetBottom
+                pageNum++
             }
 
-            pdf.save(`campaign-report-${slug || 'export'}.pdf`);
+            pdf.save(`campaign-report-${slug || 'export'}.pdf`)
         } catch (error) {
-            console.error("Failed to generate PDF", error);
+            console.error('Failed to generate PDF', error)
         } finally {
-            setIsExporting(false);
+            setIsExporting(false)
         }
     }
 
@@ -189,7 +192,10 @@ const CampaignPerformancePage = () => {
     })
 
     return (
-        <div id="campaign-report-content" className={`min-h-screen bg-slate-50 dark:bg-[#0B1120] text-slate-900 dark:text-slate-50 font-sans selection:bg-indigo-500/30 pb-16 ${isExporting ? 'pdf-export-mode' : ''}`}>
+        <div
+            id="campaign-report-content"
+            className={`min-h-screen bg-slate-50 dark:bg-[#0B1120] text-slate-900 dark:text-slate-50 font-sans selection:bg-indigo-500/30 pb-16 ${isExporting ? 'pdf-export-mode' : ''}`}
+        >
             <div className="pdf-avoid-break">
                 <CampaignBanner campaign={data} loading={loading} onRefresh={loadData} onExportPDF={handleExportPDF} isExporting={isExporting} />
             </div>

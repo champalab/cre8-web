@@ -7,8 +7,8 @@ const formatViews = (value: number) => new Intl.NumberFormat('en-US').format(Num
 export const KPICards: React.FC<{ campaign: CampaignPerformanceData }> = ({ campaign }) => {
     const { t } = useTranslation('app')
 
-    const fbCount = campaign.views_by_platform.find(p => p.platform_name.toLowerCase() === 'facebook')?.count || 0
-    const tkCount = campaign.views_by_platform.find(p => p.platform_name.toLowerCase() === 'tiktok')?.count || 0
+    const fbCount = campaign.views_by_platform.find((p) => p.platform_name.toLowerCase() === 'facebook')?.count || 0
+    const tkCount = campaign.views_by_platform.find((p) => p.platform_name.toLowerCase() === 'tiktok')?.count || 0
 
     const total = campaign.total_views || 1 // prevent div by zero
     const fbPct = (fbCount / total) * 100
@@ -17,7 +17,6 @@ export const KPICards: React.FC<{ campaign: CampaignPerformanceData }> = ({ camp
     return (
         <section className="px-6 mb-12 max-w-7xl mx-auto">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-
                 {/* KPI 1: Total Views */}
                 <div className="relative bg-gradient-to-br from-indigo-600 to-indigo-800 p-5 rounded-2xl shadow-lg hover:shadow-xl transition-all border border-indigo-500/50 flex flex-col justify-between overflow-hidden group text-white">
                     <div className="absolute -right-12 -top-12 w-32 h-32 rounded-full bg-white/10 blur-2xl pointer-events-none group-hover:scale-150 transition-transform duration-700"></div>
@@ -55,7 +54,9 @@ export const KPICards: React.FC<{ campaign: CampaignPerformanceData }> = ({ camp
                                 Facebook Reel
                             </span>
                         </div>
-                        <div className="text-[11px] text-slate-500 uppercase tracking-wider font-lao">{fbPct.toFixed(1)}% {t('publicCampaign.platformShare')}</div>
+                        <div className="text-[11px] text-slate-500 uppercase tracking-wider font-lao">
+                            {fbPct.toFixed(1)}% {t('publicCampaign.platformShare')}
+                        </div>
                         <div className="text-3xl text-slate-900 dark:text-white mt-1.5 tracking-tight font-extrabold" title={formatViews(fbCount)}>
                             {fbCount?.toLocaleString()}
                         </div>
@@ -72,11 +73,13 @@ export const KPICards: React.FC<{ campaign: CampaignPerformanceData }> = ({ camp
                     <div>
                         <div className="flex items-center justify-between mb-2 font-lao">
                             <span className="text-sm text-slate-600 dark:text-slate-400 font-semibold">{t('publicCampaign.tiktokViews')}</span>
-                            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900 text-[11px] font-semibold">
+                            <span className="inline-flex text-black dark:text-black items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-slate-900 dark:bg-slate-100 dark:text-slate-900 text-[11px] font-semibold">
                                 TikTok Video
                             </span>
                         </div>
-                        <div className="text-[11px] text-slate-500 uppercase tracking-wider font-lao">{tkPct.toFixed(1)}% {t('publicCampaign.platformShare')}</div>
+                        <div className="text-[11px] text-slate-500 uppercase tracking-wider font-lao">
+                            {tkPct.toFixed(1)}% {t('publicCampaign.platformShare')}
+                        </div>
                         <div className="text-3xl text-slate-900 dark:text-white mt-1.5 tracking-tight font-extrabold" title={formatViews(tkCount)}>
                             {tkCount?.toLocaleString()}
                         </div>
@@ -86,8 +89,6 @@ export const KPICards: React.FC<{ campaign: CampaignPerformanceData }> = ({ camp
                         <span className="text-[11px] text-teal-600 dark:text-teal-400 font-bold">{t('publicCampaign.growing')}</span>
                     </div>
                 </div>
-
-
             </div>
         </section>
     )
