@@ -9,6 +9,7 @@ import { CampaignBanner } from './components/CampaignBanner'
 import { KPICards } from './components/KPICards'
 import { InfluencerCard } from './components/InfluencerCard'
 import { InsightsSidebar } from './components/InsightsSidebar'
+import { ImagePreviewDialog } from './components/ImagePreviewDialog'
 import { toCanvas } from 'html-to-image'
 import { jsPDF } from 'jspdf'
 
@@ -71,6 +72,7 @@ const CampaignPerformancePage = () => {
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
     const [isExporting, setIsExporting] = useState(false)
+    const [previewImage, setPreviewImage] = useState<{ url: string; name: string } | null>(null)
 
     const loadData = async () => {
         if (!slug) return
@@ -232,6 +234,7 @@ const CampaignPerformancePage = () => {
                                         rank={idx + 1}
                                         totalCampaignViews={data.total_views}
                                         viewsByPlatform={data.views_by_platform}
+                                        onPreviewImage={setPreviewImage}
                                     />
                                 </div>
                             ))}
@@ -244,6 +247,17 @@ const CampaignPerformancePage = () => {
                     <InsightsSidebar campaign={data} />
                 </div>
             </div>
+
+            {/* Image Preview Modal */}
+            <ImagePreviewDialog
+                open={Boolean(previewImage)}
+                onOpenChange={(open) => {
+                    if (!open) setPreviewImage(null)
+                }}
+                src={previewImage?.url}
+                title={previewImage?.name}
+                subtitle={previewImage?.name ? `@${previewImage.name.replace(/\s+/g, '').toLowerCase()}` : undefined}
+            />
         </div>
     )
 }

@@ -1,8 +1,9 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import SafeImage from '@/components/ui/SafeImage'
 import { CampaignInfluencer } from '../campaign.api'
-import { Users, TrendingUp, Smartphone } from 'lucide-react'
+import { Users, TrendingUp, Smartphone, Maximize2 } from 'lucide-react'
+import { ImagePreviewDialog } from './ImagePreviewDialog'
 
 const Facebook = (props: React.SVGProps<SVGSVGElement>) => (
     <svg
@@ -36,17 +37,37 @@ const resolveImageUrl = (url: string | null | undefined) => {
     return `${(import.meta.env.VITE_APP_API_PATH || '').replace('/v1', '')}${url}`
 }
 
-export const InfluencerCard: React.FC<{
+export interface InfluencerCardProps {
     influencer: CampaignInfluencer
     rank: number
     totalCampaignViews: number
     viewsByPlatform: { platform_name: string; count: number }[]
-}> = ({ influencer, rank, totalCampaignViews }) => {
+    onPreviewImage?: (data: { url: string; name: string }) => void
+}
+
+export const InfluencerCard: React.FC<InfluencerCardProps> = ({
+    influencer,
+    rank,
+    totalCampaignViews,
+    onPreviewImage
+}) => {
     const { t } = useTranslation('app')
+    const [localPreviewOpen, setLocalPreviewOpen] = useState(false)
+
     const totalViews = influencer.campaign_post_links.reduce((sum, p) => sum + Number(p.count || 0), 0)
     const percentage = totalCampaignViews > 0 ? (totalViews / totalCampaignViews) * 100 : 0
 
     const isTop1 = rank === 1
+    const imageUrl = resolveImageUrl(influencer.profile_url)
+
+    const handleImageClick = () => {
+        if (!imageUrl) return
+        if (onPreviewImage) {
+            onPreviewImage({ url: imageUrl, name: influencer.actor_name })
+        } else {
+            setLocalPreviewOpen(true)
+        }
+    }
 
     return (
         <article
@@ -64,13 +85,27 @@ export const InfluencerCard: React.FC<{
                         >
                             <div className="w-full h-full rounded-[22px] overflow-hidden bg-slate-100 dark:bg-slate-900 relative">
                                 {influencer.profile_url ? (
-                                    <SafeImage
-                                        src={resolveImageUrl(influencer.profile_url)}
-                                        alt={influencer.actor_name}
-                                        variant="avatar"
-                                        fallbackName={influencer.actor_name}
-                                        className="w-full h-full object-cover"
-                                    />
+                                    <button
+                                        type="button"
+                                        onClick={handleImageClick}
+                                        aria-label={t('publicCampaign.previewImage', 'ເບິ່ງຮູບຂະໜາດໃຫຍ່')}
+                                        title={t('publicCampaign.clickToEnlarge', 'ຄລິກເພື່ອເບິ່ງຮູບໃຫຍ່')}
+                                        className="w-full h-full block relative group/avatar cursor-zoom-in text-left focus:outline-none focus:ring-2 focus:ring-indigo-500 rounded-[22px] overflow-hidden"
+                                    >
+                                        <SafeImage
+                                            src={imageUrl}
+                                            alt={influencer.actor_name}
+                                            variant="avatar"
+                                            fallbackName={influencer.actor_name}
+                                            className="w-full h-full object-cover transition-transform duration-500 group-hover/avatar:scale-110"
+                                        />
+                                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/avatar:opacity-100 transition-opacity duration-200 flex flex-col items-center justify-center text-white gap-1 backdrop-blur-[1px]">
+                                            <Maximize2 className="w-6 h-6 drop-shadow-md text-white" />
+                                            <span className="text-[10px] font-semibold tracking-wide drop-shadow font-lao">
+                                                {t('publicCampaign.clickToEnlarge', 'ເບິ່ງຮູບໃຫຍ່')}
+                                            </span>
+                                        </div>
+                                    </button>
                                 ) : (
                                     <div className="w-full h-full flex items-center justify-center text-slate-400">
                                         <Users className="w-12 h-12" />
@@ -200,6 +235,16 @@ export const InfluencerCard: React.FC<{
                     })}
                 </div>
             </div>
+
+            {!onPreviewImage && (
+                <ImagePreviewDialog
+                    open={localPreviewOpen}
+                    onOpenChange={setLocalPreviewOpen}
+                    src={imageUrl}
+                    title={influencer.actor_name}
+                    subtitle={`@${influencer.actor_name.replace(/\s+/g, '').toLowerCase()}`}
+                />
+            )}
         </article>
     )
 }

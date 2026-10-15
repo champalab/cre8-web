@@ -728,7 +728,15 @@
     "attribution": "ຄວາມຖືກຕ້ອງ (Attribution): {{percentage}}%",
     "verifiedData": "ຂໍ້ມູນທີ່ໄດ້ຮັບການຢືນຢັນແລ້ວ",
     "exporting": "ກຳລັງໂຫຼດ PDF...",
-    "exportPDF": "ດາວໂຫຼດ PDF"
+    "exportPDF": "ດາວໂຫຼດ PDF",
+    "clickToEnlarge": "ຄລິກເພື່ອເບິ່ງຮູບໃຫຍ່",
+    "previewImage": "ເບິ່ງຮູບຂະໜາດໃຫຍ່",
+    "close": "ປິດ",
+    "download": "ດາວໂຫຼດ",
+    "openOriginal": "ເປີດຮູບຕົ້ນສະບັບ",
+    "zoomIn": "ຊູມເຂົ້າ",
+    "zoomOut": "ຊູມອອກ",
+    "escToClose": "ກົດ ESC ຫຼື ຄລິກພາຍນອກເພື່ອປິດ"
   },
   "postLinksDialog": {
     "title": "ລິ້ງໂພສອິນຟລູເອັນເຊີ",

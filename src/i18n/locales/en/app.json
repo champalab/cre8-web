@@ -728,7 +728,15 @@
     "attribution": "Attribution: {{percentage}}%",
     "verifiedData": "Verified Data",
     "exporting": "Exporting PDF...",
-    "exportPDF": "Export PDF"
+    "exportPDF": "Export PDF",
+    "clickToEnlarge": "Click to view full image",
+    "previewImage": "Preview Image",
+    "close": "Close",
+    "download": "Download",
+    "openOriginal": "Open original",
+    "zoomIn": "Zoom In",
+    "zoomOut": "Zoom Out",
+    "escToClose": "Press ESC or click outside to close"
   },
   "postLinksDialog": {
     "title": "Influencer Post Links",
