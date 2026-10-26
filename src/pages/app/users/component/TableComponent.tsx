@@ -3,14 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { User, UserCreate } from '../type'
 import UserModal from './UserModal'
 import { Card } from '@/components/ui/card'
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from '@/components/ui/table'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 
 interface Props {
     data: User[]
@@ -19,7 +12,7 @@ interface Props {
 }
 
 export default function TableComponent({ data, refetch, onUpdate }: Props): ReactElement {
-    const { t } = useTranslation('app')
+    const { t } = useTranslation(['app', 'auth'])
     return (
         <Card className="my-4">
             <div className="max-h-[75vh] overflow-auto">
@@ -41,26 +34,22 @@ export default function TableComponent({ data, refetch, onUpdate }: Props): Reac
                             <TableRow key={row.id}>
                                 <TableCell>{(row as any).indexNo ?? index + 1}</TableCell>
                                 <TableCell>
-                                    <span className="text-sm">[{row.id}] {row.name}</span>
+                                    <span className="text-sm">
+                                        [{row.id}] {row.name}
+                                    </span>
                                 </TableCell>
                                 <TableCell>{(row as any).email}</TableCell>
                                 <TableCell>{(row as any).tel ?? '—'}</TableCell>
                                 <TableCell>{row.role}</TableCell>
                                 <TableCell>{(row as any).comments ?? '—'}</TableCell>
                                 <TableCell>
-                                    {row.status === 'ACTIVE' ? (
-                                        <span className="text-green-600">✅ {t('users.active')}</span>
-                                    ) : (
-                                        <span className="text-red-600">🚫 {t('users.inactive')}</span>
-                                    )}
+                                    <span className="text-green-600">
+                                        {row.status === 'ACTIVE' ? '✅ ' : '🚫 '}
+                                        {t(`auth:${row.status.toLocaleLowerCase()}`)}
+                                    </span>
                                 </TableCell>
                                 <TableCell>
-                                    <UserModal
-                                        mode="update"
-                                        onSubmit={onUpdate}
-                                        refetch={refetch}
-                                        initialValues={row}
-                                    />
+                                    <UserModal mode="update" onSubmit={onUpdate} refetch={refetch} initialValues={row} />
                                 </TableCell>
                             </TableRow>
                         ))}

@@ -49,6 +49,8 @@ export interface UserCreate {
 
 export interface Filter {
     keyword: string | null
+    role?: Role | 'ALL' | string | null
+    status?: string | 'ALL' | null
 }
 
 
@@ -60,6 +62,10 @@ export interface Customer {
     customer_code: string
     full_name?: string
     company_name: string
+    brand_name?: string | null
+    business_type?: string | null
+    website?: string | null
+    address?: string | null
     email?: string | null
     company_email?: string | null
     phone?: string | null
@@ -69,7 +75,7 @@ export interface Customer {
     status: string
     country?: string | null
     province?: string | null
-
+    password?: string
 }
 
 export interface CustomerListResponse {

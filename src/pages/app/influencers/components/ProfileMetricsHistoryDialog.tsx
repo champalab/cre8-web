@@ -93,6 +93,7 @@ export function ProfileMetricsHistoryDialog({ actor, account, open, onOpenChange
                                 <TableHead>{t('influencers.historyDate')}</TableHead>
                                 <TableHead>{t('influencers.followers')}</TableHead>
                                 <TableHead>{t('influencers.following')}</TableHead>
+                                <TableHead>{t('influencers.likes')}</TableHead>
                                 <TableHead>{t('influencers.historySource')}</TableHead>
                                 <TableHead>{t('influencers.historyStatus')}</TableHead>
                             </TableRow>
@@ -100,7 +101,7 @@ export function ProfileMetricsHistoryDialog({ actor, account, open, onOpenChange
                         <TableBody>
                             {(isLoading || isFetching) && rows.length === 0 ? (
                                 <TableRow>
-                                        <TableCell colSpan={5} className="py-10 text-center text-muted-foreground">
+                                        <TableCell colSpan={6} className="py-10 text-center text-muted-foreground">
                                             <span className="inline-flex items-center gap-2">
                                                 <Loader2 className="size-4 animate-spin" />
                                                 {t('influencers.historyLoading')}
@@ -119,6 +120,9 @@ export function ProfileMetricsHistoryDialog({ actor, account, open, onOpenChange
                                     </TableCell>
                                     <TableCell className="tabular-nums">
                                         {formatCount(row.following_count)}
+                                    </TableCell>
+                                    <TableCell className="tabular-nums font-medium">
+                                        {formatCount(row.like_count)}
                                     </TableCell>
                                     <TableCell>
                                         <Badge variant="outline">{row.source}</Badge>
@@ -159,7 +163,7 @@ export function ProfileMetricsHistoryDialog({ actor, account, open, onOpenChange
 
                             {!isLoading && !isFetching && rows.length === 0 ? (
                                 <TableRow>
-                                        <TableCell colSpan={5} className="py-10 text-center text-muted-foreground">
+                                        <TableCell colSpan={6} className="py-10 text-center text-muted-foreground">
                                              {t('influencers.historyEmpty')}
                                          </TableCell>
                                 </TableRow>

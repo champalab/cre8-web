@@ -1,17 +1,6 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import {
-    BarChart3,
-    ExternalLink,
-    ImageOff,
-    Link2,
-    Mail,
-    Pencil,
-    Phone,
-    User,
-    UserPlus,
-    Users,
-} from 'lucide-react'
+import { Banknote, BarChart3, ExternalLink, ImageOff, Link2, Mail, Pencil, Phone, User, UserPlus, Users } from 'lucide-react'
 
 import { Actor, useGetActorByIdQuery } from '@/stores/services/actorApi'
 import BackdropComponent from '@/components/BackdropComponent'
@@ -21,22 +10,8 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-} from '@/components/ui/dialog'
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from '@/components/ui/table'
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { formatDate, formatDateTime } from '@/utils/datetime'
 
 const formatFollowers = (value: string | number | null | undefined) => {
@@ -46,8 +21,7 @@ const formatFollowers = (value: string | number | null | undefined) => {
     return num.toLocaleString()
 }
 
-const getActorStatus = (status?: string | null) =>
-    status === 'INACTIVE' ? 'INACTIVE' : 'ACTIVE'
+const getActorStatus = (status?: string | null) => (status === 'INACTIVE' ? 'INACTIVE' : 'ACTIVE')
 
 const actorStatusClass = (status?: string | null) =>
     getActorStatus(status) === 'ACTIVE'
@@ -90,27 +64,18 @@ function GalleryImageItem({ url, index }: { url: string; index: number }) {
     )
 }
 
-
-
-
 export function ActorDetailDialog({ actor, open, onOpenChange, onEdit, onSocialAccounts }: Props) {
     const { t } = useTranslation('app')
     const { data, isLoading, isFetching } = useGetActorByIdQuery(actor?.id ?? 0, {
-        skip: !open || !actor?.id,
+        skip: !open || !actor?.id
     })
 
     const detail: Actor | null = data?.data ?? actor
     const socialAccounts = detail?.influencer_social_accounts ?? []
     const hasFollowerData = socialAccounts.some((account) => account.follower_count != null)
     const hasFollowingData = socialAccounts.some((account) => account.following_count != null)
-    const totalFollowers = socialAccounts.reduce(
-        (sum, account) => sum + Number(account.follower_count || 0),
-        0
-    )
-    const totalFollowing = socialAccounts.reduce(
-        (sum, account) => sum + Number(account.following_count || 0),
-        0
-    )
+    const totalFollowers = socialAccounts.reduce((sum, account) => sum + Number(account.follower_count || 0), 0)
+    const totalFollowing = socialAccounts.reduce((sum, account) => sum + Number(account.following_count || 0), 0)
 
     return (
         <>
@@ -120,9 +85,7 @@ export function ActorDetailDialog({ actor, open, onOpenChange, onEdit, onSocialA
                 <DialogContent className="max-h-[92vh] w-[calc(100vw-2rem)] max-w-4xl overflow-y-auto p-0 sm:w-full">
                     <DialogHeader>
                         <DialogTitle className="sr-only">{t('influencers.profileTitle')}</DialogTitle>
-                        <DialogDescription className="sr-only">
-                            {t('influencers.profileInformation')}
-                        </DialogDescription>
+                        <DialogDescription className="sr-only">{t('influencers.profileInformation')}</DialogDescription>
                     </DialogHeader>
 
                     {detail && (
@@ -137,26 +100,19 @@ export function ActorDetailDialog({ actor, open, onOpenChange, onEdit, onSocialA
                                         </AvatarFallback>
                                     </Avatar>
                                     <div className="flex-1 text-center sm:text-left">
-                                        <p className="mb-1 text-xs font-semibold uppercase tracking-[0.18em] text-primary">
-                                            {t('influencers.profileTitle')}
-                                        </p>
+                                        <p className="mb-1 text-xs font-semibold uppercase tracking-[0.18em] text-primary">{t('influencers.profileTitle')}</p>
                                         <h2 className="text-2xl font-bold tracking-tight">{detail.name}</h2>
                                         <p className="mt-1 break-all text-xs text-muted-foreground">
                                             Actor #{detail.id} · {detail.uuid}
                                         </p>
                                         <div className="mt-3 flex flex-wrap justify-center gap-2 sm:justify-start">
-                                            <Badge
-                                                variant="outline"
-                                                className={`font-bold uppercase ${actorStatusClass(detail.status)}`}
-                                            >
+                                            <Badge variant="outline" className={`font-bold uppercase ${actorStatusClass(detail.status)}`}>
                                                 {getActorStatus(detail.status)}
                                             </Badge>
                                             <Badge variant={detail.users ? 'default' : 'outline'}>
                                                 {detail.users ? t('influencers.loginStatus', { status: detail.users.status }) : t('influencers.noUserAccount')}
                                             </Badge>
-                                            <Badge variant="outline">
-                                                {t('influencers.linkedPlatforms', { count: socialAccounts.length })}
-                                            </Badge>
+                                            <Badge variant="outline">{t('influencers.linkedPlatforms', { count: socialAccounts.length })}</Badge>
                                         </div>
                                     </div>
                                 </div>
@@ -167,9 +123,7 @@ export function ActorDetailDialog({ actor, open, onOpenChange, onEdit, onSocialA
                                     <CardContent className="p-3 sm:p-4">
                                         <BarChart3 className="mb-2 size-5 text-primary" />
                                         <p className="text-[11px] text-muted-foreground sm:text-xs">{t('influencers.platforms')}</p>
-                                        <p className="text-xl font-bold tabular-nums sm:text-2xl">
-                                            {socialAccounts.length}
-                                        </p>
+                                        <p className="text-xl font-bold tabular-nums sm:text-2xl">{socialAccounts.length}</p>
                                     </CardContent>
                                 </Card>
                                 <Card className="border-sky-500/15 bg-gradient-to-br from-sky-500/10 to-background">
@@ -214,10 +168,7 @@ export function ActorDetailDialog({ actor, open, onOpenChange, onEdit, onSocialA
                                         label={t('common:phone')}
                                         value={
                                             detail.phone_number ? (
-                                                <a
-                                                    href={`tel:${detail.phone_number}`}
-                                                    className="inline-flex items-center gap-2 text-primary hover:underline"
-                                                >
+                                                <a href={`tel:${detail.phone_number}`} className="inline-flex items-center gap-2 text-primary hover:underline">
                                                     <Phone className="size-4" />
                                                     {detail.phone_number}
                                                 </a>
@@ -247,10 +198,7 @@ export function ActorDetailDialog({ actor, open, onOpenChange, onEdit, onSocialA
                                     <DetailField
                                         label={t('influencers.statusLabel')}
                                         value={
-                                            <Badge
-                                                variant="outline"
-                                                className={`font-bold uppercase ${actorStatusClass(detail.status)}`}
-                                            >
+                                            <Badge variant="outline" className={`font-bold uppercase ${actorStatusClass(detail.status)}`}>
                                                 {getActorStatus(detail.status)}
                                             </Badge>
                                         }
@@ -276,7 +224,6 @@ export function ActorDetailDialog({ actor, open, onOpenChange, onEdit, onSocialA
                                 </Card>
                             )}
 
-
                             {detail.users && (
                                 <Card className="mx-4 sm:mx-6">
                                     <CardHeader className="pb-3">
@@ -294,7 +241,31 @@ export function ActorDetailDialog({ actor, open, onOpenChange, onEdit, onSocialA
                                 </Card>
                             )}
 
-                            <Card className="mx-4 overflow-hidden border-primary/15 sm:mx-6">
+                            {(detail.bank_account_name || detail.bank_account_number) && (
+                                <Card className="mx-4 sm:mx-6 border-emerald-500/20 bg-gradient-to-br from-emerald-500/5 to-background">
+                                    <CardHeader className="pb-3">
+                                        <CardTitle className="flex items-center gap-2 text-base">
+                                            <Banknote className="size-4 text-emerald-500" />
+                                            {t('influencers.bankAccount')}
+                                        </CardTitle>
+                                    </CardHeader>
+                                    <CardContent className="grid gap-3 sm:grid-cols-2">
+                                        <DetailField label={t('influencers.accountName')} value={detail.bank_account_name || '—'} />
+                                        <DetailField
+                                            label={t('influencers.accountNumber')}
+                                            value={
+                                                detail.bank_account_number ? (
+                                                    <span className="font-mono font-medium tracking-wider text-foreground">{detail.bank_account_number}</span>
+                                                ) : (
+                                                    '—'
+                                                )
+                                            }
+                                        />
+                                    </CardContent>
+                                </Card>
+                            )}
+
+                            <Card className="mx-4 overflow-hidden border-primary/15 md:mx-4">
                                 <CardHeader className="pb-3">
                                     <CardTitle className="flex items-center gap-2 text-base">
                                         <span className="flex size-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
@@ -306,7 +277,7 @@ export function ActorDetailDialog({ actor, open, onOpenChange, onEdit, onSocialA
                                 <CardContent className="p-0 pb-4">
                                     {socialAccounts.length > 0 ? (
                                         <>
-                                            <div className="grid gap-3 px-4 sm:grid-cols-2 lg:grid-cols-3">
+                                            <div className="grid gap-3 px-4 sm:grid-cols-2 md:grid-cols-2 ">
                                                 {socialAccounts.map((account) => (
                                                     <div
                                                         key={account.uuid}
@@ -318,32 +289,34 @@ export function ActorDetailDialog({ actor, open, onOpenChange, onEdit, onSocialA
                                                                     {account.platform.slice(0, 2)}
                                                                 </span>
                                                                 <div className="min-w-0">
-                                                                    <p className="font-semibold capitalize">
-                                                                        {account.platform}
-                                                                    </p>
+                                                                    <p className="font-semibold capitalize">{account.platform}</p>
                                                                     <p className="truncate text-xs text-muted-foreground">
                                                                         {account.handle || t('influencers.noHandle')}
                                                                     </p>
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                        <div className="mt-4 grid grid-cols-2 gap-2">
+                                                        <div
+                                                            className={`mt-4 grid ${account.like_count != null || account.platform.toLowerCase() === 'tiktok' ? 'grid-cols-3' : 'grid-cols-2'} gap-2`}
+                                                        >
                                                             <div className="rounded-lg bg-background/80 p-2.5">
-                                                                <p className="text-xs text-muted-foreground">
-                                                                    {t('influencers.followers')}
-                                                                </p>
-                                                                <p className="mt-1 text-lg font-bold tabular-nums">
-                                                                    {formatFollowers(account.follower_count)}
-                                                                </p>
+                                                                <p className="text-xs text-muted-foreground">{t('influencers.followers')}</p>
+                                                                <p className="mt-1 text-lg font-bold tabular-nums">{formatFollowers(account.follower_count)}</p>
                                                             </div>
                                                             <div className="rounded-lg bg-background/80 p-2.5">
-                                                                <p className="text-xs text-muted-foreground">
-                                                                    {t('influencers.following')}
-                                                                </p>
+                                                                <p className="text-xs text-muted-foreground">{t('influencers.following')}</p>
                                                                 <p className="mt-1 text-lg font-bold tabular-nums">
                                                                     {formatFollowers(account.following_count)}
                                                                 </p>
                                                             </div>
+                                                            {(account.like_count != null || account.platform.toLowerCase() === 'tiktok') && (
+                                                                <div className="rounded-lg bg-background/80 p-2.5">
+                                                                    <p className="text-xs text-muted-foreground">{t('influencers.likes')}</p>
+                                                                    <p className="mt-1 text-lg font-bold tabular-nums text-rose-500">
+                                                                        {formatFollowers(account.like_count)}
+                                                                    </p>
+                                                                </div>
+                                                            )}
                                                         </div>
                                                         <p className="mt-3 text-[11px] text-muted-foreground">
                                                             {t('influencers.syncedAt', { date: formatDateTime(account.last_scraped_at) })}
@@ -364,8 +337,8 @@ export function ActorDetailDialog({ actor, open, onOpenChange, onEdit, onSocialA
                                                             <a
                                                                 href={account.profile_url}
                                                                 target="_blank"
-                                                                rel="noreferrer"
-                                                                className="mt-2 inline-flex items-center gap-1 break-all text-xs text-primary hover:underline"
+                                                                rel="noopener noreferrer"
+                                                                className="mt-3 inline-flex items-center gap-1.5 rounded-lg border border-primary/25 bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary hover:bg-primary/20 transition-colors w-fit"
                                                             >
                                                                 <ExternalLink className="size-3" />
                                                                 {t('influencers.profileLink')}
@@ -378,13 +351,7 @@ export function ActorDetailDialog({ actor, open, onOpenChange, onEdit, onSocialA
                                                 <Table className="min-w-[560px]">
                                                     <TableHeader>
                                                         <TableRow>
-                                                            {[
-                                                                'Platform',
-                                                                'Handle',
-                                                                'Followers',
-                                                                'Following',
-                                                                'Status',
-                                                            ].map((header) => (
+                                                            {['Platform', 'Handle', 'Followers', 'Following', 'Status'].map((header) => (
                                                                 <TableHead key={header}>{header}</TableHead>
                                                             ))}
                                                         </TableRow>
@@ -392,24 +359,12 @@ export function ActorDetailDialog({ actor, open, onOpenChange, onEdit, onSocialA
                                                     <TableBody>
                                                         {socialAccounts.map((account) => (
                                                             <TableRow key={account.uuid}>
-                                                                <TableCell className="font-medium capitalize">
-                                                                    {account.platform}
-                                                                </TableCell>
+                                                                <TableCell className="font-medium capitalize">{account.platform}</TableCell>
                                                                 <TableCell>{account.handle || '—'}</TableCell>
-                                                                <TableCell className="tabular-nums">
-                                                                    {formatFollowers(account.follower_count)}
-                                                                </TableCell>
-                                                                <TableCell className="tabular-nums">
-                                                                    {formatFollowers(account.following_count)}
-                                                                </TableCell>
+                                                                <TableCell className="tabular-nums">{formatFollowers(account.follower_count)}</TableCell>
+                                                                <TableCell className="tabular-nums">{formatFollowers(account.following_count)}</TableCell>
                                                                 <TableCell>
-                                                                    <Badge
-                                                                        variant={
-                                                                            account.status === 'ACTIVE'
-                                                                                ? 'default'
-                                                                                : 'secondary'
-                                                                        }
-                                                                    >
+                                                                    <Badge variant={account.status === 'ACTIVE' ? 'default' : 'secondary'}>
                                                                         {account.status}
                                                                     </Badge>
                                                                 </TableCell>
@@ -420,9 +375,7 @@ export function ActorDetailDialog({ actor, open, onOpenChange, onEdit, onSocialA
                                             </div>
                                         </>
                                     ) : (
-                                        <p className="px-6 text-sm text-muted-foreground">
-                                            {t('influencers.noSocialAccounts')}
-                                        </p>
+                                        <p className="px-6 text-sm text-muted-foreground">{t('influencers.noSocialAccounts')}</p>
                                     )}
                                 </CardContent>
                             </Card>

@@ -47,6 +47,7 @@ export interface Campaign {
         id: number
         uuid: string
         company_name?: string
+        brand_name?: string | null
         company_email?: string | null
         full_name?: string
         customer_code?: string
@@ -161,6 +162,14 @@ export const campaignApi = createApi({
                 params,
             }),
         }),
+        getCampaignsList: builder.query<CampaignRes, { page?: number; limit?: number; keyword?: string | null } | void>({
+            query: (params) => ({
+                url: `/v1/campaigns`,
+                method: 'GET',
+                params: params || {},
+            }),
+            providesTags: ['campaignApi'],
+        }),
         getCampaignDetailByUuid: builder.query<
             { status: string; data: CampaignDetail },
             { uuid: string }
@@ -201,6 +210,16 @@ export const campaignApi = createApi({
                 body,
             }),
             invalidatesTags: ['campaignApi'],
+        }),
+        deleteCampaign: builder.mutation<
+            { status: string; message: string; data?: any },
+            number | string
+        >({
+            query: (id) => ({
+                url: `/v1/campaigns/${id}`,
+                method: 'DELETE',
+            }),
+            invalidatesTags: ['campaignApi', 'campaignInfluencers'],
         }),
         getCampaignInfluencers: builder.query<{ status: string; data: CampaignInfluencerItem[] }, string>({
             query: (uuid) => ({
@@ -273,9 +292,11 @@ export const campaignApi = createApi({
 
 export const {
     useGetCampaignsMutation,
+    useGetCampaignsListQuery,
     useGetCampaignDetailByUuidQuery,
     useCreateCampaignMutation,
     useUpdateCampaignMutation,
+    useDeleteCampaignMutation,
     useGetCampaignInfluencersQuery,
     useAddCampaignInfluencerMutation,
     useUpdateCampaignInfluencerMutation,

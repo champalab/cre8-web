@@ -93,6 +93,10 @@ span.listValue {
     font-weight: 500;
 }
 
+.text-white{
+    color: #ffffff;
+}
+
 .listMember {
     list-style: none;
     color: var(--legacy-secondary);

@@ -26,13 +26,20 @@ import CustomersTable, {
     getCustomerComment,
 } from './components/CustomersTable'
 import CustomerFormDialog, { CustomerFormData } from './components/CustomerFormDialog'
+import { combinePhoneWithDialCode, parsePhoneAndCountry } from '@/components/CountryPhoneInput'
 
 const emptyForm: CustomerFormData = {
     full_name: '',
+    brand_name: '',
+    business_type: '',
+    website: '',
+    address: '',
     email: '',
     phone: '',
+    country: 'LA',
     comment: '',
     status: 'ACTIVE',
+    password: '',
 }
 
 const CUSTOMER_VIEW_KEY = 'customers:display-mode'
@@ -82,12 +89,20 @@ const CustomersPage: React.FC = () => {
 
     const openEdit = (customer: Customer) => {
         setEditUuid(customer.uuid)
+        const rawPhone = getCustomerPhone(customer) === '-' ? '' : getCustomerPhone(customer)
+        const parsed = parsePhoneAndCountry(rawPhone, customer.country || 'LA')
         setForm({
             full_name: getCustomerFullName(customer) === '-' ? '' : getCustomerFullName(customer),
+            brand_name: customer.brand_name || '',
+            business_type: customer.business_type || '',
+            website: customer.website || '',
+            address: customer.address || '',
             email: getCustomerEmail(customer) === '-' ? '' : getCustomerEmail(customer),
-            phone: getCustomerPhone(customer) === '-' ? '' : getCustomerPhone(customer),
+            phone: parsed.phone,
+            country: customer.country || parsed.country || 'LA',
             comment: getCustomerComment(customer) === '-' ? '' : getCustomerComment(customer),
             status: customer.status,
+            password: '',
         })
         setOpen(true)
     }
@@ -97,12 +112,26 @@ const CustomersPage: React.FC = () => {
             return alertWarning({ text: t('customers.enterFullName') })
         }
 
+        const cleanPhone = (form.phone || '').replace(/\D/g, '')
+        if (cleanPhone.length !== 10) {
+            return alertWarning({ text: t('customers.phone10DigitsRequired') })
+        }
+
+        const countryCode = form.country || 'LA'
+        const fullPhoneWithoutPlus = combinePhoneWithDialCode(cleanPhone, countryCode)
+
         const payload = {
             full_name: form.full_name.trim(),
+            brand_name: form.brand_name?.trim() || undefined,
+            business_type: form.business_type?.trim() || undefined,
+            website: form.website?.trim() || undefined,
+            address: form.address?.trim() || undefined,
             email: form.email?.trim() || undefined,
-            phone: form.phone?.trim() || undefined,
+            phone: fullPhoneWithoutPlus,
+            country: countryCode,
             comment: form.comment?.trim() || undefined,
             status: form.status,
+            ...(form.password?.trim() ? { password: form.password.trim() } : {}),
         }
 
         const response = editUuid
@@ -115,7 +144,6 @@ const CustomersPage: React.FC = () => {
 
         setOpen(false)
         resetForm()
-
     }
 
     const handleDelete = async (customer: Customer) => {

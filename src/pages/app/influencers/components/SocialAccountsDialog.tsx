@@ -13,7 +13,7 @@ import {
     useGetProfileMetricsBatchStatusMutation,
     useRefreshAllInfluencerSocialAccountsMutation,
     useRefreshInfluencerSocialAccountMutation,
-    useUpsertInfluencerSocialAccountMutation,
+    useUpsertInfluencerSocialAccountMutation
 } from '@/stores/services/actorApi'
 import BackdropComponent from '@/components/BackdropComponent'
 import ToastComponent from '@/components/ToastComponent'
@@ -25,30 +25,11 @@ import SafeImage from '@/components/ui/SafeImage'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogHeader,
-    DialogTitle,
-} from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@/components/ui/select'
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from '@/components/ui/table'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { ProfileMetricsHistoryDialog } from './ProfileMetricsHistoryDialog'
 
@@ -69,7 +50,7 @@ const emptyForm = {
     profile_url: '',
     handle: '',
     follower_count: '',
-    following_count: '',
+    following_count: ''
 }
 
 const formatCount = (value: string | number | null | undefined) => {
@@ -79,8 +60,16 @@ const formatCount = (value: string | number | null | undefined) => {
     return num.toLocaleString()
 }
 
-const canFetchProfileMetrics = (platform: string) =>
-    PROFILE_METRIC_PLATFORMS.includes(platform.toLowerCase() as (typeof PROFILE_METRIC_PLATFORMS)[number])
+const getCountFontSize = (value: string | number | null | undefined) => {
+    if (value == null || value === '') return 'text-base sm:text-lg'
+    const len = String(formatCount(value)).length
+    if (len >= 12) return 'text-[11px] sm:text-xs'
+    if (len >= 9) return 'text-xs sm:text-sm'
+    if (len >= 7) return 'text-sm sm:text-base'
+    return 'text-base sm:text-lg'
+}
+
+const canFetchProfileMetrics = (platform: string) => PROFILE_METRIC_PLATFORMS.includes(platform.toLowerCase() as (typeof PROFILE_METRIC_PLATFORMS)[number])
 
 type Props = {
     actor: Actor | null
@@ -104,12 +93,11 @@ export function SocialAccountsDialog({ actor, open, onOpenChange, onUpdated }: P
     const formCardRef = useRef<HTMLDivElement | null>(null)
 
     const { data, isLoading, isFetching, refetch } = useGetInfluencerSocialAccountsQuery(actor?.uuid ?? '', {
-        skip: !open || !actor?.uuid,
+        skip: !open || !actor?.uuid
     })
     const [upsertSocialAccount, { isLoading: saving }] = useUpsertInfluencerSocialAccountMutation()
     const [refreshSocialAccount] = useRefreshInfluencerSocialAccountMutation()
-    const [refreshAllSocialAccounts, { isLoading: queueingAll }] =
-        useRefreshAllInfluencerSocialAccountsMutation()
+    const [refreshAllSocialAccounts, { isLoading: queueingAll }] = useRefreshAllInfluencerSocialAccountsMutation()
     const [getBatchStatus] = useGetProfileMetricsBatchStatusMutation()
     const [disconnectOAuth, { isLoading: disconnectingOAuth }] = useDisconnectOAuthConnectionMutation()
     const [getOAuthConnectUrl, { isLoading: connectingOAuth }] = useGetOAuthConnectUrlMutation()
@@ -164,14 +152,8 @@ export function SocialAccountsDialog({ actor, open, onOpenChange, onUpdated }: P
         }
     }
 
-    const { data: facebookOAuth } = useGetOAuthConnectionStatusQuery(
-        { platform: 'facebook', actorId: actor?.id ?? 0 },
-        { skip: !open || !actor?.id }
-    )
-    const { data: tiktokOAuth } = useGetOAuthConnectionStatusQuery(
-        { platform: 'tiktok', actorId: actor?.id ?? 0 },
-        { skip: !open || !actor?.id }
-    )
+    const { data: facebookOAuth } = useGetOAuthConnectionStatusQuery({ platform: 'facebook', actorId: actor?.id ?? 0 }, { skip: !open || !actor?.id })
+    const { data: tiktokOAuth } = useGetOAuthConnectionStatusQuery({ platform: 'tiktok', actorId: actor?.id ?? 0 }, { skip: !open || !actor?.id })
 
     const accounts: InfluencerSocialAccount[] = data?.data ?? actor?.influencer_social_accounts ?? []
     const facebookConnected = Boolean(facebookOAuth?.data?.connected)
@@ -179,13 +161,9 @@ export function SocialAccountsDialog({ actor, open, onOpenChange, onUpdated }: P
 
     const linkedPlatforms = useMemo(() => new Set(accounts.map((item) => item.platform)), [accounts])
 
-    const availablePlatforms = SOCIAL_PLATFORMS.filter(
-        (platform) => !linkedPlatforms.has(platform) || platform === form.platform
-    )
+    const availablePlatforms = SOCIAL_PLATFORMS.filter((platform) => !linkedPlatforms.has(platform) || platform === form.platform)
 
-    const fetchableCount = accounts.filter(
-        (account) => canFetchProfileMetrics(account.platform) && Boolean(account.profile_url)
-    ).length
+    const fetchableCount = accounts.filter((account) => canFetchProfileMetrics(account.platform) && Boolean(account.profile_url)).length
 
     useEffect(() => {
         if (!open || !actor) {
@@ -193,9 +171,7 @@ export function SocialAccountsDialog({ actor, open, onOpenChange, onUpdated }: P
             return
         }
 
-        const nextPlatform = SOCIAL_PLATFORMS.find(
-            (platform) => !accounts.some((item) => item.platform === platform)
-        )
+        const nextPlatform = SOCIAL_PLATFORMS.find((platform) => !accounts.some((item) => item.platform === platform))
         if (nextPlatform) {
             setForm({ ...emptyForm, platform: nextPlatform })
             return
@@ -207,14 +183,8 @@ export function SocialAccountsDialog({ actor, open, onOpenChange, onUpdated }: P
                 platform: first.platform,
                 profile_url: first.profile_url,
                 handle: first.handle ?? '',
-                follower_count:
-                    first.follower_count != null && first.follower_count !== ''
-                        ? String(first.follower_count)
-                        : '',
-                following_count:
-                    first.following_count != null && first.following_count !== ''
-                        ? String(first.following_count)
-                        : '',
+                follower_count: first.follower_count != null && first.follower_count !== '' ? String(first.follower_count) : '',
+                following_count: first.following_count != null && first.following_count !== '' ? String(first.following_count) : ''
             })
         } else {
             setForm(emptyForm)
@@ -236,7 +206,7 @@ export function SocialAccountsDialog({ actor, open, onOpenChange, onUpdated }: P
                 setBatchProgress({
                     total: status.total,
                     finished: status.finished,
-                    failed: status.failed,
+                    failed: status.failed
                 })
                 if (status.done) {
                     setBatchId(null)
@@ -247,7 +217,7 @@ export function SocialAccountsDialog({ actor, open, onOpenChange, onUpdated }: P
                         message:
                             status.failed > 0
                                 ? `Profile metrics done ${status.completed}/${status.total}; failed ${status.failed}`
-                                : `Profile metrics refreshed for ${status.completed} platforms`,
+                                : `Profile metrics refreshed for ${status.completed} platforms`
                     })
                 }
             } catch {
@@ -272,14 +242,8 @@ export function SocialAccountsDialog({ actor, open, onOpenChange, onUpdated }: P
                 platform,
                 profile_url: existing.profile_url,
                 handle: existing.handle ?? '',
-                follower_count:
-                    existing.follower_count != null && existing.follower_count !== ''
-                        ? String(existing.follower_count)
-                        : '',
-                following_count:
-                    existing.following_count != null && existing.following_count !== ''
-                        ? String(existing.following_count)
-                        : '',
+                follower_count: existing.follower_count != null && existing.follower_count !== '' ? String(existing.follower_count) : '',
+                following_count: existing.following_count != null && existing.following_count !== '' ? String(existing.following_count) : ''
             })
             return
         }
@@ -305,10 +269,8 @@ export function SocialAccountsDialog({ actor, open, onOpenChange, onUpdated }: P
                 profile_url: form.profile_url.trim(),
                 handle: form.handle.trim() || undefined,
                 follower_count: form.follower_count.trim() ? Number(form.follower_count) : undefined,
-                following_count: form.following_count.trim()
-                    ? Number(form.following_count)
-                    : undefined,
-            },
+                following_count: form.following_count.trim() ? Number(form.following_count) : undefined
+            }
         })
 
         const payload = getMutationPayload(response)
@@ -328,7 +290,7 @@ export function SocialAccountsDialog({ actor, open, onOpenChange, onUpdated }: P
         try {
             const response = await refreshSocialAccount({
                 uuid: actor.uuid,
-                accountUuid: account.uuid,
+                accountUuid: account.uuid
             })
             const payload = getMutationPayload(response)
             if (payload) ToastComponent(payload)
@@ -345,7 +307,7 @@ export function SocialAccountsDialog({ actor, open, onOpenChange, onUpdated }: P
         if (!actor?.uuid) return
         if (fetchableCount === 0) {
             return alertWarning({
-                text: 'No TikTok / Facebook / Instagram profile URLs to fetch',
+                text: 'No TikTok / Facebook / Instagram profile URLs to fetch'
             })
         }
         try {
@@ -353,31 +315,30 @@ export function SocialAccountsDialog({ actor, open, onOpenChange, onUpdated }: P
             if (response.data.queued === 0) {
                 ToastComponent({
                     status: 'warning',
-                    message: 'No eligible profiles queued',
+                    message: 'No eligible profiles queued'
                 })
                 return
             }
             setBatchProgress({
                 total: response.data.queued,
                 finished: 0,
-                failed: 0,
+                failed: 0
             })
             setBatchId(response.data.batch_id)
             ToastComponent({
                 status: 'success',
-                message: `Queued ${response.data.queued} profile metrics in background`,
+                message: `Queued ${response.data.queued} profile metrics in background`
             })
         } catch (error: any) {
             ToastComponent({
                 status: 'error',
-                message: error?.data?.message || 'Failed to queue profile metrics',
+                message: error?.data?.message || 'Failed to queue profile metrics'
             })
         }
     }
 
     const isEditing = linkedPlatforms.has(form.platform)
-    const busy =
-        isLoading || isFetching || saving || queueingAll || Boolean(batchId) || disconnectingOAuth
+    const busy = isLoading || isFetching || saving || queueingAll || Boolean(batchId) || disconnectingOAuth
 
     const renderAccountActions = (account: InfluencerSocialAccount) => (
         <TooltipProvider>
@@ -446,11 +407,7 @@ export function SocialAccountsDialog({ actor, open, onOpenChange, onUpdated }: P
                                     void handleRefresh(account)
                                 }}
                             >
-                                {refreshingAccountUuid === account.uuid ? (
-                                    <Loader2 className="size-4 animate-spin" />
-                                ) : (
-                                    <Globe2Icon className="size-4" />
-                                )}
+                                {refreshingAccountUuid === account.uuid ? <Loader2 className="size-4 animate-spin" /> : <Globe2Icon className="size-4" />}
                             </Button>
                         </TooltipTrigger>
                         <TooltipContent>{t('influencers.refreshTooltip')}</TooltipContent>
@@ -471,9 +428,7 @@ export function SocialAccountsDialog({ actor, open, onOpenChange, onUpdated }: P
                             <Link2 className="size-5" />
                             Social Accounts
                         </DialogTitle>
-                        <DialogDescription>
-                            {t('influencers.socialAccountsDesc')}
-                        </DialogDescription>
+                        <DialogDescription>{t('influencers.socialAccountsDesc')}</DialogDescription>
                     </DialogHeader>
 
                     {actor && (
@@ -492,12 +447,8 @@ export function SocialAccountsDialog({ actor, open, onOpenChange, onUpdated }: P
                                     </Avatar>
                                     <div className="min-w-0">
                                         <p className="font-semibold">{actor.name}</p>
-                                        <p className="truncate text-xs text-muted-foreground">
-                                            {actor.email || actor.uuid}
-                                        </p>
-                                        <p className="truncate text-xs text-muted-foreground">
-                                            {actor.phone_number || t('influencers.noPhone')}
-                                        </p>
+                                        <p className="truncate text-xs text-muted-foreground">{actor.email || actor.uuid}</p>
+                                        <p className="truncate text-xs text-muted-foreground">{actor.phone_number || t('influencers.noPhone')}</p>
                                         {batchProgress && batchId ? (
                                             <p className="mt-1 text-xs font-medium text-primary">
                                                 {t('influencers.fetchingProfiles', {
@@ -517,11 +468,7 @@ export function SocialAccountsDialog({ actor, open, onOpenChange, onUpdated }: P
                                             onClick={handleRefreshAll}
                                             disabled={queueingAll || Boolean(batchId) || fetchableCount === 0}
                                         >
-                                            {queueingAll || batchId ? (
-                                                <Loader2 className="size-4 animate-spin" />
-                                            ) : (
-                                                <Globe2Icon className="size-4" />
-                                            )}
+                                            {queueingAll || batchId ? <Loader2 className="size-4 animate-spin" /> : <Globe2Icon className="size-4" />}
                                             {batchId ? t('influencers.gettingMetrics') : t('influencers.getAllMetrics')}
                                         </Button>
                                     </div>
@@ -533,9 +480,7 @@ export function SocialAccountsDialog({ actor, open, onOpenChange, onUpdated }: P
                                         <Badge variant={tiktokConnected ? 'default' : 'secondary'}>
                                             {tiktokConnected ? t('influencers.ttConnected') : t('influencers.ttNotConnected')}
                                         </Badge>
-                                        <span className="w-full text-right sm:w-auto">
-                                            {t('influencers.oauthMetricsHint')}
-                                        </span>
+                                        <span className="w-full text-right sm:w-auto">{t('influencers.oauthMetricsHint')}</span>
                                     </div>
                                 </div>
                             </div>
@@ -694,7 +639,7 @@ export function SocialAccountsDialog({ actor, open, onOpenChange, onUpdated }: P
                                 <CardContent className="p-0 pb-4">
                                     {accounts.length > 0 ? (
                                         <>
-                                            <div className="grid gap-3 px-4 sm:grid-cols-2 xl:grid-cols-3">
+                                            <div className="grid gap-3.5 px-4 sm:grid-cols-2">
                                                 {accounts.map((account) => (
                                                     <div
                                                         key={account.uuid}
@@ -707,45 +652,76 @@ export function SocialAccountsDialog({ actor, open, onOpenChange, onUpdated }: P
                                                                     {account.platform.slice(0, 2)}
                                                                 </div>
                                                                 <div className="min-w-0">
-                                                                    <p className="font-semibold capitalize">
-                                                                        {account.platform}
-                                                                    </p>
+                                                                    <p className="font-semibold capitalize">{account.platform}</p>
                                                                     <p className="truncate text-xs text-muted-foreground">
                                                                         {account.handle || t('influencers.noHandle')}
                                                                     </p>
                                                                 </div>
                                                             </div>
-                                                            <Badge
-                                                                variant={
-                                                                    account.status === 'ACTIVE'
-                                                                        ? 'default'
-                                                                        : 'secondary'
-                                                                }
-                                                            >
-                                                                {account.status}
-                                                            </Badge>
+                                                            <Badge variant={account.status === 'ACTIVE' ? 'default' : 'secondary'}>{account.status}</Badge>
                                                         </div>
-                                                        <div className="mt-4 grid grid-cols-2 gap-2">
-                                                            <div className="rounded-lg border bg-background/80 p-3">
-                                                                <p className="text-xs text-muted-foreground">
+                                                        <div
+                                                            className={`mt-4 grid ${account.like_count != null || account.platform.toLowerCase() === 'tiktok' ? 'grid-cols-3' : 'grid-cols-2'} gap-2`}
+                                                        >
+                                                            <div
+                                                                className="rounded-lg border bg-background/80 p-2 sm:p-2.5 min-w-0 overflow-hidden"
+                                                                title={formatCount(account.follower_count)}
+                                                            >
+                                                                <p className="text-[10px] sm:text-xs text-muted-foreground truncate">
                                                                     {t('influencers.followers')}
                                                                 </p>
-                                                                <p className="mt-1 text-xl font-bold tracking-tight tabular-nums">
+                                                                <p
+                                                                    className={`mt-0.5 font-bold tracking-tight tabular-nums truncate ${getCountFontSize(account.follower_count)}`}
+                                                                >
                                                                     {formatCount(account.follower_count)}
                                                                 </p>
                                                             </div>
-                                                            <div className="rounded-lg border bg-background/80 p-3">
-                                                                <p className="text-xs text-muted-foreground">
+                                                            <div
+                                                                className="rounded-lg border bg-background/80 p-2 sm:p-2.5 min-w-0 overflow-hidden"
+                                                                title={formatCount(account.following_count)}
+                                                            >
+                                                                <p className="text-[10px] sm:text-xs text-muted-foreground truncate">
                                                                     {t('influencers.following')}
                                                                 </p>
-                                                                <p className="mt-1 text-xl font-bold tracking-tight tabular-nums">
+                                                                <p
+                                                                    className={`mt-0.5 font-bold tracking-tight tabular-nums truncate ${getCountFontSize(account.following_count)}`}
+                                                                >
                                                                     {formatCount(account.following_count)}
                                                                 </p>
                                                             </div>
+                                                            {(account.like_count != null || account.platform.toLowerCase() === 'tiktok') && (
+                                                                <div
+                                                                    className="rounded-lg border bg-background/80 p-2 sm:p-2.5 min-w-0 overflow-hidden"
+                                                                    title={formatCount(account.like_count)}
+                                                                >
+                                                                    <p className="text-[10px] sm:text-xs text-muted-foreground truncate">
+                                                                        {t('influencers.likes')}
+                                                                    </p>
+                                                                    <p
+                                                                        className={`mt-0.5 font-bold tracking-tight tabular-nums truncate text-rose-500 ${getCountFontSize(account.like_count)}`}
+                                                                    >
+                                                                        {formatCount(account.like_count)}
+                                                                    </p>
+                                                                </div>
+                                                            )}
                                                         </div>
-                                                        <p className="mt-3 truncate text-xs text-muted-foreground" title={account.profile_url}>
-                                                            {account.profile_url}
-                                                        </p>
+                                                        {account.profile_url ? (
+                                                            <a
+                                                                href={account.profile_url}
+                                                                target="_blank"
+                                                                rel="noopener noreferrer"
+                                                                onClick={(e) => e.stopPropagation()}
+                                                                className="mt-3 inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-primary transition-colors group/link max-w-full"
+                                                                title={`Open ${account.platform} profile in new tab`}
+                                                            >
+                                                                <ExternalLink className="size-3 shrink-0 text-muted-foreground group-hover/link:text-primary transition-colors" />
+                                                                <span className="truncate underline-offset-4 group-hover/link:underline">
+                                                                    {account.profile_url}
+                                                                </span>
+                                                            </a>
+                                                        ) : (
+                                                            <p className="mt-3 truncate text-xs text-muted-foreground">—</p>
+                                                        )}
                                                         <p className="mt-1 text-[11px] text-muted-foreground">
                                                             {t('influencers.lastSync', { date: formatDateTime(account.last_scraped_at) })}
                                                         </p>
@@ -761,10 +737,7 @@ export function SocialAccountsDialog({ actor, open, onOpenChange, onUpdated }: P
                                                                 ) : null}
                                                             </div>
                                                         ) : null}
-                                                        <div
-                                                            className="mt-3 flex justify-end border-t pt-2"
-                                                            onClick={(e) => e.stopPropagation()}
-                                                        >
+                                                        <div className="mt-3 flex justify-end border-t pt-2" onClick={(e) => e.stopPropagation()}>
                                                             {renderAccountActions(account)}
                                                         </div>
                                                     </div>
@@ -775,55 +748,28 @@ export function SocialAccountsDialog({ actor, open, onOpenChange, onUpdated }: P
                                                 <Table className="min-w-[760px]">
                                                     <TableHeader>
                                                         <TableRow>
-                                                            {[
-                                                                'Platform',
-                                                                'Handle',
-                                                                'Followers',
-                                                                'Following',
-                                                                'Source',
-                                                                'Last Scraped',
-                                                                'Status',
-                                                                '',
-                                                            ].map((header) => (
-                                                                <TableHead
-                                                                    key={header || 'actions'}
-                                                                    className={
-                                                                        header === '' ? 'text-right' : undefined
-                                                                    }
-                                                                >
-                                                                    {header}
-                                                                </TableHead>
-                                                            ))}
+                                                            {['Platform', 'Handle', 'Followers', 'Following', 'Source', 'Last Scraped', 'Status', ''].map(
+                                                                (header) => (
+                                                                    <TableHead key={header || 'actions'} className={header === '' ? 'text-right' : undefined}>
+                                                                        {header}
+                                                                    </TableHead>
+                                                                )
+                                                            )}
                                                         </TableRow>
                                                     </TableHeader>
                                                     <TableBody>
                                                         {accounts.map((account) => (
                                                             <TableRow
                                                                 key={account.uuid}
-                                                                className={
-                                                                    form.platform === account.platform
-                                                                        ? 'bg-muted/40'
-                                                                        : undefined
-                                                                }
-                                                                onClick={() =>
-                                                                    handlePlatformChange(account.platform)
-                                                                }
+                                                                className={form.platform === account.platform ? 'bg-muted/40' : undefined}
+                                                                onClick={() => handlePlatformChange(account.platform)}
                                                             >
-                                                                <TableCell className="font-medium capitalize">
-                                                                    {account.platform}
-                                                                </TableCell>
+                                                                <TableCell className="font-medium capitalize">{account.platform}</TableCell>
                                                                 <TableCell>{account.handle || '—'}</TableCell>
-                                                                <TableCell className="tabular-nums">
-                                                                    {formatCount(account.follower_count)}
-                                                                </TableCell>
-                                                                <TableCell className="tabular-nums">
-                                                                    {formatCount(account.following_count)}
-                                                                </TableCell>
+                                                                <TableCell className="tabular-nums">{formatCount(account.follower_count)}</TableCell>
+                                                                <TableCell className="tabular-nums">{formatCount(account.following_count)}</TableCell>
                                                                 <TableCell>
-                                                                    <Badge
-                                                                        variant="outline"
-                                                                        className="font-normal"
-                                                                    >
+                                                                    <Badge variant="outline" className="font-normal">
                                                                         {account.follower_source}
                                                                     </Badge>
                                                                 </TableCell>
@@ -831,9 +777,7 @@ export function SocialAccountsDialog({ actor, open, onOpenChange, onUpdated }: P
                                                                     {formatDateTime(account.last_scraped_at)}
                                                                     {account.last_error_code ? (
                                                                         <div className="max-w-[160px]">
-                                                                            <div className="truncate text-destructive">
-                                                                                {account.last_error_code}
-                                                                            </div>
+                                                                            <div className="truncate text-destructive">{account.last_error_code}</div>
                                                                             {account.last_error_message ? (
                                                                                 <div
                                                                                     className="mt-0.5 line-clamp-2 text-[10px] text-muted-foreground"
@@ -846,19 +790,11 @@ export function SocialAccountsDialog({ actor, open, onOpenChange, onUpdated }: P
                                                                     ) : null}
                                                                 </TableCell>
                                                                 <TableCell>
-                                                                    <Badge
-                                                                        variant={
-                                                                            account.status === 'ACTIVE'
-                                                                                ? 'default'
-                                                                                : 'secondary'
-                                                                        }
-                                                                    >
+                                                                    <Badge variant={account.status === 'ACTIVE' ? 'default' : 'secondary'}>
                                                                         {account.status}
                                                                     </Badge>
                                                                 </TableCell>
-                                                                <TableCell className="whitespace-nowrap text-right">
-                                                                    {renderAccountActions(account)}
-                                                                </TableCell>
+                                                                <TableCell className="whitespace-nowrap text-right">{renderAccountActions(account)}</TableCell>
                                                             </TableRow>
                                                         ))}
                                                     </TableBody>
@@ -866,9 +802,7 @@ export function SocialAccountsDialog({ actor, open, onOpenChange, onUpdated }: P
                                             </div>
                                         </>
                                     ) : (
-                                        <p className="px-6 pb-2 text-sm text-muted-foreground">
-                                            {t('influencers.addProfileUrlPrompt')}
-                                        </p>
+                                        <p className="px-6 pb-2 text-sm text-muted-foreground">{t('influencers.addProfileUrlPrompt')}</p>
                                     )}
                                 </CardContent>
                             </Card>
@@ -878,9 +812,7 @@ export function SocialAccountsDialog({ actor, open, onOpenChange, onUpdated }: P
                                     <CardTitle className="text-base">
                                         {isEditing ? t('influencers.editSocialAccount') : t('influencers.addSocialAccount')}
                                     </CardTitle>
-                                    <CardDescription>
-                                        {t('influencers.socialAccountDesc')}
-                                    </CardDescription>
+                                    <CardDescription>{t('influencers.socialAccountDesc')}</CardDescription>
                                 </CardHeader>
                                 <CardContent>
                                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -895,9 +827,7 @@ export function SocialAccountsDialog({ actor, open, onOpenChange, onUpdated }: P
                                                         <SelectItem key={platform} value={platform}>
                                                             {platform}
                                                             {linkedPlatforms.has(platform) ? t('influencers.linkedLabel') : ''}
-                                                            {canFetchProfileMetrics(platform)
-                                                                ? ''
-                                                                : t('influencers.noAutoMetrics')}
+                                                            {canFetchProfileMetrics(platform) ? '' : t('influencers.noAutoMetrics')}
                                                         </SelectItem>
                                                     ))}
                                                 </SelectContent>
@@ -908,9 +838,7 @@ export function SocialAccountsDialog({ actor, open, onOpenChange, onUpdated }: P
                                             <Input
                                                 id="social_handle"
                                                 value={form.handle}
-                                                onChange={(e) =>
-                                                    setForm({ ...form, handle: e.target.value })
-                                                }
+                                                onChange={(e) => setForm({ ...form, handle: e.target.value })}
                                                 placeholder="username"
                                             />
                                         </div>
@@ -921,31 +849,27 @@ export function SocialAccountsDialog({ actor, open, onOpenChange, onUpdated }: P
                                                 value={form.profile_url}
                                                 onChange={(e) => {
                                                     const profileUrl = e.target.value
-                                                    const existing = accounts.find(
-                                                        (item) => item.platform === form.platform
-                                                    )
-                                                    const changed =
-                                                        existing != null &&
-                                                        existing.profile_url !== profileUrl
+                                                    const existing = accounts.find((item) => item.platform === form.platform)
+                                                    const changed = existing != null && existing.profile_url !== profileUrl
                                                     setForm({
                                                         ...form,
                                                         profile_url: profileUrl,
                                                         ...(changed
                                                             ? {
-                                                                follower_count: '',
-                                                                following_count: '',
-                                                            }
-                                                            : {}),
+                                                                  follower_count: '',
+                                                                  following_count: ''
+                                                              }
+                                                            : {})
                                                     })
                                                 }}
                                                 placeholder={
                                                     form.platform === 'tiktok'
                                                         ? 'https://www.tiktok.com/@username'
                                                         : form.platform === 'instagram'
-                                                            ? 'https://www.instagram.com/username'
-                                                            : form.platform === 'facebook'
-                                                                ? 'https://www.facebook.com/username'
-                                                                : 'https://...'
+                                                          ? 'https://www.instagram.com/username'
+                                                          : form.platform === 'facebook'
+                                                            ? 'https://www.facebook.com/username'
+                                                            : 'https://...'
                                                 }
                                             />
                                         </div>
@@ -956,9 +880,7 @@ export function SocialAccountsDialog({ actor, open, onOpenChange, onUpdated }: P
                                                 type="number"
                                                 min={0}
                                                 value={form.follower_count}
-                                                onChange={(e) =>
-                                                    setForm({ ...form, follower_count: e.target.value })
-                                                }
+                                                onChange={(e) => setForm({ ...form, follower_count: e.target.value })}
                                             />
                                         </div>
                                         <div className="grid gap-2">
@@ -968,17 +890,11 @@ export function SocialAccountsDialog({ actor, open, onOpenChange, onUpdated }: P
                                                 type="number"
                                                 min={0}
                                                 value={form.following_count}
-                                                onChange={(e) =>
-                                                    setForm({ ...form, following_count: e.target.value })
-                                                }
+                                                onChange={(e) => setForm({ ...form, following_count: e.target.value })}
                                             />
                                         </div>
                                         <div className="flex flex-col gap-2 sm:col-span-2 sm:flex-row sm:items-end">
-                                            <Button
-                                                className="w-full sm:w-auto"
-                                                onClick={handleSubmit}
-                                                disabled={saving || Boolean(batchId)}
-                                            >
+                                            <Button className="w-full sm:w-auto" onClick={handleSubmit} disabled={saving || Boolean(batchId)}>
                                                 {isEditing ? t('influencers.updateBtn') : t('influencers.addSocialAccount')}
                                             </Button>
                                             {isEditing ? (
@@ -986,12 +902,8 @@ export function SocialAccountsDialog({ actor, open, onOpenChange, onUpdated }: P
                                                     variant="outline"
                                                     className="w-full sm:w-auto"
                                                     onClick={() => {
-                                                        const next = SOCIAL_PLATFORMS.find(
-                                                            (p) => !linkedPlatforms.has(p)
-                                                        )
-                                                        setForm(
-                                                            next ? { ...emptyForm, platform: next } : emptyForm
-                                                        )
+                                                        const next = SOCIAL_PLATFORMS.find((p) => !linkedPlatforms.has(p))
+                                                        setForm(next ? { ...emptyForm, platform: next } : emptyForm)
                                                     }}
                                                 >
                                                     {t('influencers.addNew')}

@@ -10,6 +10,7 @@ export interface InfluencerSocialAccount {
     handle: string | null
     follower_count: string | number | null
     following_count: string | number | null
+    like_count?: string | number | null
     follower_source: string
     status: string
     last_scraped_at: string | null
@@ -28,6 +29,7 @@ export interface ProfileMetricSnapshot {
     profile_url: string
     follower_count: string | number | null
     following_count: string | number | null
+    like_count: string | number | null
     source: string
     status: string
     error_code: string | null

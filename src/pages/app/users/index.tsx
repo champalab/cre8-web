@@ -13,7 +13,9 @@ const UsersPage: React.FC = () => {
     const [page] = useState(1)
 
     const [filter, setFilter] = useState<Filter>({
-        keyword: null
+        keyword: '',
+        role: 'ADMIN',
+        status: 'ALL'
     })
 
     const [data, setData] = useState([])
@@ -22,8 +24,14 @@ const UsersPage: React.FC = () => {
     const [onCreate, { isLoading: isLoadingCreate }] = useCreateUserMutation()
     const [onUpdate, { isLoading: isLoadingUpdate }] = useUpdateUserMutation()
 
-    const refetch = async () => {
-        const result = await onFetch({ ...filter, page })
+    const refetch = async (customFilter?: Filter) => {
+        const active = customFilter || filter
+        const payload: Record<string, any> = { page }
+        if (active.keyword?.trim()) payload.keyword = active.keyword.trim()
+        if (active.role && active.role !== 'ALL') payload.role = active.role
+        if (active.status && active.status !== 'ALL') payload.status = active.status
+
+        const result = await onFetch(payload)
         if ('data' in result && result.data && result.data.status === 'success') {
             setData(result.data.data)
         }
@@ -34,14 +42,11 @@ const UsersPage: React.FC = () => {
     }, [page])
 
     return (
-        <div>
+        <div className="space-y-4">
             <BackdropComponent open={isLoading || isLoadingUpdate || isLoadingCreate} />
-            <PageHeader
-                title={t('users.title')}
-                actions={<UserModal mode="create" onSubmit={onCreate} refetch={refetch} />}
-            />
-            <CardFilter onClick={refetch} setQuery={setFilter} query={filter} />
-            <TableComponent data={data} refetch={refetch} onUpdate={onUpdate} />
+            <PageHeader title={t('users.title')} actions={<UserModal mode="create" onSubmit={onCreate} refetch={() => refetch()} />} />
+            <CardFilter onSearch={refetch} onClick={() => refetch()} setQuery={setFilter} query={filter} />
+            <TableComponent data={data} refetch={() => refetch()} onUpdate={onUpdate} />
         </div>
     )
 }

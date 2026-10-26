@@ -11,11 +11,18 @@ import { RootState } from '@/stores'
 function NavLinkItem({ item, collapsed }: { item: NavItem; collapsed: boolean }) {
   const { t } = useTranslation('sidebar')
   const { pathname } = useLocation()
-  const label = t(item.nameKey)
-  const isActive =
-    (item.path === '/app/campaigns' && pathname.startsWith('/app/campaigns')) ||
-    matchPath({ path: item.path, end: true }, pathname) != null
+  const isCampaignDetailRoute =
+    pathname.startsWith('/app/campaign-reports') ||
+    (pathname.startsWith('/app/campaigns/') && pathname !== '/app/campaigns')
 
+  const isActive =
+    item.path === '/app/campaign-reports'
+      ? isCampaignDetailRoute
+      : item.path === '/app/campaigns'
+        ? pathname === '/app/campaigns'
+        : matchPath({ path: item.path, end: true }, pathname) != null
+
+  const label = t(item.nameKey)
   const Icon = item.icon
 
   const link = (

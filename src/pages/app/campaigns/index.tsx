@@ -18,12 +18,19 @@ import {
     RefreshCw,
     Search,
     Share2,
+    Trash2,
     Globe2Icon
 } from 'lucide-react'
-import { useCreateCampaignMutation, useGetCampaignsMutation, useUpdateCampaignMutation, Campaign } from '../../../stores/services/campaignApi'
+import {
+    useCreateCampaignMutation,
+    useGetCampaignsMutation,
+    useUpdateCampaignMutation,
+    useDeleteCampaignMutation,
+    Campaign
+} from '../../../stores/services/campaignApi'
 import BackdropComponent from '@/components/BackdropComponent'
 import { PageHeader } from '@/components/page-header'
-import { alertWarning } from '../../../utils/alerts'
+import { alertWarning, confirmDelete } from '../../../utils/alerts'
 import { getMutationPayload, isMutationSuccess } from '../../../utils/mutation-response'
 import ToastComponent from '../../../components/ToastComponent'
 import { useFetchAllMetricsMutation, useGetMetricsBatchStatusMutation } from '../../../stores/services/viewLogApi'
@@ -121,6 +128,7 @@ const CampaignsPage: React.FC = () => {
     const [fetchCampaigns, { isLoading }] = useGetCampaignsMutation()
     const [createCampaign, { isLoading: creating }] = useCreateCampaignMutation()
     const [updateCampaign, { isLoading: updating }] = useUpdateCampaignMutation()
+    const [deleteCampaign, { isLoading: deleting }] = useDeleteCampaignMutation()
     const [fetchAllMetrics, { isLoading: queueingMetrics }] = useFetchAllMetricsMutation()
     const [getBatchStatus] = useGetMetricsBatchStatusMutation()
 
@@ -226,6 +234,30 @@ const CampaignsPage: React.FC = () => {
         refetch()
     }
 
+    const handleDeleteCampaign = async (c: Campaign) => {
+        const confirmation = await confirmDelete({
+            title: t('campaigns.deleteTitle'),
+            text: t('campaigns.deleteText', { name: c.title }),
+            confirmButtonText: t('common:delete', 'Delete'),
+            cancelButtonText: t('common:cancel', 'Cancel')
+        })
+        if (!confirmation.isConfirmed) return
+
+        try {
+            const res = await deleteCampaign(c.id).unwrap()
+            ToastComponent({
+                status: 'success',
+                message: res.message || t('campaigns.deleteSuccess')
+            })
+            refetch()
+        } catch (error: any) {
+            ToastComponent({
+                status: 'error',
+                message: error?.data?.message || t('common:errorOccurred', 'An error occurred')
+            })
+        }
+    }
+
     const handleFetchMetrics = async (campaign_id: number) => {
         try {
             const res = await fetchAllMetrics({ campaign_id }).unwrap()
@@ -265,7 +297,7 @@ const CampaignsPage: React.FC = () => {
         return true
     }
 
-    const tableBusy = isLoading || creating || updating || queueingMetrics
+    const tableBusy = isLoading || creating || updating || deleting || queueingMetrics
 
     return (
         <div className="space-y-5">
@@ -472,6 +504,16 @@ const CampaignsPage: React.FC = () => {
                                                             >
                                                                 <Pencil className="size-3.5" />
                                                             </Button>
+
+                                                            <Button
+                                                                variant="ghost"
+                                                                size="icon"
+                                                                className="size-7 text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors"
+                                                                onClick={() => handleDeleteCampaign(row)}
+                                                                title={t('campaigns.deleteCampaign')}
+                                                            >
+                                                                <Trash2 className="size-3.5" />
+                                                            </Button>
                                                         </>
                                                     )}
                                                     <Button size="sm" variant="secondary" className="h-7 px-2.5 text-xs font-semibold gap-1" asChild>
@@ -578,14 +620,30 @@ const CampaignsPage: React.FC = () => {
                                                         )}
 
                                                         {canManage && (
-                                                            <Tooltip>
-                                                                <TooltipTrigger asChild>
-                                                                    <Button variant="ghost" size="icon" className="size-7" onClick={() => openEdit(row)}>
-                                                                        <Pencil className="size-3.5" />
-                                                                    </Button>
-                                                                </TooltipTrigger>
-                                                                <TooltipContent>{t('common:edit')}</TooltipContent>
-                                                            </Tooltip>
+                                                            <>
+                                                                <Tooltip>
+                                                                    <TooltipTrigger asChild>
+                                                                        <Button variant="ghost" size="icon" className="size-7" onClick={() => openEdit(row)}>
+                                                                            <Pencil className="size-3.5" />
+                                                                        </Button>
+                                                                    </TooltipTrigger>
+                                                                    <TooltipContent>{t('common:edit')}</TooltipContent>
+                                                                </Tooltip>
+
+                                                                <Tooltip>
+                                                                    <TooltipTrigger asChild>
+                                                                        <Button
+                                                                            variant="ghost"
+                                                                            size="icon"
+                                                                            className="size-7 text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors"
+                                                                            onClick={() => handleDeleteCampaign(row)}
+                                                                        >
+                                                                            <Trash2 className="size-3.5" />
+                                                                        </Button>
+                                                                    </TooltipTrigger>
+                                                                    <TooltipContent>{t('campaigns.deleteCampaign')}</TooltipContent>
+                                                                </Tooltip>
+                                                            </>
                                                         )}
                                                         <Tooltip>
                                                             <TooltipTrigger asChild>
