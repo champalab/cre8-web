@@ -205,6 +205,12 @@ function PublicFooter() {
           <Link to={localizePath('/contact', lang)} className="hover:text-white">
             {t('contact', { ns: 'nav' })}
           </Link>
+          <Link to={localizePath('/terms', lang)} className="hover:text-white">
+            {lang === 'lo' ? 'ເງື່ອນໄຂການບໍລິການ' : 'Terms of Service'}
+          </Link>
+          <Link to={localizePath('/privacy', lang)} className="hover:text-white">
+            {lang === 'lo' ? 'ນະໂຍບາຍຄວາມເປັນສ່ວນຕົວ' : 'Privacy Policy'}
+          </Link>
           <span>Tel/WA: 020 2224 1188</span>
           <span>cre8lao@gmail.com</span>
         </nav>

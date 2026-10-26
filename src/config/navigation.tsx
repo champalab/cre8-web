@@ -204,6 +204,30 @@ export const publicRoutes: PublicRouteItem[] = [
         path: '/downloader',
         routePath: 'downloader',
         component: lazyPage(() => import('../pages/public/video-downloader'))
+    },
+    {
+        name: 'terms',
+        path: '/terms',
+        routePath: 'terms',
+        component: lazyPage(() => import('../pages/public/legal/TermsPage'))
+    },
+    {
+        name: 'terms-en',
+        path: '/en/terms',
+        routePath: 'en/terms',
+        component: lazyPage(() => import('../pages/public/legal/TermsPage'))
+    },
+    {
+        name: 'privacy',
+        path: '/privacy',
+        routePath: 'privacy',
+        component: lazyPage(() => import('../pages/public/legal/PrivacyPage'))
+    },
+    {
+        name: 'privacy-en',
+        path: '/en/privacy',
+        routePath: 'en/privacy',
+        component: lazyPage(() => import('../pages/public/legal/PrivacyPage'))
     }
 ]
 

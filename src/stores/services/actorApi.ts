@@ -160,6 +160,16 @@ export const actorApi = createApi({
                 { type: 'oauthConnections', id: `${arg.platform}-${arg.actorId}` },
             ],
         }),
+        getOAuthConnectUrl: builder.mutation<
+            { status: string; data: { authorization_url: string } },
+            { platform: OAuthPlatform; actorId: number }
+        >({
+            query: ({ platform, actorId }) => ({
+                url: `/v1/integrations/${platform}/connect`,
+                method: 'GET',
+                params: { actor_id: actorId },
+            }),
+        }),
         createActor: builder.mutation<
             { status: string; data: Actor; message?: string },
             Pick<Actor, 'name' | 'email' | 'profile_url' | 'profile_urls' | 'phone_number' | 'status'>
@@ -303,4 +313,5 @@ export const {
     useGetProfileMetricSnapshotsQuery,
     useGetOAuthConnectionStatusQuery,
     useDisconnectOAuthConnectionMutation,
+    useGetOAuthConnectUrlMutation,
 } = actorApi
