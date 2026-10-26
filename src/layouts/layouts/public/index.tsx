@@ -199,8 +199,8 @@ function PublicFooter() {
           <Link to={localizePath('/services', lang)} className="hover:text-white">
             {t('services', { ns: 'nav' })}
           </Link>
-          <Link to={localizePath('/influencer-marketing', lang)} className="hover:text-white">
-            {t('pages.influencer-marketing.h1', { ns: 'seo' })}
+          <Link to={localizePath('/downloader', lang)} className="hover:text-white">
+            {t('pages.downloader.h1', { ns: 'seo' })}
           </Link>
           <Link to={localizePath('/contact', lang)} className="hover:text-white">
             {t('contact', { ns: 'nav' })}

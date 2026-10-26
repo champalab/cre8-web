@@ -1,5 +1,4 @@
-import React from 'react'
-import { countries, getEmojiFlag, type TCountryCode } from 'countries-list'
+import { countries, getEmojiFlag, type TCountryCode, type ICountry } from 'countries-list'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -12,7 +11,7 @@ export interface CountryOption {
     flag: string
 }
 
-export const COUNTRIES: CountryOption[] = Object.entries(countries)
+export const COUNTRIES: CountryOption[] = (Object.entries(countries) as [string, ICountry][])
     .map(([code, item]) => ({
         code,
         name: item.name,
