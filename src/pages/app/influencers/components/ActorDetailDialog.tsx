@@ -345,6 +345,7 @@ export function ActorDetailDialog({ actor, open, onOpenChange, onEdit, onSocialA
                                                             </a>
                                                         ) : null}
                                                     </div>
+
                                                 ))}
                                             </div>
                                             <div className="hidden">

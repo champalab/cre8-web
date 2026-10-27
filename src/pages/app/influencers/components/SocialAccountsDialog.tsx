@@ -472,160 +472,9 @@ export function SocialAccountsDialog({ actor, open, onOpenChange, onUpdated }: P
                                             {batchId ? t('influencers.gettingMetrics') : t('influencers.getAllMetrics')}
                                         </Button>
                                     </div>
-                                    <div className="flex w-full flex-wrap gap-1.5 text-[11px] text-muted-foreground sm:justify-end">
-                                        <Badge variant={facebookConnected ? 'default' : 'secondary'}>
-                                            {facebookConnected ? t('influencers.fbConnected') : t('influencers.fbNotConnected')}
-                                            {facebookOAuth?.data?.expiring_soon ? t('influencers.fbExpiring') : ''}
-                                        </Badge>
-                                        <Badge variant={tiktokConnected ? 'default' : 'secondary'}>
-                                            {tiktokConnected ? t('influencers.ttConnected') : t('influencers.ttNotConnected')}
-                                        </Badge>
-                                        <span className="w-full text-right sm:w-auto">{t('influencers.oauthMetricsHint')}</span>
-                                    </div>
+
                                 </div>
                             </div>
-
-                            {/* Official Social API Connections Card */}
-                            <Card className="border-primary/20 bg-gradient-to-br from-primary/[0.03] via-background to-background">
-                                <CardHeader className="pb-3">
-                                    <div className="flex items-center justify-between">
-                                        <div>
-                                            <CardTitle className="text-base flex items-center gap-2">
-                                                <Link2 className="size-4 text-primary" />
-                                                {t('influencers.officialApiConnections', { defaultValue: 'Official API Connections' })}
-                                            </CardTitle>
-                                            <CardDescription>
-                                                {t('influencers.officialApiConnectionsDesc', {
-                                                    defaultValue: 'Connect TikTok & Facebook accounts via official OAuth to automatically sync real-time video metrics.'
-                                                })}
-                                            </CardDescription>
-                                        </div>
-                                    </div>
-                                </CardHeader>
-                                <CardContent className="grid gap-3 sm:grid-cols-2">
-                                    {/* TikTok Card */}
-                                    <div className="flex flex-col justify-between rounded-xl border border-white/10 bg-white/[0.02] p-4 transition-all">
-                                        <div className="flex items-start justify-between gap-3">
-                                            <div className="flex items-center gap-3">
-                                                <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-black text-white border border-white/10">
-                                                    <TiktokIcon className="size-5" />
-                                                </div>
-                                                <div className="min-w-0">
-                                                    <div className="flex items-center gap-2">
-                                                        <span className="font-semibold text-sm">TikTok</span>
-                                                        <Badge variant={tiktokConnected ? 'default' : 'secondary'} className="text-[10px]">
-                                                            {tiktokConnected ? t('influencers.ttConnected') : t('influencers.ttNotConnected')}
-                                                        </Badge>
-                                                    </div>
-                                                    {tiktokConnected && tiktokOAuth?.data?.display_name ? (
-                                                        <p className="truncate text-xs text-muted-foreground mt-0.5">
-                                                            {tiktokOAuth.data.display_name}
-                                                        </p>
-                                                    ) : (
-                                                        <p className="text-xs text-muted-foreground mt-0.5">
-                                                            Login Kit & Display API
-                                                        </p>
-                                                    )}
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div className="mt-4 pt-3 border-t border-white/5 flex items-center justify-end">
-                                            {tiktokConnected ? (
-                                                <Button
-                                                    size="sm"
-                                                    variant="outline"
-                                                    className="text-xs text-destructive hover:bg-destructive/10 hover:text-destructive h-8"
-                                                    onClick={() => handleDisconnectOAuth('tiktok')}
-                                                    disabled={disconnectingOAuth && oauthActionPlatform === 'tiktok'}
-                                                >
-                                                    {disconnectingOAuth && oauthActionPlatform === 'tiktok' ? (
-                                                        <Loader2 className="size-3.5 animate-spin mr-1.5" />
-                                                    ) : (
-                                                        <Unplug className="size-3.5 mr-1.5" />
-                                                    )}
-                                                    Disconnect TikTok
-                                                </Button>
-                                            ) : (
-                                                <Button
-                                                    size="sm"
-                                                    className="text-xs bg-slate-900 hover:bg-black text-white dark:bg-white dark:text-black dark:hover:bg-slate-200 h-8 font-medium"
-                                                    onClick={() => handleConnectOAuth('tiktok')}
-                                                    disabled={connectingOAuth && oauthActionPlatform === 'tiktok'}
-                                                >
-                                                    {connectingOAuth && oauthActionPlatform === 'tiktok' ? (
-                                                        <Loader2 className="size-3.5 animate-spin mr-1.5" />
-                                                    ) : (
-                                                        <TiktokIcon className="size-3.5 mr-1.5" />
-                                                    )}
-                                                    Connect TikTok
-                                                </Button>
-                                            )}
-                                        </div>
-                                    </div>
-
-                                    {/* Facebook Card */}
-                                    <div className="flex flex-col justify-between rounded-xl border border-white/10 bg-white/[0.02] p-4 transition-all">
-                                        <div className="flex items-start justify-between gap-3">
-                                            <div className="flex items-center gap-3">
-                                                <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-[#1877F2]/15 text-[#1877F2]">
-                                                    <FacebookIcon className="size-5" />
-                                                </div>
-                                                <div className="min-w-0">
-                                                    <div className="flex items-center gap-2">
-                                                        <span className="font-semibold text-sm">Facebook</span>
-                                                        <Badge variant={facebookConnected ? 'default' : 'secondary'} className="text-[10px]">
-                                                            {facebookConnected ? t('influencers.fbConnected') : t('influencers.fbNotConnected')}
-                                                        </Badge>
-                                                    </div>
-                                                    {facebookConnected && facebookOAuth?.data?.display_name ? (
-                                                        <p className="truncate text-xs text-muted-foreground mt-0.5">
-                                                            {facebookOAuth.data.display_name}
-                                                        </p>
-                                                    ) : (
-                                                        <p className="text-xs text-muted-foreground mt-0.5">
-                                                            Graph API & Insights
-                                                        </p>
-                                                    )}
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div className="mt-4 pt-3 border-t border-white/5 flex items-center justify-end">
-                                            {facebookConnected ? (
-                                                <Button
-                                                    size="sm"
-                                                    variant="outline"
-                                                    className="text-xs text-destructive hover:bg-destructive/10 hover:text-destructive h-8"
-                                                    onClick={() => handleDisconnectOAuth('facebook')}
-                                                    disabled={disconnectingOAuth && oauthActionPlatform === 'facebook'}
-                                                >
-                                                    {disconnectingOAuth && oauthActionPlatform === 'facebook' ? (
-                                                        <Loader2 className="size-3.5 animate-spin mr-1.5" />
-                                                    ) : (
-                                                        <Unplug className="size-3.5 mr-1.5" />
-                                                    )}
-                                                    Disconnect Facebook
-                                                </Button>
-                                            ) : (
-                                                <Button
-                                                    size="sm"
-                                                    className="text-xs bg-[#1877F2] hover:bg-[#1877F2]/90 text-white h-8 font-medium"
-                                                    onClick={() => handleConnectOAuth('facebook')}
-                                                    disabled={connectingOAuth && oauthActionPlatform === 'facebook'}
-                                                >
-                                                    {connectingOAuth && oauthActionPlatform === 'facebook' ? (
-                                                        <Loader2 className="size-3.5 animate-spin mr-1.5" />
-                                                    ) : (
-                                                        <FacebookIcon className="size-3.5 mr-1.5" />
-                                                    )}
-                                                    Connect Facebook
-                                                </Button>
-                                            )}
-                                        </div>
-                                    </div>
-                                </CardContent>
-                            </Card>
 
                             <Card>
                                 <CardHeader className="pb-3">
@@ -856,9 +705,9 @@ export function SocialAccountsDialog({ actor, open, onOpenChange, onUpdated }: P
                                                         profile_url: profileUrl,
                                                         ...(changed
                                                             ? {
-                                                                  follower_count: '',
-                                                                  following_count: ''
-                                                              }
+                                                                follower_count: '',
+                                                                following_count: ''
+                                                            }
                                                             : {})
                                                     })
                                                 }}
@@ -866,10 +715,10 @@ export function SocialAccountsDialog({ actor, open, onOpenChange, onUpdated }: P
                                                     form.platform === 'tiktok'
                                                         ? 'https://www.tiktok.com/@username'
                                                         : form.platform === 'instagram'
-                                                          ? 'https://www.instagram.com/username'
-                                                          : form.platform === 'facebook'
-                                                            ? 'https://www.facebook.com/username'
-                                                            : 'https://...'
+                                                            ? 'https://www.instagram.com/username'
+                                                            : form.platform === 'facebook'
+                                                                ? 'https://www.facebook.com/username'
+                                                                : 'https://...'
                                                 }
                                             />
                                         </div>
