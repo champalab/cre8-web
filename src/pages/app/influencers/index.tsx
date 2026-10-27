@@ -24,7 +24,6 @@ import { ActorDetailDialog } from './components/ActorDetailDialog'
 import { ActorFormDialog } from './components/ActorFormDialog'
 import { ActorsSearchBar } from './components/ActorsSearchBar'
 import { ActorsStatsCards } from './components/ActorsStatsCards'
-import { SocialAccountsDialog } from './components/SocialAccountsDialog'
 import { emptyForm as emptyActorForm, getActorStatus } from './components/utils'
 import { useDebounce } from '@/hooks/useDebounce'
 import { ActorGridCard } from './components/ActorGridCard'
@@ -60,10 +59,9 @@ const ActorsPage: React.FC = () => {
     const [open, setOpen] = useState(false)
     const [editActor, setEditActor] = useState<Actor | null>(null)
     const [form, setForm] = useState(emptyActorForm)
-    const [socialActor, setSocialActor] = useState<Actor | null>(null)
-    const [socialOpen, setSocialOpen] = useState(false)
     const [detailActor, setDetailActor] = useState<Actor | null>(null)
     const [detailOpen, setDetailOpen] = useState(false)
+    const [detailTab, setDetailTab] = useState<'overview' | 'social'>('social')
     const [searchParams, setSearchParams] = useSearchParams()
     const [followBatchId, setFollowBatchId] = useState<string | null>(null)
     const [followBatchProgress, setFollowBatchProgress] = useState({
@@ -107,10 +105,6 @@ const ActorsPage: React.FC = () => {
         const list = Array.isArray(data.data) ? data.data : []
         setRows(list)
         setTotal(data.pagination ?? { totalItems: 0, totalPages: 0 })
-        if (socialActor) {
-            const updated = list.find((item: Actor) => item.id === socialActor.id)
-            if (updated) setSocialActor(updated)
-        }
         if (detailActor) {
             const updated = list.find((item: Actor) => item.id === detailActor.id)
             if (updated) setDetailActor(updated)
@@ -273,12 +267,14 @@ const ActorsPage: React.FC = () => {
     }
 
     const openSocialAccounts = (actor: Actor) => {
-        setSocialActor(actor)
-        setSocialOpen(true)
+        setDetailActor(actor)
+        setDetailTab('social')
+        setDetailOpen(true)
     }
 
     const openDetail = (actor: Actor) => {
         setDetailActor(actor)
+        setDetailTab('social')
         setDetailOpen(true)
     }
 
@@ -296,9 +292,9 @@ const ActorsPage: React.FC = () => {
         family_status: form.marital_status || null,
         tags: form.tags.trim()
             ? form.tags
-                  .split(',')
-                  .map((t) => t.trim())
-                  .filter(Boolean)
+                .split(',')
+                .map((t) => t.trim())
+                .filter(Boolean)
             : null,
         standard_price: form.standard_price ? Number(form.standard_price) : null,
         province_id: form.province_id ? Number(form.province_id) : null,
@@ -439,9 +435,8 @@ const ActorsPage: React.FC = () => {
                                         onClick={() => changeViewMode(mode)}
                                         aria-label={label}
                                         aria-pressed={viewMode === mode}
-                                        className={`flex h-9 items-center justify-center gap-2 rounded-lg px-3 text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
-                                            viewMode === mode ? 'bg-background text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'
-                                        }`}
+                                        className={`flex h-9 items-center justify-center gap-2 rounded-lg px-3 text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${viewMode === mode ? 'bg-background text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'
+                                            }`}
                                     >
                                         <Icon className="size-4" aria-hidden="true" />
                                         <span>{label}</span>
@@ -542,9 +537,15 @@ const ActorsPage: React.FC = () => {
                 isSubmitting={creating || updating}
             />
 
-            <ActorDetailDialog actor={detailActor} open={detailOpen} onOpenChange={setDetailOpen} onEdit={openEdit} onSocialAccounts={openSocialAccounts} />
-
-            <SocialAccountsDialog actor={socialActor} open={socialOpen} onOpenChange={setSocialOpen} onUpdated={refetch} />
+            <ActorDetailDialog
+                actor={detailActor}
+                open={detailOpen}
+                onOpenChange={setDetailOpen}
+                onEdit={openEdit}
+                onSocialAccounts={openSocialAccounts}
+                initialTab={detailTab}
+                onUpdated={refetch}
+            />
         </div>
     )
 }
